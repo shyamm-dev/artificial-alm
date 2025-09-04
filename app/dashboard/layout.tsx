@@ -1,4 +1,4 @@
-import UserProfileIsland from '@/components/UserProfileIsland';
+import UserProfileIsland from '@/components/user-profile-island';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 

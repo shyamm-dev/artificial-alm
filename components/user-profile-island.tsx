@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
 
 interface UserProfileIslandProps {
   userDetails: {
@@ -16,8 +17,15 @@ interface UserProfileIslandProps {
 }
 
 export default function UserProfileIsland({ userDetails }: UserProfileIslandProps) {
+  const router = useRouter();
   const handleSignOut = async () => {
-    await authClient.signOut();
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login");
+        },
+      },
+    });
   }
 
   return (

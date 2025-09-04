@@ -14,7 +14,7 @@ const TermsOfServicePage = () => {
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
         <p className="text-gray-700 leading-relaxed">
-          By accessing and using this application ("App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the App.
+          By accessing and using this application (&quot;App&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, you may not use the App.
         </p>
       </section>
 
@@ -51,7 +51,7 @@ const TermsOfServicePage = () => {
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">6. Limitation of Liability</h2>
         <p className="text-gray-700 leading-relaxed">
-          The App is provided "as is" without any warranties, express or implied. We do not guarantee the accuracy, completeness, or usefulness of any information on the App. We will not be liable for any direct, indirect, incidental, consequential, or punitive damages arising out of your use of, or inability to use, the App.
+          The App is provided &quot;as is&quot; without any warranties, express or implied. We do not guarantee the accuracy, completeness, or usefulness of any information on the App. We will not be liable for any direct, indirect, incidental, consequential, or punitive damages arising out of your use of, or inability to use, the App.
         </p>
       </section>
 

@@ -17,7 +17,7 @@ const PrivacyPolicyPage = () => {
                     Welcome to our Privacy Policy page. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about our policy, or our practices with regard to your personal information, please contact us.
                 </p>
                 <p className="text-gray-700 leading-relaxed mt-2">
-                    This Privacy Policy applies to all information collected through our website, and/or any related services, sales, marketing or events (we refer to them collectively in this Privacy Policy as the "Services").
+                    This Privacy Policy applies to all information collected through our website, and/or any related services, sales, marketing or events (we refer to them collectively in this Privacy Policy as the &quot;Services&quot;).
                 </p>
             </section>
 

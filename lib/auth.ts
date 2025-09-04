@@ -21,7 +21,7 @@ export const auth = betterAuth({
     },
 
     logger: {
-        disabled: (process.env.NODE_ENV as string) === "production",
+        disabled: process.env.NODE_ENV === "production",
         level: "debug",
     },
 
