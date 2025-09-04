@@ -10,7 +10,7 @@ export default async function Dashboard() {
     }
 
     return (
-        <div>
+        <div className="flex min-h-screen items-center justify-center">
             <h1>Welcome {session.user.name}</h1>
         </div>
     )

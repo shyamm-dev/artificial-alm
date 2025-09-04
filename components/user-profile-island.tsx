@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
+import { Loader2, LogOut } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 
@@ -17,11 +17,15 @@ interface UserProfileIslandProps {
 }
 
 export default function UserProfileIsland({ userDetails }: UserProfileIslandProps) {
+  const [isSigningOut, setIsSigningOut] = React.useState(false);
   const router = useRouter();
+
   const handleSignOut = async () => {
+    setIsSigningOut(true);
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
+          setIsSigningOut(false);
           router.push("/login");
         },
       },
@@ -42,8 +46,11 @@ export default function UserProfileIsland({ userDetails }: UserProfileIslandProp
         </div>
 
         {/* Signout Icon */}
-        <Button onClick={handleSignOut} variant="ghost" size="icon" className="text-gray-600 hover:text-red-500">
-          <LogOut className="h-6 w-6" />
+        <Button onClick={handleSignOut} disabled={isSigningOut} variant="ghost" size="icon" className="text-gray-600 hover:text-red-500">
+          {isSigningOut ?
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> :
+            <LogOut className="h-6 w-6" />
+          }
         </Button>
       </CardContent>
     </Card>

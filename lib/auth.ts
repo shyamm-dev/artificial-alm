@@ -20,6 +20,14 @@ export const auth = betterAuth({
         },
     },
 
+    // TODO : turborepo is messinbg with the cookies. during logut throws error. Works fine in prod build
+    // session: {
+    //     cookieCache: {
+    //         enabled: true,
+    //         maxAge: 5 * 60 // Cache duration in seconds
+    //     }
+    // },
+
     logger: {
         disabled: process.env.NODE_ENV === "production",
         level: "debug",
