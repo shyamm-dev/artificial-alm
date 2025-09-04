@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { authClient } from "@/lib/auth-client"
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 export function LoginForm({
   className,
@@ -21,10 +21,9 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
 
   const [isLoading, setIsLoading] = useState(false);
-
   const atlassianLogin = async () => {
     setIsLoading(true);
-    await authClient.signIn.social({ provider: "atlassian" });
+    await authClient.signIn.social({ provider: "atlassian", callbackURL: "/dashboard" });
     setIsLoading(false);
   }
 
