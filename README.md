@@ -1,36 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Artificial AML v3
 
-## Getting Started
+This is a Next.js project bootstrapped with `create-next-app`.
 
-First, run the development server:
+## Development Notes
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Server Actions
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Server actions should only be used for mutations** (e.g., creating, updating, or deleting data).
+- **Any action that fetches data must not use a server action.** Instead, fetch data directly in your components or use Route Handlers.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Using server actions for data fetching is discouraged because it issues an internal POST request. This has two major drawbacks:
+1.  **Caching:** Data fetched through POST requests cannot be cached by Next.js's Data Cache.
+2.  **Parallelism:** It breaks request parallelism. A new mutation, when triggered, has to wait until the previous data-fetching POST request completes.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Data Access and Security
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Centralize Data Operations:** All third-party API calls and database interactions must be handled through a dedicated Data Access Layer (DAL), located in `/lib/data-access-layer`. This ensures a single source of truth for data fetching and mutations.
+- **Session Verification:** Every method within the DAL must verify that a valid user session exists before proceeding with any operation.
+- **Access Token Validation:** For routes or methods that interact with protected third-party APIs, the access token must be retrieved and validated before making the external request.

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "./lib/get-server-session";
 
 export async function middleware(request: NextRequest) {
-    const session = await auth.api.getSession({ headers: await headers() });
+    const session = await getServerSession();
     const pathname = request.nextUrl.pathname;
 
     if (!session && pathname !== "/login") {
@@ -21,5 +20,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     runtime: "nodejs",
-    matcher: ["/", "/login", "/dashboard/:path*"],
+    matcher: [
+        "/", "/login", "/dashboard/:path*"
+    ],
 };

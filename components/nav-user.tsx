@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
-import { useState } from "react"
 
 export function NavUser({
   user,
@@ -42,15 +41,12 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar();
-  const [isSigningOut, setIsSigningOut] = useState(false);
   const router = useRouter();
 
   const handleSignOut = async () => {
-    setIsSigningOut(true);
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          setIsSigningOut(false);
           router.push("/login");
         },
       },
