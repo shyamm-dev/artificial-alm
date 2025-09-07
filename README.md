@@ -1,6 +1,7 @@
 # Artificial AML v3
 
-This is a Next.js project bootstrapped with `create-next-app`.
+This project uses the following Tech stack and Libs,
+Next.js + BetterAuth + Turso + Drizzle + Shadcn
 
 ## Development Notes
 
@@ -18,3 +19,44 @@ Using server actions for data fetching is discouraged because it issues an inter
 - **Centralize Data Operations:** All third-party API calls and database interactions must be handled through a dedicated Data Access Layer (DAL), located in `/lib/data-access-layer`. This ensures a single source of truth for data fetching and mutations.
 - **Session Verification:** Every method within the DAL must verify that a valid user session exists before proceeding with any operation.
 - **Access Token Validation:** For routes or methods that interact with protected third-party APIs, the access token must be retrieved and validated before making the external request.
+
+### Local Database Development
+
+To run a local database for development, you need to set the `TURSO_CONNECTION_URL` environment variable in your `.env.local` file:
+
+```
+TURSO_CONNECTION_URL=http://localhost:8080
+```
+
+Then, use Turso to start the local database:
+
+```bash
+turso dev --db-file local.db
+```
+
+This command starts a local Turso database using `local.db` as the file.
+
+### Database Migrations
+
+After making changes to your Drizzle schema (`db/schema.ts`), you need to:
+
+1.  **Generate a new migration:**
+    ```bash
+    pnpm drizzle-kit generate:sqlite
+    ```
+    This command will create a new migration file in the `migrations` directory.
+
+2.  **Apply the migration to your database:**
+    ```bash
+    pnpm drizzle-kit migrate
+    ```
+    This command applies the pending migrations to your `local.db` database.
+
+### Viewing Drizzle Studio
+
+To view your database schema and data using Drizzle Studio:
+
+```bash
+pnpm drizzle-kit studio
+```
+This command will open Drizzle Studio in your browser, allowing you to inspect your database.
