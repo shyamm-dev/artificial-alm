@@ -1,6 +1,6 @@
 import { getAtlassianAccessToken } from "@/lib/get-server-secrets";
-import type { JiraPaginatedProjectsResponse } from "./types";
-import { Result, tryCatch } from "@/lib/utils/try-catch";
+import type { JiraAccessibleResourcesResponse, JiraPaginatedProjectsResponse } from "./types";
+import { Result, tryCatch } from "@/lib/try-catch";
 
 export interface JiraRequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"; // now required
@@ -13,7 +13,7 @@ export interface JiraRequestOptions {
  * Makes a Jira API request and wraps result in Result<T, Error>.
  * Method must be explicitly provided.
  */
-export async function makeJiraRequest<T = any>(cloudId: string, endpoint: string, options: JiraRequestOptions): Promise<Result<T>> {
+export async function makeJiraRequest<T = any>(cloudId: string, endpoint: string, options: JiraRequestOptions) {
   return tryCatch(
     (async () => {
       const token = await getAtlassianAccessToken();
@@ -32,7 +32,7 @@ export async function makeJiraRequest<T = any>(cloudId: string, endpoint: string
       const res = await fetch(url, {
         method: options.method,
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token.accessToken}`,
           Accept: "application/json",
           "Content-Type": "application/json",
           ...options.headers,
@@ -52,12 +52,40 @@ export async function makeJiraRequest<T = any>(cloudId: string, endpoint: string
 }
 
 /**
+ * Fetch all Jira accessible resources (sites) for the current user.
+ */
+export async function getAccessibleResources() {
+  return tryCatch(
+    (async () => {
+      const token = await getAtlassianAccessToken();
+      if (!token) throw new Error("No Atlassian access token available");
+
+      const res = await fetch("https://api.atlassian.com/oauth/token/accessible-resources", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
+          Accept: "application/json",
+        }
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Failed to fetch accessible resources ${res.status}: ${text}`);
+      }
+
+      return (await res.json()) as JiraAccessibleResourcesResponse;
+    })()
+  );
+}
+
+
+/**
  * Get paginated Jira projects using cloudId
  */
-export async function getPaginatedProjects(cloudId: string, startAt = 0, maxResults = 50): Promise<Result<JiraPaginatedProjectsResponse>> {
+export async function getPaginatedJiraProjects(cloudId: string) {
   return makeJiraRequest<JiraPaginatedProjectsResponse>(
     cloudId,
     "/project/search",
-    { method: "GET", params: { startAt, maxResults } }
+    { method: "GET" }
   );
 }
