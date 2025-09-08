@@ -86,6 +86,6 @@ export async function getPaginatedJiraProjects(cloudId: string) {
   return makeJiraRequest<JiraPaginatedProjectsResponse>(
     cloudId,
     "/project/search",
-    { method: "GET" }
+    { method: "GET", params: { expand: "description,lead,issueTypes,url,projectKeys,permissions,insight" } }
   );
 }
