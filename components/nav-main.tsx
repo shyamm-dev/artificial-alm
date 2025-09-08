@@ -1,6 +1,5 @@
 "use client"
 
-import { type Icon } from "@tabler/icons-react"
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,17 +9,10 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils/tailwind-utils"
+import { NavItem } from "@/lib/navigation"
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string
-    url: string
-    icon?: Icon
-  }[]
-}) {
+export function NavMain({ items }: { items: NavItem[] }) {
   const pathname = usePathname()
 
   return (

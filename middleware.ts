@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "./lib/get-server-session";
+import { getServerSession } from "./lib/get-server-secrets";
 
 export async function middleware(request: NextRequest) {
     const session = await getServerSession();

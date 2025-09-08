@@ -1,17 +1,10 @@
-"use client"
+"use client";
 
 import {
-  IconDashboard,
-  IconFolder,
   IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSettings,
 } from "@tabler/icons-react";
 
-import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -22,40 +15,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-
-const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: IconDashboard,
-    },
-    {
-      title: "Projects",
-      url: "/projects",
-      icon: IconFolder,
-    },
-    {
-      title: "Testcase",
-      url: "/testcase",
-      icon: IconListDetails,
-    }
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    }
-  ],
-  documents: [
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    }
-  ],
-}
+import { navOptions } from "@/lib/navigation";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
@@ -77,9 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={navOptions} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
