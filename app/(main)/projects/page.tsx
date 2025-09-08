@@ -1,7 +1,10 @@
 import { getAccessibleResources, getPaginatedJiraProjects } from "@/lib/data-access-layer/atlassian-api/jira";
 import { JiraAccessibleResource, JiraProject } from "@/lib/data-access-layer/atlassian-api/types";
+import { Button } from "@/components/ui/button";
+import { IconRefresh } from "@tabler/icons-react";
+import ProjectAccordian from "./project-accordian";
 
-interface SiteWithProjects extends JiraAccessibleResource {
+export interface SiteWithProjects extends JiraAccessibleResource {
   projects: JiraProject[];
 }
 
@@ -26,9 +29,26 @@ export default async function ProjectsPage() {
   );
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Projects</h1>
-      Project accordian goes here
-    </div>
+    <>
+      <div className="px-4 lg:px-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Projects</h1>
+            <p className="text-muted-foreground">
+              something goes here
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button className="flex items-center gap-2">
+              <IconRefresh className="h-4 w-4" />
+              Sync Changes
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="px-4 lg:px-6">
+        <ProjectAccordian sitesData={sitesWithProjects} />
+      </div>
+    </>
   );
 }

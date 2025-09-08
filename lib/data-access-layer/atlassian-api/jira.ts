@@ -1,13 +1,16 @@
 import { getAtlassianAccessToken } from "@/lib/get-server-secrets";
 import type { JiraAccessibleResourcesResponse, JiraPaginatedProjectsResponse } from "./types";
-import { Result, tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/lib/try-catch";
 
 export interface JiraRequestOptions {
-  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"; // now required
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   headers?: Record<string, string>;
   params?: Record<string, string | number | boolean>;
   body?: any;
 }
+
+const AccessibleResourceEndpoint = 'https://api.atlassian.com/oauth/token/accessible-resources';
+const JiraCloudEndpoint = 'https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3<endpoint>';
 
 /**
  * Makes a Jira API request and wraps result in Result<T, Error>.
@@ -19,7 +22,7 @@ export async function makeJiraRequest<T = any>(cloudId: string, endpoint: string
       const token = await getAtlassianAccessToken();
       if (!token) throw new Error("No Atlassian access token available");
 
-      let url = `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3${endpoint}`;
+      let url = JiraCloudEndpoint.replace('<cloudId>', cloudId).replace('<endpoint>', endpoint);
 
       if (options.params) {
         const params = new URLSearchParams();
@@ -60,7 +63,7 @@ export async function getAccessibleResources() {
       const token = await getAtlassianAccessToken();
       if (!token) throw new Error("No Atlassian access token available");
 
-      const res = await fetch("https://api.atlassian.com/oauth/token/accessible-resources", {
+      const res = await fetch(AccessibleResourceEndpoint, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token.accessToken}`,

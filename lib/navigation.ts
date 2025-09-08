@@ -14,8 +14,8 @@ export type NavItem = {
 };
 
 export const navOptions: NavItem[] = [
-  { pageTitle: "Dashboard", title: "Dashboard", url: "/dashboard", icon: IconDashboard, },
-  { pageTitle: "Manage Projects And Compliance", title: "Projects", url: "/projects", icon: IconFolder, },
-  { pageTitle: "Schedule Testcase Generation", title: "Scheduler", url: "/scheduler", icon: IconCalendar, },
-  { pageTitle: "Track Testcase Progress", title: "Testcase", url: "/testcase", icon: IconListDetails, }
+  { title: "Dashboard", url: "/dashboard", pageTitle: "Dashboard", icon: IconDashboard, },
+  { title: "Projects", url: "/projects", pageTitle: "Manage Projects And Compliance", icon: IconFolder, },
+  { title: "Scheduler", url: "/scheduler", pageTitle: "Schedule Testcase Generation", icon: IconCalendar, },
+  { title: "Testcase", url: "/testcase", pageTitle: "Track Testcase Progress", icon: IconListDetails, }
 ];
