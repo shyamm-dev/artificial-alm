@@ -10,87 +10,81 @@ export interface JiraRequestOptions {
   body?: any;
 }
 
-const AccessibleResourceEndpoint = 'https://api.atlassian.com/oauth/token/accessible-resources';
-const JiraCloudEndpoint = 'https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3<endpoint>';
+export class JiraClient {
+  private static readonly ACCESSIBLE_RESOURCE_ENDPOINT = 'https://api.atlassian.com/oauth/token/accessible-resources';
+  private static readonly JIRA_CLOUD_ENDPOINT = 'https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3<endpoint>';
 
-/**
- * Makes a Jira API request and wraps result in Result<T, Error>.
- * Method must be explicitly provided.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function makeJiraRequest<T = any>(cloudId: string, endpoint: string, options: JiraRequestOptions) {
-  return tryCatch(
-    (async () => {
-      const token = await getAtlassianAccessToken();
-      if (!token) throw new Error("No Atlassian access token available");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async makeRequest<T = any>(cloudId: string, endpoint: string, options: JiraRequestOptions) {
+    return tryCatch(
+      (async () => {
+        const token = await getAtlassianAccessToken();
+        if (!token) throw new Error("No Atlassian access token available");
 
-      let url = JiraCloudEndpoint.replace('<cloudId>', cloudId).replace('<endpoint>', endpoint);
+        let url = JiraClient.JIRA_CLOUD_ENDPOINT.replace('<cloudId>', cloudId).replace('<endpoint>', endpoint);
 
-      if (options.params) {
-        const params = new URLSearchParams();
-        Object.entries(options.params).forEach(([key, value]) => {
-          params.append(key, String(value));
-        });
-        url += `?${params.toString()}`;
-      }
-
-      const res = await fetch(url, {
-        method: options.method,
-        headers: {
-          Authorization: `Bearer ${token.accessToken}`,
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
-        ...(options.body && { body: JSON.stringify(options.body) }),
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Jira API request failed ${res.status}: ${text}`);
-      }
-
-      if (res.status === 204) return {} as T;
-      return (await res.json()) as T;
-    })()
-  );
-}
-
-/**
- * Fetch all Jira accessible resources (sites) for the current user.
- */
-export async function getAccessibleResources() {
-  return tryCatch(
-    (async () => {
-      const token = await getAtlassianAccessToken();
-      if (!token) throw new Error("No Atlassian access token available");
-
-      const res = await fetch(AccessibleResourceEndpoint, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token.accessToken}`,
-          Accept: "application/json",
+        if (options.params) {
+          const params = new URLSearchParams();
+          Object.entries(options.params).forEach(([key, value]) => {
+            params.append(key, String(value));
+          });
+          url += `?${params.toString()}`;
         }
-      });
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Failed to fetch accessible resources ${res.status}: ${text}`);
-      }
+        const res = await fetch(url, {
+          method: options.method,
+          headers: {
+            Authorization: `Bearer ${token.accessToken}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            ...options.headers,
+          },
+          ...(options.body && { body: JSON.stringify(options.body) }),
+        });
 
-      return (await res.json()) as JiraAccessibleResourcesResponse;
-    })()
-  );
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Jira API request failed ${res.status}: ${text}`);
+        }
+
+        if (res.status === 204) return {} as T;
+        return (await res.json()) as T;
+      })()
+    );
+  }
+
+  async getAccessibleResources() {
+    return tryCatch(
+      (async () => {
+        const token = await getAtlassianAccessToken();
+        if (!token) throw new Error("No Atlassian access token available");
+
+        const res = await fetch(JiraClient.ACCESSIBLE_RESOURCE_ENDPOINT, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token.accessToken}`,
+            Accept: "application/json",
+          }
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Failed to fetch accessible resources ${res.status}: ${text}`);
+        }
+
+        return (await res.json()) as JiraAccessibleResourcesResponse;
+      })()
+    );
+  }
+
+  async getPaginatedProjects(cloudId: string) {
+    return this.makeRequest<JiraPaginatedProjectsResponse>(
+      cloudId,
+      "/project/search",
+      { method: "GET", params: { expand: "description,lead,issueTypes,url,projectKeys,permissions,insight" } }
+    );
+  }
 }
 
-
-/**
- * Get paginated Jira projects using cloudId
- */
-export async function getPaginatedJiraProjects(cloudId: string) {
-  return makeJiraRequest<JiraPaginatedProjectsResponse>(
-    cloudId,
-    "/project/search",
-    { method: "GET", params: { expand: "description,lead,issueTypes,url,projectKeys,permissions,insight" } }
-  );
-}
+// Export singleton instance
+export const jiraClient = new JiraClient();

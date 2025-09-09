@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { IconRefresh } from "@tabler/icons-react";
 import ProjectAccordian from "./project-accordian";
-import { getAccessibleResources, getPaginatedJiraProjects } from "@/data-access-layer/atlassian-cloud-api/jira";
 import { JiraAccessibleResource, JiraProject } from "@/data-access-layer/atlassian-cloud-api/types";
+import { jiraClient } from "@/data-access-layer/atlassian-cloud-api/jira";
 
 export interface SiteWithProjects extends JiraAccessibleResource {
   projects: JiraProject[];
 }
 
 export default async function ProjectsPage() {
-  const resourcesResult = await getAccessibleResources();
+  const resourcesResult = await jiraClient.getAccessibleResources();
   if (resourcesResult.error) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -20,7 +20,7 @@ export default async function ProjectsPage() {
 
   const sitesWithProjects: SiteWithProjects[] = await Promise.all(
     resourcesResult.data.map(async (site) => {
-      const projectsResult = await getPaginatedJiraProjects(site.id);
+      const projectsResult = await jiraClient.getPaginatedProjects(site.id);
       return {
         ...site,
         projects: projectsResult.data?.values || [],

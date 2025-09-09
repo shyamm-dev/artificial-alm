@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { SettingsIcon, BarChart3Icon } from "lucide-react"
-import ProjectSheet from "./project-sheet"
 import Image from "next/image"
+import ProjectSheet from "./project-sheet"
 import { JiraProject } from "@/data-access-layer/atlassian-cloud-api/types"
 
 interface ExtendedProject extends JiraProject {
@@ -20,12 +20,12 @@ interface ExtendedProject extends JiraProject {
 interface ProjectCardProps {
   project: ExtendedProject;
   siteId: string;
-  onProjectSelection: (siteId: string, projectId: string, isSelected: boolean) => void;
-  onSettingsClick: (project: ExtendedProject) => void;
   selectedProject: ExtendedProject | null;
   siteName: string;
   siteUrl: string;
   availableStandards: string[];
+  onProjectSelection: (siteId: string, projectId: string, isSelected: boolean) => void;
+  onSettingsClick: (project: ExtendedProject) => void;
   onComplianceStandardToggle: (standard: string) => void;
 }
 
@@ -106,7 +106,10 @@ export default function ProjectCard({
                         <Image
                           src={issueType.iconUrl}
                           alt={issueType.name}
+                          width={12}
+                          height={12}
                           className="h-3 w-3 cursor-help"
+                          unoptimized
                         />
                       </TooltipTrigger>
                       <TooltipContent>

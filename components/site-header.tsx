@@ -9,7 +9,7 @@ import { navOptions } from "@/lib/navigation";
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const [title, setTitle] = useState("Dashboard");
+  const [title, setTitle] = useState("");
 
   useEffect(() => {
     const item = navOptions.find(item => pathname.includes(item.url));

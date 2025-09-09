@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { JiraProject } from "@/data-access-layer/atlassian-cloud-api/types"
 import Image from "next/image"
+import { JiraProject } from "@/data-access-layer/atlassian-cloud-api/types"
+
 
 interface ExtendedProject extends JiraProject {
   isSelected: boolean;
@@ -70,7 +71,10 @@ export default function ProjectSheet({
                         <Image
                           src={issueType.iconUrl}
                           alt={issueType.name}
+                          width={16}
+                          height={16}
                           className="h-4 w-4"
+                          unoptimized
                         />
                         <span className="text-xs">{issueType.name}</span>
                       </div>
@@ -89,11 +93,15 @@ export default function ProjectSheet({
             <div>
               <h4 className="text-sm font-medium mb-3">Active Standards</h4>
               <div className="flex flex-wrap gap-2">
-                {project.complianceStandards.map((standard: string) => (
-                  <Badge key={standard} variant="default">
-                    {standard}
-                  </Badge>
-                ))}
+                {project.complianceStandards.length > 0 ? (
+                  project.complianceStandards.map((standard: string) => (
+                    <Badge key={standard} variant="default">
+                      {standard}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className="text-sm text-muted-foreground">NA</span>
+                )}
               </div>
             </div>
             <div>
