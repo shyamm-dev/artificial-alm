@@ -13,6 +13,7 @@ export interface JiraRequestOptions {
 export class JiraClient {
   private static readonly ACCESSIBLE_RESOURCE_ENDPOINT = 'https://api.atlassian.com/oauth/token/accessible-resources';
   private static readonly JIRA_CLOUD_ENDPOINT = 'https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3<endpoint>';
+  private static readonly JIRA_PROJECT_DEFAULT_EXPAND = 'description,issueTypes,insight';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async makeRequest<T = any>(cloudId: string, endpoint: string, options: JiraRequestOptions) {
@@ -81,7 +82,7 @@ export class JiraClient {
     return this.makeRequest<JiraPaginatedProjectsResponse>(
       cloudId,
       "/project/search",
-      { method: "GET", params: { expand: "description,lead,issueTypes,url,projectKeys,permissions,insight" } }
+      { method: "GET", params: { expand: JiraClient.JIRA_PROJECT_DEFAULT_EXPAND } }
     );
   }
 }

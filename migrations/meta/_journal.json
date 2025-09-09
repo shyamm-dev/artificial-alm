@@ -8,6 +8,20 @@
       "when": 1756966464786,
       "tag": "0000_daily_ma_gnuci",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1757415872552,
+      "tag": "0001_flimsy_carlie_cooper",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1757420089927,
+      "tag": "0002_open_smasher",
+      "breakpoints": true
     }
   ]
 }

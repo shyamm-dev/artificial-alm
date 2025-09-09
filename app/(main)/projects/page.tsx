@@ -28,6 +28,8 @@ export default async function ProjectsPage() {
     })
   );
 
+  console.log(sitesWithProjects);
+
   return (
     <>
       <div className="px-4 lg:px-6">
