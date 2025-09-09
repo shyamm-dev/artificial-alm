@@ -1,8 +1,8 @@
-import { getAccessibleResources, getPaginatedJiraProjects } from "@/lib/data-access-layer/atlassian-api/jira";
-import { JiraAccessibleResource, JiraProject } from "@/lib/data-access-layer/atlassian-api/types";
 import { Button } from "@/components/ui/button";
 import { IconRefresh } from "@tabler/icons-react";
 import ProjectAccordian from "./project-accordian";
+import { getAccessibleResources, getPaginatedJiraProjects } from "@/data-access-layer/atlassian-cloud-api/jira";
+import { JiraAccessibleResource, JiraProject } from "@/data-access-layer/atlassian-cloud-api/types";
 
 export interface SiteWithProjects extends JiraAccessibleResource {
   projects: JiraProject[];

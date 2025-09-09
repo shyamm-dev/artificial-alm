@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/sheet"
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { JiraProject } from "@/lib/data-access-layer/atlassian-api/types"
+import { JiraProject } from "@/data-access-layer/atlassian-cloud-api/types"
+import Image from "next/image"
 
 interface ExtendedProject extends JiraProject {
   isSelected: boolean;
@@ -66,7 +67,7 @@ export default function ProjectSheet({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="flex items-center gap-2 p-2 border rounded-md cursor-help">
-                        <img
+                        <Image
                           src={issueType.iconUrl}
                           alt={issueType.name}
                           className="h-4 w-4"

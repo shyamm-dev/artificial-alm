@@ -1,4 +1,4 @@
-import { getAtlassianAccessToken } from "@/lib/get-server-secrets";
+import { getAtlassianAccessToken } from "@/lib/get-server-access-token";
 import type { JiraAccessibleResourcesResponse, JiraPaginatedProjectsResponse } from "./types";
 import { tryCatch } from "@/lib/try-catch";
 
@@ -6,6 +6,7 @@ export interface JiraRequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   headers?: Record<string, string>;
   params?: Record<string, string | number | boolean>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body?: any;
 }
 
@@ -16,6 +17,7 @@ const JiraCloudEndpoint = 'https://api.atlassian.com/ex/jira/<cloudId>/rest/api/
  * Makes a Jira API request and wraps result in Result<T, Error>.
  * Method must be explicitly provided.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function makeJiraRequest<T = any>(cloudId: string, endpoint: string, options: JiraRequestOptions) {
   return tryCatch(
     (async () => {

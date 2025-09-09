@@ -7,8 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { ExternalLinkIcon } from "lucide-react"
 import { SiteWithProjects } from "./page"
-import { JiraProject } from "@/lib/data-access-layer/atlassian-api/types"
 import ProjectCard from "./project-card"
+import { JiraProject } from "@/data-access-layer/atlassian-cloud-api/types"
 
 interface ExtendedProject extends JiraProject {
   isSelected: boolean;
