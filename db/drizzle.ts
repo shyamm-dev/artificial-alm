@@ -7,6 +7,5 @@ export const db = drizzle({
   connection: {
     url: process.env.TURSO_CONNECTION_URL!,
     authToken: process.env.TURSO_AUTH_TOKEN!,
-  },
-  logger: process.env.NODE_ENV === 'development',
+  }
 });

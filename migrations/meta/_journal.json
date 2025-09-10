@@ -22,6 +22,41 @@
       "when": 1757420089927,
       "tag": "0002_open_smasher",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1757477640111,
+      "tag": "0003_regular_tigra",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1757481107889,
+      "tag": "0004_wooden_preak",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1757483816495,
+      "tag": "0005_useful_vampiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1757487536987,
+      "tag": "0006_fearless_the_professor",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1757498886005,
+      "tag": "0007_jazzy_the_executioner",
+      "breakpoints": true
     }
   ]
 }

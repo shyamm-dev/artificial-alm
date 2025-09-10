@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { SettingsIcon, BarChart3Icon } from "lucide-react"
 import Image from "next/image"
 import ProjectSheet from "./project-sheet"
-import { JiraProject } from "@/data-access-layer/atlassian-cloud-api/types"
+import { JiraProject } from "@/data-access-layer/types"
 
 interface ExtendedProject extends JiraProject {
   isSelected: boolean;

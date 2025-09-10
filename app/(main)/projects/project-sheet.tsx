@@ -15,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Image from "next/image"
-import { JiraProject } from "@/data-access-layer/atlassian-cloud-api/types"
+import { JiraProject } from "@/data-access-layer/types"
 
 
 interface ExtendedProject extends JiraProject {

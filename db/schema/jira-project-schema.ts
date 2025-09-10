@@ -1,6 +1,7 @@
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { atlassianResource } from "./atlassian-resource-schema";
 import { timestamps } from "../helper/timestamp-helper";
+import { ComplianceFramework } from "@/constants/compliance";
 
 export const jiraProject = sqliteTable("jira_project", {
   id: text("id").primaryKey(), // Jira's project id
@@ -19,18 +20,12 @@ export const jiraProject = sqliteTable("jira_project", {
   avatar24: text("avatar_24"),
   avatar16: text("avatar_16"),
 
-  // Inlined Insight
-  totalIssueCount: integer("total_issue_count"),
-  lastIssueUpdateTime: text("last_issue_update_time"),
-
   // FK to Atlassian Resource (site)
   resourceId: integer("resource_id").notNull().references(() => atlassianResource.id, { onDelete: "cascade" }),
 
   ...timestamps
 },
-  (table) => [
-    index("idx_jiraProject_resourceId").on(table.resourceId),
-  ]
+  (table) => [index("idx_jira_project_resource_id").on(table.resourceId)]
 );
 
 export const jiraProjectIssueType = sqliteTable("jira_project_issue_type", {
@@ -46,7 +41,27 @@ export const jiraProjectIssueType = sqliteTable("jira_project_issue_type", {
 
   ...timestamps
 },
+  (table) => [index("idx_jira_project_issue_type_project_id").on(table.projectId)]
+);
+
+export const jiraProjectCompliance = sqliteTable("jira_project_compliance", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
+  framework: text("framework").$type<ComplianceFramework>().notNull(),
+
+  ...timestamps
+},
+  (table) => [index("idx_project_compliance_project_id").on(table.projectId)]
+);
+
+export const projectMetadata = sqliteTable("project_metadata", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  projectId: text("project_id").unique().notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
+  imported: integer("imported", { mode: "boolean" }).default(false).notNull(),
+
+  ...timestamps
+},
   (table) => [
-    index("idx_jiraProjectIssueType_projectId").on(table.projectId),
+    index("idx_project_metadata_project_id").on(table.projectId)
   ]
 );

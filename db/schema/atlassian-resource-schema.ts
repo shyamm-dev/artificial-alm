@@ -13,7 +13,5 @@ export const atlassianResource = sqliteTable("atlassian_resource", {
 
   ...timestamps
 },
-  (table) => [
-    index("idx_atlassianResource_userId").on(table.userId),
-  ]
+  (table) => [index("idx_atlassian_resource_userId").on(table.userId)]
 );

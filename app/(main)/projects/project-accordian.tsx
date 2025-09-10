@@ -8,7 +8,8 @@ import { Separator } from "@/components/ui/separator"
 import { ExternalLinkIcon } from "lucide-react"
 import { SiteWithProjects } from "./page"
 import ProjectCard from "./project-card"
-import { JiraProject } from "@/data-access-layer/atlassian-cloud-api/types"
+import { JiraProject } from "@/data-access-layer/types"
+import { COMPLIANCE_FRAMEWORKS } from "@/constants/compliance"
 
 interface ExtendedProject extends JiraProject {
   isSelected: boolean;
@@ -24,17 +25,7 @@ interface ProjectsAccordianProps {
   sitesData: SiteWithProjects[];
 }
 
-const availableStandards = [
-  "IEC 62304",
-  "ISO 13485",
-  "ISO 27001",
-  "FDA 21 CFR Part 820",
-  "GDPR",
-  "HIPAA",
-  "CAN-SPAM",
-  "SOX",
-  "PCI DSS",
-]
+const availableStandards = [...COMPLIANCE_FRAMEWORKS];
 
 export default function ProjectAccordian({ sitesData }: ProjectsAccordianProps) {
   const transformedSites = sitesData.map(site => ({
@@ -43,7 +34,7 @@ export default function ProjectAccordian({ sitesData }: ProjectsAccordianProps) 
       ...project,
       description: project.description || "No description available",
       isSelected: false,
-      complianceStandards: ["IEC 62304", "ISO 13485"],
+      complianceStandards: [],
       lastSync: new Date().toISOString(),
     }))
   }));
@@ -111,7 +102,7 @@ export default function ProjectAccordian({ sitesData }: ProjectsAccordianProps) 
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">
-                    {site.projects.filter((p) => p.isSelected).length}/{site.projects.length} synced
+                    {site.projects.filter((p) => p.isSelected).length}/{site.projects.length} Projects selected
                   </Badge>
                 </div>
               </div>

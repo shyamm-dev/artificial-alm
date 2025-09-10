@@ -1,34 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { IconRefresh } from "@tabler/icons-react";
 import ProjectAccordian from "./project-accordian";
-import { JiraAccessibleResource, JiraProject } from "@/data-access-layer/atlassian-cloud-api/types";
-import { jiraClient } from "@/data-access-layer/atlassian-cloud-api/jira";
-
-export interface SiteWithProjects extends JiraAccessibleResource {
-  projects: JiraProject[];
-}
+import { jiraClient, } from "@/data-access-layer/atlassian-cloud-api/jira-cloud-api";
 
 export default async function ProjectsPage() {
-  const resourcesResult = await jiraClient.getAccessibleResources();
-  if (resourcesResult.error) {
+  const sitesWithProjects = await jiraClient.getSyncedAtlassianResourceWithProjects();
+  if (sitesWithProjects.error) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <p className="text-red-500">Error fetching Jira sites: {resourcesResult.error?.message}</p>
+        <p className="text-red-500">Error fetching Jira sites/projects : {sitesWithProjects.error?.message}</p>
       </div>
     );
   }
-
-  const sitesWithProjects: SiteWithProjects[] = await Promise.all(
-    resourcesResult.data.map(async (site) => {
-      const projectsResult = await jiraClient.getPaginatedProjects(site.id);
-      return {
-        ...site,
-        projects: projectsResult.data?.values || [],
-      };
-    })
-  );
-
-  console.log(sitesWithProjects);
 
   return (
     <>
@@ -49,7 +32,7 @@ export default async function ProjectsPage() {
         </div>
       </div>
       <div className="px-4 lg:px-6">
-        <ProjectAccordian sitesData={sitesWithProjects} />
+        <ProjectAccordian sitesData={sitesWithProjects.data} />
       </div>
     </>
   );

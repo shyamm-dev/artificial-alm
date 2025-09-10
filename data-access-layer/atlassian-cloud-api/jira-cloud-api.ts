@@ -1,6 +1,6 @@
 import { getAtlassianAccessToken } from "@/lib/get-server-access-token";
-import type { JiraAccessibleResourcesResponse, JiraPaginatedProjectsResponse } from "./types";
-import { tryCatch } from "@/lib/try-catch";
+import type { AtlassianResourceResponse, AtlassianResourceWithProjects, JiraProjectsPaginatedResponse } from "../types";
+import { Failure, tryCatch } from "@/lib/try-catch";
 
 export interface JiraRequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -13,7 +13,7 @@ export interface JiraRequestOptions {
 export class JiraClient {
   private static readonly ACCESSIBLE_RESOURCE_ENDPOINT = 'https://api.atlassian.com/oauth/token/accessible-resources';
   private static readonly JIRA_CLOUD_ENDPOINT = 'https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3<endpoint>';
-  private static readonly JIRA_PROJECT_DEFAULT_EXPAND = 'description,issueTypes,insight';
+  private static readonly JIRA_PROJECT_DEFAULT_EXPAND = 'description,issueTypes';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async makeRequest<T = any>(cloudId: string, endpoint: string, options: JiraRequestOptions) {
@@ -54,7 +54,7 @@ export class JiraClient {
     );
   }
 
-  async getAccessibleResources() {
+  private async getAtlassianResources() {
     return tryCatch(
       (async () => {
         const token = await getAtlassianAccessToken();
@@ -73,16 +73,41 @@ export class JiraClient {
           throw new Error(`Failed to fetch accessible resources ${res.status}: ${text}`);
         }
 
-        return (await res.json()) as JiraAccessibleResourcesResponse;
+        return (await res.json()) as AtlassianResourceResponse;
       })()
     );
   }
 
-  async getPaginatedProjects(cloudId: string) {
-    return this.makeRequest<JiraPaginatedProjectsResponse>(
+  private async getPaginatedProjects(cloudId: string) {
+    return this.makeRequest<JiraProjectsPaginatedResponse>(
       cloudId,
       "/project/search",
       { method: "GET", params: { expand: JiraClient.JIRA_PROJECT_DEFAULT_EXPAND } }
+    );
+  }
+
+  public async getSyncedAtlassianResourceWithProjects() {
+    return tryCatch(
+      (async () => {
+        const resourcesResult = await jiraClient.getAtlassianResources();
+        if (resourcesResult.error)
+          throw resourcesResult.error;
+
+        const sitesWithProjects: AtlassianResourceWithProjects[] = await Promise.all(
+          resourcesResult.data.map(async (site) => {
+            const projectsResult = await jiraClient.getPaginatedProjects(site.id);
+            if (projectsResult.error)
+              throw projectsResult.error;
+
+            return {
+              ...site,
+              projects: projectsResult.data?.values || [],
+            };
+          })
+        );
+
+        return sitesWithProjects;
+      })()
     );
   }
 }
