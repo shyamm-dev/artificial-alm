@@ -110,7 +110,35 @@ export class JiraClient {
       })()
     );
   }
+
+  public async searchIssues(
+    cloudId: string,
+    projectKey: string,
+    searchTerm: string,
+    maxResults: number = 10,
+    startAt: number = 0
+  ) {
+    const jql = `(project = "${projectKey}") AND (issueKey = "${searchTerm}" OR text ~ "${searchTerm}")`;
+
+    return this.makeRequest(
+      cloudId,
+      "/search",
+      {
+        method: "POST",
+        body: {
+          jql,
+          maxResults,
+          startAt,
+          fields: ["summary", "issuetype"],
+        },
+      }
+    );
+  }
 }
+// /search api almost provides most of the things like attachment, sub-tasks, issuelinks (both inward and outward links), comments, description.
+// we can use JQL project = "EX" AND issueKey in (EX-1, EX-2, EX-3) for get multiple issues with same search endpoint
+// or get issue api has to be called multiple times for each issue key
+
 
 // Export singleton instance
 export const jiraClient = new JiraClient();
