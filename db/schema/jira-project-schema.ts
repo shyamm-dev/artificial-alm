@@ -4,7 +4,7 @@ import { timestamps } from "../helper/timestamp-helper";
 import { ComplianceFramework } from "@/constants/compliance";
 
 export const jiraProject = sqliteTable("jira_project", {
-  id: text("id").primaryKey(), // Jira's project id
+  id: text("id").primaryKey(),
   key: text("key").notNull(),
   name: text("name").notNull(),
   description: text("description"),
@@ -20,17 +20,16 @@ export const jiraProject = sqliteTable("jira_project", {
   avatar24: text("avatar_24"),
   avatar16: text("avatar_16"),
 
-  // FK to Atlassian Resource (site)
-  resourceId: integer("resource_id").notNull().references(() => atlassianResource.id, { onDelete: "cascade" }),
+  // FK to Atlassian Resource
+  cloudId: text("cloud_id").notNull().references(() => atlassianResource.cloudId, { onDelete: "cascade" }),
 
   ...timestamps
 },
-  (table) => [index("idx_jira_project_resource_id").on(table.resourceId)]
+  (table) => [index("idx_jira_project_cloud_id").on(table.cloudId)]
 );
 
 export const jiraProjectIssueType = sqliteTable("jira_project_issue_type", {
-  id: text("id").primaryKey(), // Jira project issueType id
-  projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
   iconUrl: text("icon_url"),
@@ -39,6 +38,9 @@ export const jiraProjectIssueType = sqliteTable("jira_project_issue_type", {
   hierarchyLevel: integer("hierarchy_level"),
   self: text("self").notNull(),
 
+  // FK to jira project
+  projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
+
   ...timestamps
 },
   (table) => [index("idx_jira_project_issue_type_project_id").on(table.projectId)]
@@ -46,22 +48,18 @@ export const jiraProjectIssueType = sqliteTable("jira_project_issue_type", {
 
 export const jiraProjectCompliance = sqliteTable("jira_project_compliance", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
   framework: text("framework").$type<ComplianceFramework>().notNull(),
+
+  // Denormalized last updated by info
+  lastUpdatedById: text("last_updated_by_id"),
+  lastUpdatedByName: text("last_updated_by_name"),
+  lastUpdatedByEmail: text("last_updated_by_email"),
+  lastUpdatedByAvatar: text("last_updated_by_avatar"),
+
+  // FK to jira project
+  projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
 
   ...timestamps
 },
   (table) => [index("idx_project_compliance_project_id").on(table.projectId)]
-);
-
-export const projectMetadata = sqliteTable("project_metadata", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  projectId: text("project_id").unique().notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
-  imported: integer("imported", { mode: "boolean" }).default(false).notNull(),
-
-  ...timestamps
-},
-  (table) => [
-    index("idx_project_metadata_project_id").on(table.projectId)
-  ]
 );

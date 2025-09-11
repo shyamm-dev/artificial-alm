@@ -1,6 +1,7 @@
 import { getAtlassianAccessToken } from "@/lib/get-server-access-token";
 import type { AtlassianResourceResponse, AtlassianResourceWithProjects, JiraProjectsPaginatedResponse } from "../types";
-import { Failure, tryCatch } from "@/lib/try-catch";
+import { tryCatch } from "@/lib/try-catch";
+import { syncAtlassianDataWithDB } from "../atlassian-resource-sync/db-sync";
 
 export interface JiraRequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -86,7 +87,7 @@ export class JiraClient {
     );
   }
 
-  public async getSyncedAtlassianResourceWithProjects() {
+  public async getAtlassianResourceWithProjects() {
     return tryCatch(
       (async () => {
         const resourcesResult = await jiraClient.getAtlassianResources();
@@ -131,14 +132,36 @@ export class JiraClient {
           startAt,
           fields: ["summary", "issuetype"],
         },
-      }
+      })
+  }
+
+  public async getSyncedAtlassianResourceWithProjects() {
+    return tryCatch(
+      (async () => {
+        const resourcesResult = await jiraClient.getAtlassianResources();
+        if (resourcesResult.error)
+          throw resourcesResult.error;
+
+        const sitesWithProjects: AtlassianResourceWithProjects[] = await Promise.all(
+          resourcesResult.data.map(async (site) => {
+            const projectsResult = await jiraClient.getPaginatedProjects(site.id);
+            if (projectsResult.error)
+              throw projectsResult.error;
+
+            return {
+              ...site,
+              projects: projectsResult.data?.values || [],
+            };
+          })
+        );
+
+        await syncAtlassianDataWithDB(sitesWithProjects);
+
+        return sitesWithProjects;
+      })()
     );
   }
 }
-// /search api almost provides most of the things like attachment, sub-tasks, issuelinks (both inward and outward links), comments, description.
-// we can use JQL project = "EX" AND issueKey in (EX-1, EX-2, EX-3) for get multiple issues with same search endpoint
-// or get issue api has to be called multiple times for each issue key
-
 
 // Export singleton instance
 export const jiraClient = new JiraClient();

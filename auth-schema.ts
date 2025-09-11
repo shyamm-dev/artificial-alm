@@ -73,5 +73,3 @@ export const verification = sqliteTable("verification", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
-
-export const authSchema = { user, session, account, verification };
