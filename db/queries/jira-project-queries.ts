@@ -1,12 +1,18 @@
-import { jiraProject, jiraProjectIssueType } from '../schema/jira-project-schema';
-import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-zod";
+import { db } from "@/db/drizzle";
+import { jiraProject, jiraProjectIssueType } from "@/db/schema/jira-project-schema";
+import { JiraProject, JiraIssueType } from "@/data-access-layer/types";
+import { stripUndefined, transformProject, transformIssueType, jiraProjectInsertSchema, jiraIssueTypeInsertSchema } from "@/db/helper/sync-helpers";
 
-// SELECT | INSERT | UPDATE jiraProject
-export const jiraProjectInsertSchema = createInsertSchema(jiraProject);
-export const jiraProjectSelectSchema = createSelectSchema(jiraProject);
-export const jiraProjectUpdateSchema = createUpdateSchema(jiraProject);
+export function upsertJiraProject(apiProject: JiraProject, cloudId: string) {
+  const parsedProject = stripUndefined(jiraProjectInsertSchema.parse(transformProject(apiProject, cloudId)));
+  return db.insert(jiraProject)
+    .values(parsedProject)
+    .onConflictDoUpdate({ target: jiraProject.id, set: parsedProject });
+}
 
-// SELECT | INSERT | UPDATE jiraProjectIssueType
-export const jiraProjectIssueTypeInsertSchema = createInsertSchema(jiraProjectIssueType);
-export const jiraProjectIssueTypeSelectSchema = createSelectSchema(jiraProjectIssueType);
-export const jiraProjectIssueTypeUpdateSchema = createUpdateSchema(jiraProjectIssueType);
+export function upsertJiraIssueType(issue: JiraIssueType, projectId: string) {
+  const parsedIssue = stripUndefined(jiraIssueTypeInsertSchema.parse(transformIssueType(issue, projectId)));
+  return db.insert(jiraProjectIssueType)
+    .values(parsedIssue)
+    .onConflictDoUpdate({ target: jiraProjectIssueType.id, set: parsedIssue });
+}

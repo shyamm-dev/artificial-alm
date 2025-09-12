@@ -3,12 +3,18 @@ import type { AtlassianResourceResponse, AtlassianResourceWithProjects, JiraProj
 import { tryCatch } from "@/lib/try-catch";
 import { syncAtlassianDataWithDB } from "../atlassian-resource-sync/db-sync";
 
-export interface JiraRequestOptions {
+interface JiraRequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   headers?: Record<string, string>;
   params?: Record<string, string | number | boolean>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body?: any;
+}
+
+interface MakeJiraRequestArgs {
+  cloudId: string,
+  endpoint: string,
+  options: JiraRequestOptions
 }
 
 export class JiraClient {
@@ -17,31 +23,31 @@ export class JiraClient {
   private static readonly JIRA_PROJECT_DEFAULT_EXPAND = 'description,issueTypes';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async makeRequest<T = any>(cloudId: string, endpoint: string, options: JiraRequestOptions) {
+  private async makeRequest<T = any>(args: MakeJiraRequestArgs) {
     return tryCatch(
       (async () => {
         const token = await getAtlassianAccessToken();
         if (!token) throw new Error("No Atlassian access token available");
 
-        let url = JiraClient.JIRA_CLOUD_ENDPOINT.replace('<cloudId>', cloudId).replace('<endpoint>', endpoint);
+        let url = JiraClient.JIRA_CLOUD_ENDPOINT.replace('<cloudId>', args.cloudId).replace('<endpoint>', args.endpoint);
 
-        if (options.params) {
+        if (args.options.params) {
           const params = new URLSearchParams();
-          Object.entries(options.params).forEach(([key, value]) => {
+          Object.entries(args.options.params).forEach(([key, value]) => {
             params.append(key, String(value));
           });
           url += `?${params.toString()}`;
         }
 
         const res = await fetch(url, {
-          method: options.method,
+          method: args.options.method,
           headers: {
             Authorization: `Bearer ${token.accessToken}`,
             Accept: "application/json",
             "Content-Type": "application/json",
-            ...options.headers,
+            ...args.options.headers,
           },
-          ...(options.body && { body: JSON.stringify(options.body) }),
+          ...(args.options.body && { body: JSON.stringify(args.options.body) }),
         });
 
         if (!res.ok) {
@@ -80,11 +86,12 @@ export class JiraClient {
   }
 
   private async getPaginatedProjects(cloudId: string) {
-    return this.makeRequest<JiraProjectsPaginatedResponse>(
-      cloudId,
-      "/project/search",
-      { method: "GET", params: { expand: JiraClient.JIRA_PROJECT_DEFAULT_EXPAND } }
-    );
+    const payload: MakeJiraRequestArgs = {
+      cloudId: cloudId,
+      endpoint: "/project/search",
+      options: { method: "GET", params: { expand: JiraClient.JIRA_PROJECT_DEFAULT_EXPAND } }
+    }
+    return this.makeRequest<JiraProjectsPaginatedResponse>(payload);
   }
 
   public async getAtlassianResourceWithProjects() {
@@ -112,52 +119,24 @@ export class JiraClient {
     );
   }
 
-  public async searchIssues(
-    cloudId: string,
-    projectKey: string,
-    searchTerm: string,
-    maxResults: number = 10,
-    startAt: number = 0
-  ) {
+  public async getSearchedIssues(cloudId: string, projectKey: string, searchTerm: string, maxResults: number = 10, startAt: number = 0) {
     const jql = `(project = "${projectKey}") AND (issueKey = "${searchTerm}" OR text ~ "${searchTerm}")`;
-
-    return this.makeRequest(
-      cloudId,
-      "/search",
-      {
-        method: "POST",
-        body: {
-          jql,
-          maxResults,
-          startAt,
-          fields: ["summary", "issuetype"],
-        },
-      })
+    const payload: MakeJiraRequestArgs = {
+      cloudId: cloudId,
+      endpoint: "/search",
+      options: { method: "POST", body: { jql, maxResults, startAt, fields: ["summary", "issuetype"] } }
+    }
+    return this.makeRequest(payload);
   }
 
-  public async getSyncedAtlassianResourceWithProjects() {
+  public async syncAtlassianResourceAndJiraProjects() {
     return tryCatch(
       (async () => {
-        const resourcesResult = await jiraClient.getAtlassianResources();
-        if (resourcesResult.error)
-          throw resourcesResult.error;
+        const apiData = await this.getAtlassianResourceWithProjects();
+        if (apiData.error)
+          throw apiData.error;
 
-        const sitesWithProjects: AtlassianResourceWithProjects[] = await Promise.all(
-          resourcesResult.data.map(async (site) => {
-            const projectsResult = await jiraClient.getPaginatedProjects(site.id);
-            if (projectsResult.error)
-              throw projectsResult.error;
-
-            return {
-              ...site,
-              projects: projectsResult.data?.values || [],
-            };
-          })
-        );
-
-        await syncAtlassianDataWithDB(sitesWithProjects);
-
-        return sitesWithProjects;
+        return syncAtlassianDataWithDB(apiData.data);
       })()
     );
   }

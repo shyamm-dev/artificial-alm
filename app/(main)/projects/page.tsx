@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { IconRefresh } from "@tabler/icons-react";
 import ProjectAccordian from "./project-accordian";
-import { jiraClient, } from "@/data-access-layer/atlassian-cloud-api/jira-cloud-api";
+import { jiraClient } from "@/data-access-layer/atlassian-cloud-api/jira-cloud-api";
+import { SyncButton } from "../../../components/sync-button";
+import { syncAtlassianResource } from "./actions/sync-actions";
 
 export default async function ProjectsPage() {
-  const sitesWithProjects = await jiraClient.getSyncedAtlassianResourceWithProjects();
+  const sitesWithProjects = await jiraClient.getAtlassianResourceWithProjects();
   if (sitesWithProjects.error) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -24,10 +24,9 @@ export default async function ProjectsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button className="flex items-center gap-2">
-              <IconRefresh className="h-4 w-4" />
-              Sync Changes
-            </Button>
+            <form action={syncAtlassianResource}>
+              <SyncButton />
+            </form>
           </div>
         </div>
       </div>

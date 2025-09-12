@@ -17,11 +17,17 @@ export async function middleware(request: NextRequest) {
 }
 
 // TODO: Need to consider switching to edge runtime if Firebase app hosting supports it.
-// TODO: Implement reverse regex matching for matcher. This is a security risk
 
 export const config = {
   runtime: "nodejs",
   matcher: [
-    "/", "/login", "/dashboard/:path*", "/projects/:path*", "/scheduler/:path*", "/testcase/:path*"
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|privacy-policy|terms-of-service).*)',
   ],
 };
