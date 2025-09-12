@@ -15,6 +15,13 @@
       "when": 1757656323178,
       "tag": "0001_jittery_nicolaos",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1757656625102,
+      "tag": "0002_dry_cloak",
+      "breakpoints": true
     }
   ]
 }

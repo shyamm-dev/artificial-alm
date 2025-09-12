@@ -1,4 +1,4 @@
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { timestamps } from "../helper/timestamp-helper";
 
 export const atlassianResource = sqliteTable("atlassian_resource", {
@@ -9,4 +9,6 @@ export const atlassianResource = sqliteTable("atlassian_resource", {
   avatarUrl: text("avatar_url"),
 
   ...timestamps
-});
+},
+  (table) => [index("idx_resource_cloudId").on(table.cloudId)]
+);

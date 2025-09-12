@@ -1,4 +1,4 @@
-import { sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, primaryKey, index } from "drizzle-orm/sqlite-core";
 import { atlassianResource } from "./atlassian-resource-schema";
 import { user } from "@/auth-schema";
 import { timestamps } from "../helper/timestamp-helper";
@@ -15,5 +15,10 @@ export const userAtlassianProjectAccess = sqliteTable("user_atlassian_project_ac
 
   ...timestamps
 },
-  (table) => [primaryKey({ columns: [table.userId, table.cloudId, table.projectId] })]
+  (table) => [
+    primaryKey({ columns: [table.userId, table.cloudId, table.projectId] }),
+    index("idx_userAccess_userId").on(table.userId),
+    index("idx_userAccess_cloudId").on(table.cloudId),
+    index("idx_userAccess_projectId").on(table.projectId),
+  ]
 );
