@@ -1,13 +1,15 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { getServerSessionPromise } from "@/lib/get-server-session";
+import { ServerSessionProvider } from "@/components/providers/server-session-provider";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function MainGroupLayout({ children }: { children: React.ReactNode }) {
+  const sessionPromise = getServerSessionPromise();
+
   return (
-    <SidebarProvider
+    <ServerSessionProvider sessionPromise={sessionPromise}>
+      <SidebarProvider
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 72)",
@@ -27,5 +29,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </SidebarInset>
     </SidebarProvider>
+    </ServerSessionProvider>
   )
 }

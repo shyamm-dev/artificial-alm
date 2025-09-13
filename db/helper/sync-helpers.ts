@@ -11,6 +11,7 @@ export const jiraIssueTypeInsertSchema = createInsertSchema(jiraProjectIssueType
 export const userAccessInsertSchema = createInsertSchema(userAtlassianProjectAccess);
 
 export function stripUndefined<T extends Record<string, unknown>>(obj: T): T {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined)) as T;
 }
 

@@ -28,14 +28,17 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { use } from "react";
 import { useRouter } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
+import { useServerSession } from "@/components/providers/server-session-provider";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  const { data } = authClient.useSession();
+  const sessionPromise = useServerSession();
+  const sessionResult = use(sessionPromise);
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -45,6 +48,32 @@ export function NavUser() {
         },
       },
     });
+  }
+
+  if (!sessionResult) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            size="lg"
+            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            onClick={() => router.push("/login")}
+          >
+            <Avatar className="h-8 w-8 rounded-lg grayscale">
+              <AvatarFallback className="rounded-lg">
+                <IconUserCircle className="h-6 w-6" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">Guest</span>
+              <span className="text-muted-foreground truncate text-xs">
+                Sign in
+              </span>
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
   }
 
   return (
@@ -57,13 +86,13 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={data?.user.image || undefined} alt={data?.user.name?.charAt(0)} />
+                <AvatarImage src={sessionResult.user.image || undefined} alt={sessionResult.user.name?.charAt(0)} />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{data?.user.name}</span>
+                <span className="truncate font-medium">{sessionResult.user.name}</span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {data?.user.email}
+                  {sessionResult.user.email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -78,13 +107,13 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={data?.user.image || undefined} alt={data?.user.name?.charAt(0)} />
+                  <AvatarImage src={sessionResult.user.image || undefined} alt={sessionResult.user.name?.charAt(0)} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{data?.user.name}</span>
+                  <span className="truncate font-medium">{sessionResult.user.name}</span>
                   <span className="text-muted-foreground truncate text-xs">
-                    {data?.user.email}
+                    {sessionResult.user.email}
                   </span>
                 </div>
               </div>

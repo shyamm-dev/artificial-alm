@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { navOptions } from "@/lib/navigation";
+import { Suspense } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
@@ -40,7 +41,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={navOptions} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <Suspense>
+          <NavUser />
+        </Suspense>
       </SidebarFooter>
     </Sidebar>
   )

@@ -1,15 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { use, useState } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { ExternalLinkIcon } from "lucide-react"
-import { SiteWithProjects } from "./page"
 import ProjectCard from "./project-card"
-import { JiraProject } from "@/data-access-layer/types"
+import { AtlassianResourceWithProjects, JiraProject } from "@/data-access-layer/types"
 import { COMPLIANCE_FRAMEWORKS } from "@/constants/compliance"
+import { Result } from "@/lib/try-catch"
 
 interface ExtendedProject extends JiraProject {
   isSelected: boolean;
@@ -17,18 +17,23 @@ interface ExtendedProject extends JiraProject {
   lastSync: string;
 }
 
-interface ExtendedSite extends Omit<SiteWithProjects, 'projects'> {
+interface ExtendedSite extends Omit<AtlassianResourceWithProjects, 'projects'> {
   projects: ExtendedProject[];
-}
-
-interface ProjectsAccordianProps {
-  sitesData: SiteWithProjects[];
 }
 
 const availableStandards = [...COMPLIANCE_FRAMEWORKS];
 
-export default function ProjectAccordian({ sitesData }: ProjectsAccordianProps) {
-  const transformedSites = sitesData.map(site => ({
+export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWithProjectsPromise: Promise<Result<AtlassianResourceWithProjects[], Error>> }) {
+  const sitesWithProjects = use(sitesWithProjectsPromise);
+  if (sitesWithProjects.error) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <p className="text-red-500">Error fetching Jira sites/projects</p>
+      </div>
+    );
+  }
+
+  const transformedSites = sitesWithProjects.data.map(site => ({
     ...site,
     projects: site.projects.map(project => ({
       ...project,

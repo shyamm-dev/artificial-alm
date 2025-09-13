@@ -1,37 +1,48 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { IconRefresh } from "@tabler/icons-react";
+import { IconRefresh, IconLoader2 } from "@tabler/icons-react";
 import { useFormStatus } from "react-dom";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
+import { syncAtlassianResource } from "@/app/(main)/projects/actions/sync-actions";
+import { toast } from "sonner";
 
-export function SyncButton() {
+const initialState = {
+  message: "",
+  success: false,
+};
+
+function SyncButtonContent() {
   const { pending } = useFormStatus();
-  const [syncComplete, setSyncComplete] = useState(false);
-
-  useEffect(() => {
-    if (!pending && syncComplete) {
-      const timer = setTimeout(() => {
-        setSyncComplete(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [pending, syncComplete]);
-
-  useEffect(() => {
-    if (!pending && !syncComplete) {
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur(); // Remove focus from the button after submission
-      }
-      setSyncComplete(true);
-    }
-  }, [pending]);
-
 
   return (
     <Button type="submit" className="flex items-center gap-2" disabled={pending}>
-      <IconRefresh className="h-4 w-4" />
-      {pending ? "Syncing..." : syncComplete ? "Complete!" : "Sync Atlassian"}
+      {pending ? (
+        <IconLoader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <IconRefresh className="h-4 w-4" />
+      )}
+      {pending ? "Syncing..." : "Sync Atlassian"}
     </Button>
+  );
+}
+
+export function SyncButton() {
+  const [state, formAction] = useActionState(syncAtlassianResource, initialState);
+
+  useEffect(() => {
+    if (state.message) {
+      if (state.success) {
+        toast.success(state.message);
+      } else {
+        toast.error(state.message);
+      }
+    }
+  }, [state]);
+
+  return (
+    <form action={formAction}>
+      <SyncButtonContent />
+    </form>
   );
 }
