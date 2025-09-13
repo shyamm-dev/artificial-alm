@@ -109,38 +109,16 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
                     };
 
                     return (
-                      <>
-                        <ProjectCard
-                          key={project.id}
-                          project={project}
-                          onSettingsClick={(proj) => setSelectedProjectId(proj.id)}
-                          selectedProjectId={selectedProjectId}
-                          siteName={site.name}
-                          siteUrl={site.url}
-                          availableStandards={availableStandards}
-                          onComplianceStandardToggle={handleComplianceStandardToggle}
-                        />
-                        <ProjectCard
-                          key={`${project.id}-2`}
-                          project={project}
-                          onSettingsClick={(proj) => setSelectedProjectId(proj.id)}
-                          selectedProjectId={selectedProjectId}
-                          siteName={site.name}
-                          siteUrl={site.url}
-                          availableStandards={availableStandards}
-                          onComplianceStandardToggle={handleComplianceStandardToggle}
-                        />
-                        <ProjectCard
-                          key={`${project.id}-3`}
-                          project={project}
-                          onSettingsClick={(proj) => setSelectedProjectId(proj.id)}
-                          selectedProjectId={selectedProjectId}
-                          siteName={site.name}
-                          siteUrl={site.url}
-                          availableStandards={availableStandards}
-                          onComplianceStandardToggle={handleComplianceStandardToggle}
-                        />
-                      </>
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onSettingsClick={(proj) => setSelectedProjectId(proj.id)}
+                        selectedProjectId={selectedProjectId}
+                        siteName={site.name}
+                        siteUrl={site.url}
+                        availableStandards={availableStandards}
+                        onComplianceStandardToggle={handleComplianceStandardToggle}
+                      />
                     );
                   })}
                 </div>
