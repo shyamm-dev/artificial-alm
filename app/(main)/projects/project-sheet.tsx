@@ -32,11 +32,11 @@ export default function ProjectSheet({
   project: {
     id: string
     name: string
-    issueTypes?: { id: string; name: string; iconUrl: string; description?: string | null }[]
+    issueTypes?: { id: string; name: string; iconUrl: string | null; description?: string | null }[]
     complianceStandards: string[]
     compliance?: {
       lastUpdatedByName: string | null
-      updatedAt: string
+      updatedAt: Date
     } | null
   }
   siteName: string
@@ -86,7 +86,7 @@ export default function ProjectSheet({
                     <TooltipTrigger asChild>
                       <div className="flex items-center gap-2 p-2 border rounded-md cursor-help">
                         <Image
-                          src={issueType.iconUrl}
+                          src={issueType.iconUrl || ''}
                           alt={issueType.name}
                           width={16}
                           height={16}

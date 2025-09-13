@@ -42,11 +42,8 @@ export default function ProjectCard({
               <AvatarImage src={project.avatar48 || undefined} alt={project.name} />
               <AvatarFallback className="text-sm">{project.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
-            <div className="text-sm space-y-1">
-              <div>
-                <span className="font-medium text-foreground">Project Name</span>
-                <span className="text-muted-foreground font-semibold"> : {project.name}</span>
-              </div>
+            <div className="text-sm">
+              <h3 className="font-semibold text-foreground">{project.name}</h3>
             </div>
           </div>
           <ProjectSheet
@@ -63,9 +60,9 @@ export default function ProjectCard({
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-foreground text-xs">Description:</span>
+        <div className="space-y-3">
+          <div className="flex items-start gap-2">
+            <span className="font-medium text-foreground text-xs min-w-fit">Description:</span>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -83,8 +80,8 @@ export default function ProjectCard({
             </TooltipProvider>
           </div>
           {project.issueTypes && project.issueTypes.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-foreground text-xs">Issue Types:</span>
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-foreground text-xs min-w-fit">Issue Types:</span>
               <div className="flex items-center gap-1">
                 {project.issueTypes.map((issueType) => (
                   <TooltipProvider key={issueType.id}>
@@ -108,9 +105,9 @@ export default function ProjectCard({
               </div>
             </div>
           )}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-foreground text-xs">Standards:</span>
+          <div className="space-y-1">
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-foreground text-xs min-w-fit">Standards:</span>
               {project.complianceStandards.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
                   {project.complianceStandards.slice(0, 2).map((standard) => (
