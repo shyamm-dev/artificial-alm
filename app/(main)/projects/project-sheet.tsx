@@ -34,6 +34,10 @@ export default function ProjectSheet({
     name: string
     issueTypes?: { id: string; name: string; iconUrl: string; description?: string | null }[]
     complianceStandards: string[]
+    compliance?: {
+      lastUpdatedByName: string | null
+      updatedAt: string
+    } | null
   }
   siteName: string
   siteUrl: string
@@ -116,6 +120,11 @@ export default function ProjectSheet({
                   <span className="text-sm text-muted-foreground">NA</span>
                 )}
               </div>
+              {project.compliance?.lastUpdatedByName && (
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Last updated by {project.compliance.lastUpdatedByName} on {new Date(project.compliance.updatedAt).toLocaleDateString()}
+                </div>
+              )}
             </div>
             <div>
               <h4 className="text-sm font-medium mb-3">Available Standards</h4>

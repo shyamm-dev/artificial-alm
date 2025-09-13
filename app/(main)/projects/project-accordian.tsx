@@ -29,19 +29,26 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
     return Array.from(sitesMap.values());
   })();
 
-  const [projectCompliance, setProjectCompliance] = useState(new Map<string, string[]>());
-  const [selectedProject, setSelectedProject] = useState<(typeof jiraProject.$inferSelect & { complianceStandards: string[] }) | null>(null);
+  const [projectCompliance, setProjectCompliance] = useState(() => {
+    const initialCompliance = new Map<string, string[]>();
+    userAccessData.forEach((access) => {
+      if (access.project) {
+        initialCompliance.set(access.project.id, access.project.compliance?.frameworks || []);
+      }
+    });
+    return initialCompliance;
+  });
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const handleComplianceStandardToggle = (standard: string) => {
-    if (!selectedProject) return;
+    if (!selectedProjectId) return;
 
-    const currentStandards = projectCompliance.get(selectedProject.id) || [];
+    const currentStandards = projectCompliance.get(selectedProjectId) || [];
     const updatedStandards = currentStandards.includes(standard)
       ? currentStandards.filter(s => s !== standard)
       : [...currentStandards, standard];
 
-    setProjectCompliance(prev => new Map(prev.set(selectedProject.id, updatedStandards)));
-    setSelectedProject({ ...selectedProject, complianceStandards: updatedStandards });
+    setProjectCompliance(prev => new Map(prev.set(selectedProjectId, updatedStandards)));
   };
 
   return (
@@ -91,8 +98,8 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
                       <ProjectCard
                         key={project.id}
                         project={project}
-                        onSettingsClick={setSelectedProject}
-                        selectedProject={selectedProject}
+                        onSettingsClick={(proj) => setSelectedProjectId(proj.id)}
+                        selectedProjectId={selectedProjectId}
                         siteName={site.name}
                         siteUrl={site.url}
                         availableStandards={availableStandards}

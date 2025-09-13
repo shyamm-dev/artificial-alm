@@ -19,7 +19,7 @@ type ProjectWithCompliance = typeof jiraProject.$inferSelect & {
 export default function ProjectCard({
   project,
   onSettingsClick,
-  selectedProject,
+  selectedProjectId,
   siteName,
   siteUrl,
   availableStandards,
@@ -27,7 +27,7 @@ export default function ProjectCard({
 }: {
   project: ProjectWithCompliance
   onSettingsClick: (project: ProjectWithCompliance) => void
-  selectedProject: ProjectWithCompliance | null
+  selectedProjectId: string | null
   siteName: string
   siteUrl: string
   availableStandards: string[]
@@ -50,7 +50,7 @@ export default function ProjectCard({
             </div>
           </div>
           <ProjectSheet
-            project={selectedProject || project}
+            project={project}
             siteName={siteName}
             siteUrl={siteUrl}
             availableStandards={availableStandards}
@@ -129,6 +129,11 @@ export default function ProjectCard({
               )}
             </div>
           </div>
+          {project.compliance?.lastUpdatedByName && (
+            <div className="text-xs text-muted-foreground">
+              Updated by {project.compliance.lastUpdatedByName} on {new Date(project.compliance.updatedAt).toLocaleDateString()}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
