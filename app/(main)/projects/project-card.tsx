@@ -131,6 +131,7 @@ export default function ProjectCard({
               Updated by {project.compliance.lastUpdatedByName} on {new Date(project.compliance.updatedAt).toLocaleDateString()}
             </div>
           )}
+
         </div>
       </CardContent>
     </Card>

@@ -69,11 +69,11 @@ export default function ProjectSheet({
           <SheetDescription>Configure compliance standards for this project</SheetDescription>
         </SheetHeader>
         <div className="px-4 pb-2 space-y-1 text-sm grid grid-cols-[auto_1fr] gap-x-2 gap-y-1">
-          <span className="font-medium text-foreground">Site Name</span>
+          <span className="font-medium text-foreground">Org Name</span>
           <span className="text-muted-foreground">{': ' + siteName}</span>
           <span className="font-medium text-foreground">Project Name</span>
           <span className="text-muted-foreground">{': ' + project.name}</span>
-          <span className="font-medium text-foreground">Project URL</span>
+          <span className="font-medium text-foreground">Org URL</span>
           <span className="text-muted-foreground">{': ' + siteUrl}</span>
         </div>
         {project.issueTypes && project.issueTypes.length > 0 && (
@@ -105,7 +105,7 @@ export default function ProjectSheet({
             </div>
           </div>
         )}
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-20">
           <div className="space-y-4">
             <div>
               <h4 className="text-sm font-medium mb-3">Active Standards</h4>
@@ -148,13 +148,13 @@ export default function ProjectSheet({
             </div>
           </div>
         </div>
-        <SheetFooter>
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-background border-t">
           <SheetClose asChild>
-            <Button onClick={handleSaveChanges} disabled={isSaving}>
+            <Button onClick={handleSaveChanges} disabled={isSaving} className="w-full">
               {isSaving ? "Saving..." : "Save Changes"}
             </Button>
           </SheetClose>
-        </SheetFooter>
+        </div>
       </SheetContent>
     </Sheet>
   )
