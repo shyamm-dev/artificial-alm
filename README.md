@@ -17,6 +17,7 @@ Using server actions for data fetching is discouraged because it issues an inter
 ### Data Access and Security
 
 - **Centralize Data Operations:** All third-party API calls and database interactions must be handled through a dedicated Data Access Layer (DAL), located in `/lib/data-access-layer`. This ensures a single source of truth for data fetching and mutations.
+- **Third-Party API Access:** All external API calls must go through the DAL - never call third-party APIs directly from components or other parts of the application.
 - **Session Verification:** Every method within the DAL must verify that a valid user session exists before proceeding with any operation.
 - **Access Token Validation:** For routes or methods that interact with protected third-party APIs, the access token must be retrieved and validated before making the external request.
 
@@ -60,3 +61,46 @@ To view your database schema and data using Drizzle Studio:
 pnpm drizzle-kit studio
 ```
 This command will open Drizzle Studio in your browser, allowing you to inspect your database.
+
+### Database Schema Structure
+
+#### Schema Files
+- **Main Schema:** Define tables in `db/schema.ts`
+- **Relations:** Write all table relations in `db/relations.ts`
+- **New Schema Files:** For additional schema files, export them and add to `db/index.ts`
+
+```typescript
+// db/index.ts
+export * from './schema'
+export * from './relations'
+export * from './new-schema-file'
+```
+
+#### Database Types
+Infer types from your schema:
+
+```typescript
+import { InferSelectModel, InferInsertModel } from 'drizzle-orm'
+import { users } from './schema'
+
+export type User = InferSelectModel<typeof users>
+export type NewUser = InferInsertModel<typeof users>
+```
+
+### Query Structure
+
+- **Simple Queries:** Use direct Drizzle queries in components
+- **Complex Queries:** Create reusable query functions in `/lib/queries`
+- **Mutations:** Handle through server actions with proper validation
+
+### Validation
+
+- **Input Validation:** Use Zod schemas for all form inputs and API endpoints
+- **Database Validation:** Validate data before database operations
+- **Type Safety:** Leverage TypeScript and Drizzle's type inference
+
+### Session Management
+
+- **Server:** Session is fetched on the server side
+- **Client:** Session is passed through a provider and accessed in client components using the session hook
+- **Authentication:** All protected routes and API calls must verify session validity
