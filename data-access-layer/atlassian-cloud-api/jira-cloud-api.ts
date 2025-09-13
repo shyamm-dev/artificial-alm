@@ -2,6 +2,7 @@ import { getAtlassianAccessToken } from "@/lib/get-server-access-token";
 import type { AtlassianResourceResponse, AtlassianResourceWithProjects, JiraProjectsPaginatedResponse } from "../types";
 import { tryCatch } from "@/lib/try-catch";
 import { syncAtlassianDataWithDB } from "../atlassian-resource-sync/db-sync";
+import { getServerSession } from "@/lib/get-server-session";
 
 interface JiraRequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -17,7 +18,7 @@ interface MakeJiraRequestArgs {
   options: JiraRequestOptions
 }
 
-export class JiraClient {
+class JiraClient {
   private static readonly ACCESSIBLE_RESOURCE_ENDPOINT = 'https://api.atlassian.com/oauth/token/accessible-resources';
   private static readonly JIRA_CLOUD_ENDPOINT = 'https://api.atlassian.com/ex/jira/<cloudId>/rest/api/3<endpoint>';
   private static readonly JIRA_PROJECT_DEFAULT_EXPAND = 'description,issueTypes';
@@ -27,7 +28,8 @@ export class JiraClient {
     return tryCatch(
       (async () => {
         const token = await getAtlassianAccessToken();
-        if (!token) throw new Error("No Atlassian access token available");
+        if (!token)
+          throw new Error("No Session or Atlassian access token available");
 
         let url = JiraClient.JIRA_CLOUD_ENDPOINT.replace('<cloudId>', args.cloudId).replace('<endpoint>', args.endpoint);
 
