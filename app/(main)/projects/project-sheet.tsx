@@ -14,21 +14,12 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Image from "next/image"
-import { JiraProject } from "@/data-access-layer/types"
-import { Checkbox } from "@/components/ui/checkbox" // Keep Checkbox for available standards
 
-interface ExtendedProject extends JiraProject {
-  complianceStandards: string[];
-}
-
-interface ProjectSheetProps {
-  project: ExtendedProject;
-  siteName: string;
-  siteUrl: string;
-  availableStandards: string[];
-  onComplianceStandardToggle: (standard: string) => void;
-  children: React.ReactNode;
-}
+import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "sonner";
+import { saveProjectCompliance } from "./actions/sync-actions";
+import { useState } from "react";
+import { ComplianceFramework } from "@/constants/compliance";
 
 export default function ProjectSheet({
   project,
@@ -37,7 +28,32 @@ export default function ProjectSheet({
   availableStandards,
   onComplianceStandardToggle,
   children
-}: ProjectSheetProps) {
+}: {
+  project: {
+    id: string
+    name: string
+    issueTypes?: { id: string; name: string; iconUrl: string; description?: string | null }[]
+    complianceStandards: string[]
+  }
+  siteName: string
+  siteUrl: string
+  availableStandards: string[]
+  onComplianceStandardToggle: (standard: string) => void
+  children: React.ReactNode
+}) {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveChanges = async () => {
+    setIsSaving(true);
+    const result = await saveProjectCompliance(project.id, project.complianceStandards as ComplianceFramework[]);
+    if (result?.success) {
+      toast.success(result.message);
+    } else {
+      toast.error(result?.message);
+    }
+    setIsSaving(false);
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -104,7 +120,7 @@ export default function ProjectSheet({
             <div>
               <h4 className="text-sm font-medium mb-3">Available Standards</h4>
               <div className="grid grid-cols-2 gap-2">
-                {availableStandards.map((standard) => (
+                {availableStandards.map((standard: string) => (
                   <div key={standard} className="flex items-center space-x-2">
                     <Checkbox
                       id={`standard-${standard}`}
@@ -125,7 +141,9 @@ export default function ProjectSheet({
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button>Save Changes</Button>
+            <Button onClick={handleSaveChanges} disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

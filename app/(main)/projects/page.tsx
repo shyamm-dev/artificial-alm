@@ -1,10 +1,16 @@
 import ProjectAccordian from "./project-accordian";
-import { jiraClient } from "@/data-access-layer/atlassian-cloud-api/jira-cloud-api";
 import { SyncButton } from "../../../components/sync-button";
 import { Suspense } from "react";
+import { getServerSession } from "@/lib/get-server-session";
+import { getUserResourcesAndProjects } from "@/db/queries/user-project-queries";
+import { redirect } from "next/navigation";
 
 export default async function ProjectsPage() {
-  const sitesWithProjectsPromise = jiraClient.getAtlassianResourceWithProjects();
+  const session = await getServerSession();
+  if (!session)
+    redirect("/login");
+
+  const sitesWithProjectsPromise = getUserResourcesAndProjects(session.user.id);
 
   return (
     <>

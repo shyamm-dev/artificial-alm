@@ -2,7 +2,7 @@ import { getAtlassianAccessToken } from "@/lib/get-server-access-token";
 import type { AtlassianResourceResponse, AtlassianResourceWithProjects, JiraProjectsPaginatedResponse } from "../types";
 import { tryCatch } from "@/lib/try-catch";
 import { syncAtlassianDataWithDB } from "../atlassian-resource-sync/db-sync";
-import { getServerSession } from "@/lib/get-server-session";
+
 
 interface JiraRequestOptions {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";

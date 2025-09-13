@@ -24,7 +24,6 @@ export function transformResource(apiRes: AtlassianResourceWithProjects) {
     cloudId: apiRes.id,
     name: apiRes.name,
     url: apiRes.url,
-    scopes: JSON.stringify(apiRes.scopes),
     avatarUrl: apiRes.avatarUrl,
   };
 }

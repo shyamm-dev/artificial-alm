@@ -8,20 +8,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { SettingsIcon } from "lucide-react"
 import Image from "next/image"
 import ProjectSheet from "./project-sheet"
-import { JiraProject } from "@/data-access-layer/types"
+import { jiraProject, jiraProjectIssueType, jiraProjectCompliance } from "@/db/schema/jira-project-schema"
 
-interface ExtendedProject extends JiraProject {
-  complianceStandards: string[];
-}
-
-interface ProjectCardProps {
-  project: ExtendedProject;
-  selectedProject: ExtendedProject | null;
-  siteName: string;
-  siteUrl: string;
-  availableStandards: string[];
-  onSettingsClick: (project: ExtendedProject) => void;
-  onComplianceStandardToggle: (standard: string) => void;
+type ProjectWithCompliance = typeof jiraProject.$inferSelect & {
+  complianceStandards: string[]
+  issueTypes?: (typeof jiraProjectIssueType.$inferSelect)[]
+  compliance?: typeof jiraProjectCompliance.$inferSelect | null
 }
 
 export default function ProjectCard({
@@ -32,14 +24,22 @@ export default function ProjectCard({
   siteUrl,
   availableStandards,
   onComplianceStandardToggle
-}: ProjectCardProps) {
+}: {
+  project: ProjectWithCompliance
+  onSettingsClick: (project: ProjectWithCompliance) => void
+  selectedProject: ProjectWithCompliance | null
+  siteName: string
+  siteUrl: string
+  availableStandards: string[]
+  onComplianceStandardToggle: (standard: string) => void
+}) {
   return (
     <Card className="relative">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={project.avatarUrls?.['48x48']} alt={project.name} />
+              <AvatarImage src={project.avatar48 || undefined} alt={project.name} />
               <AvatarFallback className="text-sm">{project.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="text-sm space-y-1">
@@ -70,14 +70,14 @@ export default function ProjectCard({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="text-muted-foreground text-xs cursor-help">
-                    {project.description.length > 50
-                      ? `${project.description.substring(0, 50)}...`
-                      : project.description
+                    {(project.description || '').length > 50
+                      ? `${(project.description || '').substring(0, 50)}...`
+                      : (project.description || 'No description')
                     }
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{project.description}</p>
+                  <p>{project.description || 'No description'}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -91,7 +91,7 @@ export default function ProjectCard({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Image
-                          src={issueType.iconUrl}
+                          src={issueType.iconUrl || ''}
                           alt={issueType.name}
                           width={12}
                           height={12}
