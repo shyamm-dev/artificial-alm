@@ -1,4 +1,5 @@
 import { sqliteTable, text, primaryKey, index } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
 import { atlassianResource } from "./atlassian-resource-schema";
 import { user } from "@/auth-schema";
 import { timestamps } from "../helper/timestamp-helper";
@@ -22,3 +23,18 @@ export const userAtlassianProjectAccess = sqliteTable("user_atlassian_project_ac
     index("idx_userAccess_projectId").on(table.projectId),
   ]
 );
+
+export const userAtlassianProjectAccessRelations = relations(userAtlassianProjectAccess, ({ one }) => ({
+  user: one(user, {
+    fields: [userAtlassianProjectAccess.userId],
+    references: [user.id],
+  }),
+  resource: one(atlassianResource, {
+    fields: [userAtlassianProjectAccess.cloudId],
+    references: [atlassianResource.cloudId],
+  }),
+  project: one(jiraProject, {
+    fields: [userAtlassianProjectAccess.projectId],
+    references: [jiraProject.id],
+  }),
+}));

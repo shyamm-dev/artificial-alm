@@ -8,6 +8,7 @@ CREATE TABLE `atlassian_resource` (
 	`updated_at` integer DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)) NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `idx_resource_cloudId` ON `atlassian_resource` (`cloud_id`);--> statement-breakpoint
 CREATE TABLE `account` (
 	`id` text PRIMARY KEY NOT NULL,
 	`account_id` text NOT NULL,
@@ -25,6 +26,7 @@ CREATE TABLE `account` (
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE INDEX `idx_account_user_id` ON `account` (`user_id`);--> statement-breakpoint
 CREATE TABLE `session` (
 	`id` text PRIMARY KEY NOT NULL,
 	`expires_at` integer NOT NULL,
@@ -38,6 +40,8 @@ CREATE TABLE `session` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `session_token_unique` ON `session` (`token`);--> statement-breakpoint
+CREATE INDEX `idx_session_user_id` ON `session` (`user_id`);--> statement-breakpoint
+CREATE INDEX `idx_session_token` ON `session` (`token`);--> statement-breakpoint
 CREATE TABLE `user` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
@@ -49,6 +53,7 @@ CREATE TABLE `user` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);--> statement-breakpoint
+CREATE INDEX `idx_user_email` ON `user` (`email`);--> statement-breakpoint
 CREATE TABLE `verification` (
 	`id` text PRIMARY KEY NOT NULL,
 	`identifier` text NOT NULL,
@@ -58,6 +63,7 @@ CREATE TABLE `verification` (
 	`updated_at` integer DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)) NOT NULL
 );
 --> statement-breakpoint
+CREATE INDEX `idx_verification_identifier` ON `verification` (`identifier`);--> statement-breakpoint
 CREATE TABLE `jira_project` (
 	`id` text PRIMARY KEY NOT NULL,
 	`key` text NOT NULL,
@@ -80,19 +86,17 @@ CREATE TABLE `jira_project` (
 --> statement-breakpoint
 CREATE INDEX `idx_jira_project_cloud_id` ON `jira_project` (`cloud_id`);--> statement-breakpoint
 CREATE TABLE `jira_project_compliance` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`framework` text NOT NULL,
+	`frameworks` text NOT NULL,
 	`last_updated_by_id` text,
 	`last_updated_by_name` text,
 	`last_updated_by_email` text,
 	`last_updated_by_avatar` text,
-	`project_id` text NOT NULL,
+	`project_id` text PRIMARY KEY NOT NULL,
 	`created_at` integer DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)) NOT NULL,
 	FOREIGN KEY (`project_id`) REFERENCES `jira_project`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE INDEX `idx_project_compliance_project_id` ON `jira_project_compliance` (`project_id`);--> statement-breakpoint
 CREATE TABLE `jira_project_issue_type` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
@@ -120,3 +124,7 @@ CREATE TABLE `user_atlassian_project_access` (
 	FOREIGN KEY (`cloud_id`) REFERENCES `atlassian_resource`(`cloud_id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`project_id`) REFERENCES `jira_project`(`id`) ON UPDATE no action ON DELETE cascade
 );
+--> statement-breakpoint
+CREATE INDEX `idx_userAccess_userId` ON `user_atlassian_project_access` (`user_id`);--> statement-breakpoint
+CREATE INDEX `idx_userAccess_cloudId` ON `user_atlassian_project_access` (`cloud_id`);--> statement-breakpoint
+CREATE INDEX `idx_userAccess_projectId` ON `user_atlassian_project_access` (`project_id`);

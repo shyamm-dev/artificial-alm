@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
 import { atlassianResource } from "./atlassian-resource-schema";
 import { timestamps } from "../helper/timestamp-helper";
 import { ComplianceFramework } from "@/constants/compliance";
@@ -47,8 +48,7 @@ export const jiraProjectIssueType = sqliteTable("jira_project_issue_type", {
 );
 
 export const jiraProjectCompliance = sqliteTable("jira_project_compliance", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  framework: text("framework").$type<ComplianceFramework>().notNull(),
+  frameworks: text("frameworks", { mode: "json" }).$type<ComplianceFramework[]>().notNull(),
 
   // Denormalized last updated by info
   lastUpdatedById: text("last_updated_by_id"),
@@ -56,10 +56,33 @@ export const jiraProjectCompliance = sqliteTable("jira_project_compliance", {
   lastUpdatedByEmail: text("last_updated_by_email"),
   lastUpdatedByAvatar: text("last_updated_by_avatar"),
 
-  // FK to jira project
-  projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
-
+  // FK to jira project, now also the primary key
+  projectId: text("project_id").primaryKey().references(() => jiraProject.id, { onDelete: "cascade" }),
   ...timestamps
-},
-  (table) => [index("idx_project_compliance_project_id").on(table.projectId)]
-);
+});
+
+export const jiraProjectRelations = relations(jiraProject, ({ one, many }) => ({
+  resource: one(atlassianResource, {
+    fields: [jiraProject.cloudId],
+    references: [atlassianResource.cloudId],
+  }),
+  issueTypes: many(jiraProjectIssueType),
+  compliance: one(jiraProjectCompliance, {
+    fields: [jiraProject.id],
+    references: [jiraProjectCompliance.projectId],
+  }),
+}));
+
+export const jiraProjectIssueTypeRelations = relations(jiraProjectIssueType, ({ one }) => ({
+  project: one(jiraProject, {
+    fields: [jiraProjectIssueType.projectId],
+    references: [jiraProject.id],
+  }),
+}));
+
+export const jiraProjectComplianceRelations = relations(jiraProjectCompliance, ({ one }) => ({
+  project: one(jiraProject, {
+    fields: [jiraProjectCompliance.projectId],
+    references: [jiraProject.id],
+  }),
+}));

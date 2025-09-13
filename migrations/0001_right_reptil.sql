@@ -1,0 +1,1 @@
+ALTER TABLE `atlassian_resource` DROP COLUMN `scopes`;
