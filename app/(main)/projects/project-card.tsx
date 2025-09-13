@@ -1,20 +1,17 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { SettingsIcon, BarChart3Icon } from "lucide-react"
+import { SettingsIcon } from "lucide-react"
 import Image from "next/image"
 import ProjectSheet from "./project-sheet"
 import { JiraProject } from "@/data-access-layer/types"
 
 interface ExtendedProject extends JiraProject {
-  isSelected: boolean;
   complianceStandards: string[];
-  lastSync: string;
 }
 
 interface ProjectCardProps {
@@ -24,7 +21,6 @@ interface ProjectCardProps {
   siteName: string;
   siteUrl: string;
   availableStandards: string[];
-  onProjectSelection: (siteId: string, projectId: string, isSelected: boolean) => void;
   onSettingsClick: (project: ExtendedProject) => void;
   onComplianceStandardToggle: (standard: string) => void;
 }
@@ -32,7 +28,6 @@ interface ProjectCardProps {
 export default function ProjectCard({
   project,
   siteId,
-  onProjectSelection,
   onSettingsClick,
   selectedProject,
   siteName,
@@ -45,38 +40,14 @@ export default function ProjectCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2">
-            <Checkbox
-              id={`project-${project.id}`}
-              checked={project.isSelected}
-              onCheckedChange={(checked) =>
-                onProjectSelection(siteId, project.id, checked as boolean)
-              }
-            />
-            <Avatar className="h-6 w-6">
-              <AvatarImage src={project.avatarUrls?.['24x24']} alt={project.name} />
-              <AvatarFallback className="text-xs">{project.name.charAt(0).toUpperCase()}</AvatarFallback>
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={project.avatarUrls?.['48x48']} alt={project.name} />
+              <AvatarFallback className="text-sm">{project.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="text-sm space-y-1">
               <div>
                 <span className="font-medium text-foreground">Project Name</span>
                 <span className="text-muted-foreground font-semibold"> : {project.name}</span>
-              </div>
-              <div className="space-y-1">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="text-muted-foreground text-xs cursor-help">
-                        {project.description.length > 50
-                          ? `${project.description.substring(0, 50)}...`
-                          : project.description
-                        }
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{project.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
             </div>
           </div>
@@ -95,6 +66,24 @@ export default function ProjectCard({
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-foreground text-xs">Description:</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="text-muted-foreground text-xs cursor-help">
+                    {project.description.length > 50
+                      ? `${project.description.substring(0, 50)}...`
+                      : project.description
+                    }
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{project.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           {project.issueTypes && project.issueTypes.length > 0 && (
             <div className="flex items-center gap-2">
               <span className="font-medium text-foreground text-xs">Issue Types:</span>
@@ -141,25 +130,7 @@ export default function ProjectCard({
                 <span className="text-xs text-muted-foreground">NA</span>
               )}
             </div>
-            {project.insight && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1 cursor-help">
-                      <BarChart3Icon className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{project.insight.totalIssueCount}</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Total Issues: {project.insight.totalIssueCount}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
           </div>
-          <p className="text-xs text-muted-foreground">
-            Last sync: {new Date(project.lastSync).toLocaleDateString()}
-          </p>
         </div>
       </CardContent>
     </Card>

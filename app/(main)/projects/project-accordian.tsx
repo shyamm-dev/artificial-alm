@@ -12,9 +12,7 @@ import { COMPLIANCE_FRAMEWORKS } from "@/constants/compliance"
 import { Result } from "@/lib/try-catch"
 
 interface ExtendedProject extends JiraProject {
-  isSelected: boolean;
   complianceStandards: string[];
-  lastSync: string;
 }
 
 interface ExtendedSite extends Omit<AtlassianResourceWithProjects, 'projects'> {
@@ -25,6 +23,21 @@ const availableStandards = [...COMPLIANCE_FRAMEWORKS];
 
 export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWithProjectsPromise: Promise<Result<AtlassianResourceWithProjects[], Error>> }) {
   const sitesWithProjects = use(sitesWithProjectsPromise);
+
+  const initialSites = sitesWithProjects.data
+    ? sitesWithProjects.data.map(site => ({
+        ...site,
+        projects: site.projects.map(project => ({
+          ...project,
+          description: project.description || "No description available",
+          complianceStandards: [],
+        }))
+      }))
+    : [];
+
+  const [sites, setSites] = useState<ExtendedSite[]>(initialSites);
+  const [selectedProject, setSelectedProject] = useState<ExtendedProject | null>(null);
+
   if (sitesWithProjects.error) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -33,43 +46,14 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
     );
   }
 
-  const transformedSites = sitesWithProjects.data.map(site => ({
-    ...site,
-    projects: site.projects.map(project => ({
-      ...project,
-      description: project.description || "No description available",
-      isSelected: false,
-      complianceStandards: [],
-      lastSync: new Date().toISOString(),
-    }))
-  }));
-
-  const [sites, setSites] = useState<ExtendedSite[]>(transformedSites)
-  const [selectedProject, setSelectedProject] = useState<ExtendedProject | null>(null)
-
-  const handleProjectSelection = (siteId: string, projectId: string, isSelected: boolean) => {
-    setSites((prevSites) =>
-      prevSites.map((site) =>
-        site.id === siteId
-          ? {
-            ...site,
-            projects: site.projects.map((project) =>
-              project.id === projectId ? { ...project, isSelected } : project,
-            ),
-          }
-          : site,
-      ),
-    )
-  }
-
   const handleComplianceStandardToggle = (standard: string) => {
-    if (!selectedProject) return
+    if (!selectedProject) return;
 
     const updatedStandards = selectedProject.complianceStandards.includes(standard)
       ? selectedProject.complianceStandards.filter((s: string) => s !== standard)
-      : [...selectedProject.complianceStandards, standard]
+      : [...selectedProject.complianceStandards, standard];
 
-    setSelectedProject({ ...selectedProject, complianceStandards: updatedStandards })
+    setSelectedProject({ ...selectedProject, complianceStandards: updatedStandards });
 
     setSites((prevSites) =>
       prevSites.map((site) => ({
@@ -78,8 +62,8 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
           project.id === selectedProject.id ? { ...project, complianceStandards: updatedStandards } : project,
         ),
       })),
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -107,7 +91,7 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">
-                    {site.projects.filter((p) => p.isSelected).length}/{site.projects.length} Projects selected
+                    {site.projects.length} Projects
                   </Badge>
                 </div>
               </div>
@@ -120,7 +104,6 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
                     key={project.id}
                     project={project}
                     siteId={site.id}
-                    onProjectSelection={handleProjectSelection}
                     onSettingsClick={setSelectedProject}
                     selectedProject={selectedProject}
                     siteName={site.name}

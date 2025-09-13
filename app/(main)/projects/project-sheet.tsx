@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Sheet,
   SheetClose,
@@ -16,12 +15,10 @@ import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Image from "next/image"
 import { JiraProject } from "@/data-access-layer/types"
-
+import { Checkbox } from "@/components/ui/checkbox" // Keep Checkbox for available standards
 
 interface ExtendedProject extends JiraProject {
-  isSelected: boolean;
   complianceStandards: string[];
-  lastSync: string;
 }
 
 interface ProjectSheetProps {
