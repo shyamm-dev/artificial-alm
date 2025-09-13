@@ -16,7 +16,6 @@ interface ExtendedProject extends JiraProject {
 
 interface ProjectCardProps {
   project: ExtendedProject;
-  siteId: string;
   selectedProject: ExtendedProject | null;
   siteName: string;
   siteUrl: string;
@@ -27,7 +26,6 @@ interface ProjectCardProps {
 
 export default function ProjectCard({
   project,
-  siteId,
   onSettingsClick,
   selectedProject,
   siteName,

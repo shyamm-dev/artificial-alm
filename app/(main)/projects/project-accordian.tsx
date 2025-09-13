@@ -103,7 +103,6 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
                   <ProjectCard
                     key={project.id}
                     project={project}
-                    siteId={site.id}
                     onSettingsClick={setSelectedProject}
                     selectedProject={selectedProject}
                     siteName={site.name}
