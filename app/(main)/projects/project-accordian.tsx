@@ -39,6 +39,7 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
     return initialCompliance;
   });
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleComplianceStandardToggle = (standard: string) => {
     if (!selectedProjectId) return;
@@ -59,11 +60,33 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
     );
   }
 
+  const filteredSites = sites.map(site => {
+    const siteProjects = userAccessData.filter(access => 
+      access.resource.cloudId === site.cloudId && 
+      access.project &&
+      access.project.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    return { site, projects: siteProjects };
+  }).filter(({ projects }) => projects.length > 0);
+
   return (
     <>
-      <Accordion type="multiple" className="space-y-4" defaultValue={sites.map(site => site.cloudId)}>
-        {sites.map((site) => {
-          const siteProjects = userAccessData.filter(access => access.resource.cloudId === site.cloudId && access.project);
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search projects..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+        />
+      </div>
+      {filteredSites.length === 0 && searchQuery ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No projects found matching "{searchQuery}"</p>
+        </div>
+      ) : (
+        <Accordion type="multiple" className="space-y-4" defaultValue={filteredSites.map(({ site }) => site.cloudId)}>
+          {filteredSites.map(({ site, projects: siteProjects }) => {
 
           return (
             <AccordionItem key={site.cloudId} value={site.cloudId} className="border rounded-lg">
@@ -93,7 +116,7 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
                       Atlassian
                     </Badge>
                     <Badge variant="outline">
-                      {siteProjects.length} Projects
+                      {siteProjects.length} Project{siteProjects.length !== 1 ? 's' : ''}
                     </Badge>
                   </div>
                 </div>
@@ -125,8 +148,9 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
               </AccordionContent>
             </AccordionItem>
           );
-        })}
-      </Accordion>
+          })}
+        </Accordion>
+      )}
     </>
   )
 }

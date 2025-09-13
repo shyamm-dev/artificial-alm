@@ -23,6 +23,9 @@ export default async function ProjectsPage() {
       <div className="px-4 lg:px-6">
         <Suspense fallback={
           <div className="space-y-4">
+            <div className="mb-4">
+              <div className="h-10 bg-muted rounded-md animate-pulse"></div>
+            </div>
             <div className="border rounded-lg p-6">
               <div className="animate-pulse space-y-3">
                 <div className="h-4 bg-muted rounded w-1/4"></div>
