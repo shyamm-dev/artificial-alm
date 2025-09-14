@@ -1,5 +1,5 @@
 import ProjectAccordian from "./project-accordian";
-import { SyncButton } from "../../../components/sync-button";
+import { SyncButton } from "./sync-button";
 import { Suspense } from "react";
 import { getServerSession } from "@/lib/get-server-session";
 import { getUserResourcesAndProjects } from "@/db/queries/user-project-queries";

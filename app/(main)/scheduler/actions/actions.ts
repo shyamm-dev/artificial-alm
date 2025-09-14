@@ -16,7 +16,6 @@ export async function searchJiraIssues(args: JiraIssueSearchActionArgs) {
     throw new Error("Not Authorized to access this project !");
 
   const jql = buildJQL(args.projectId, args.filters);
-  console.log("JQL: ", jql);
 
   const result = await jiraClient.searchJiraIssues(args.cloudId, jql, ["summary", "issuetype", "description"]);
 
