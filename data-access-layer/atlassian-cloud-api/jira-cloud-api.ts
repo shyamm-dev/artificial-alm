@@ -1,5 +1,5 @@
 import { getAtlassianAccessToken } from "@/lib/get-server-access-token";
-import type { AtlassianResourceResponse, AtlassianResourceWithProjects, JiraProjectsPaginatedResponse, JiraSearchResponse } from "../types";
+import type { AtlassianResourceResponse, AtlassianResourceWithProjects, BulkFetchJiraIssuesResponse, JiraProjectsPaginatedResponse, JiraSearchResponse } from "../types";
 import { tryCatch } from "@/lib/try-catch";
 import { syncAtlassianDataWithDB } from "../atlassian-resource-sync/db-sync";
 
@@ -137,6 +137,21 @@ class JiraClient {
       }
     }
     return this.makeRequest<JiraSearchResponse>(payload);
+  }
+
+  public async bulkFetchJiraIssues(cloudId: string, issueKeys: string[], fields: string[] = ["summary", "issuetype", "description", "attachment"]) {
+    const payload: MakeJiraRequestArgs = {
+      cloudId,
+      endpoint: "/issue/bulkfetch",
+      options: {
+        method: "POST",
+        body: {
+          issueIdsOrKeys: issueKeys,
+          fields
+        }
+      }
+    }
+    return this.makeRequest<BulkFetchJiraIssuesResponse>(payload);
   }
 
   public async syncAtlassianResourceAndJiraProjects() {

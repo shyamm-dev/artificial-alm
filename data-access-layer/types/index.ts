@@ -69,6 +69,13 @@ export interface JiraIssueDescription {
   }>;
 }
 
+interface JiraIssueAttachment {
+  filename: string;
+  content: string;
+  size: number;
+  mimeType: string;
+}
+
 export interface JiraIssue {
   expand: string;
   id: string;
@@ -78,6 +85,7 @@ export interface JiraIssue {
     summary: string;
     issuetype: JiraIssueType;
     description?: JiraIssueDescription;
+    attachment?: JiraIssueAttachment[];
   };
 }
 
@@ -86,7 +94,9 @@ export interface JiraSearchResponse {
   isLast: boolean;
 }
 
-// ----- Jira sites with projects
+export interface BulkFetchJiraIssuesResponse {
+  issues: JiraIssue[];
+}
 
 export interface AtlassianResourceWithProjects extends AtlassianResource {
   projects: JiraProject[];
