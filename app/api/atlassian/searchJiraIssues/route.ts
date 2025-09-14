@@ -31,7 +31,6 @@ export async function POST(request: NextRequest) {
     }
 
     const jql = buildJQL(validatedParams.projectId, validatedParams.filters)
-    console.log("[jql] : ", jql)
 
     const result = await jiraClient.searchJiraIssues(validatedParams.cloudId, jql, ["summary", "issuetype", "description"])
 
