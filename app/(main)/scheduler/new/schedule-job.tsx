@@ -97,29 +97,16 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
     issueTypeId: issue.fields.issuetype.id
   })) || []
 
-  // Clear requirements when project changes
+  // Clear requirements when project or issue types change
   useEffect(() => {
     form.setValue("requirements", [])
-  }, [selectedProject, form])
-
-  // Reset requirements when issue types change
-  useEffect(() => {
-    form.setValue("requirements", [])
-  }, [selectedIssueTypes, form])
-
-  function onSubmit(data: JobFormData) {
-    console.log(data)
-  }
-
-  function handleCancel() {
-    router.push("/scheduler")
-  }
+  }, [selectedProject, selectedIssueTypes, form])
 
   return (
     <TooltipProvider>
       <div className="border rounded-lg p-6">
         <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form className="space-y-4">
           <div className="space-y-4">
             {/* Job Name Field - Start */}
             <FormField

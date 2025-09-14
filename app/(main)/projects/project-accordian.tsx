@@ -10,7 +10,7 @@ import { ExternalLinkIcon } from "lucide-react"
 import ProjectCard from "./project-card"
 import { COMPLIANCE_FRAMEWORKS } from "@/constants/compliance"
 import { getUserResourcesAndProjects } from "@/db/queries/user-project-queries"
-import { jiraProject } from "@/db/schema/jira-project-schema"
+
 
 const availableStandards = [...COMPLIANCE_FRAMEWORKS];
 
@@ -82,7 +82,7 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
       </div>
       {filteredSites.length === 0 && searchQuery ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No projects found matching "{searchQuery}"</p>
+          <p className="text-muted-foreground">No projects found matching &quot;{searchQuery}&quot;</p>
         </div>
       ) : (
         <Accordion type="multiple" className="space-y-4" defaultValue={filteredSites.map(({ site }) => site.cloudId)}>
@@ -136,7 +136,6 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
                         key={project.id}
                         project={project}
                         onSettingsClick={(proj) => setSelectedProjectId(proj.id)}
-                        selectedProjectId={selectedProjectId}
                         siteName={site.name}
                         siteUrl={site.url}
                         availableStandards={availableStandards}

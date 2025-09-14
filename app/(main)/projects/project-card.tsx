@@ -19,7 +19,6 @@ type ProjectWithCompliance = typeof jiraProject.$inferSelect & {
 export default function ProjectCard({
   project,
   onSettingsClick,
-  selectedProjectId,
   siteName,
   siteUrl,
   availableStandards,
@@ -27,7 +26,6 @@ export default function ProjectCard({
 }: {
   project: ProjectWithCompliance
   onSettingsClick: (project: ProjectWithCompliance) => void
-  selectedProjectId: string | null
   siteName: string
   siteUrl: string
   availableStandards: string[]
