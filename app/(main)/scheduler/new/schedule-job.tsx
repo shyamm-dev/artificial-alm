@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -47,6 +48,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
   const [open, setOpen] = useState(false)
   const [issueTypesOpen, setIssueTypesOpen] = useState(false)
   const [requirementsOpen, setRequirementsOpen] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [searchText, setSearchText] = useState("")
 
 
@@ -418,7 +420,35 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
               />
               {selectedRequirements && selectedRequirements.length > 0 && (
                 <div className="mt-2 space-y-1">
-                  <h4 className="text-sm font-medium text-muted-foreground">Requirements added so far</h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-medium text-muted-foreground">Requirements added so far</h4>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          Remove all
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Remove all requirements?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will remove all selected requirements. You can add them back by selecting from the dropdown.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => form.setValue("requirements", [])}>
+                            Remove all
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                   {selectedRequirements.map((requirementId) => {
                     const requirement = requirementOptions.find(req => req.id === requirementId)
                     return requirement ? (
@@ -462,7 +492,28 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
             {/* Requirements Field - End */}
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="destructive" onClick={handleCancel}>Cancel</Button>
+            <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button type="button" variant="destructive">Cancel</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Cancel job creation?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    All your progress will be lost. Are you sure you want to cancel?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Stay</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => {
+                    setCancelDialogOpen(false)
+                    setTimeout(() => router.push("/scheduler"), 100)
+                  }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Cancel job
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button type="submit">Create Job</Button>
           </div>
         </form>
