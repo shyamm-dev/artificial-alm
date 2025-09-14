@@ -123,7 +123,7 @@ class JiraClient {
     );
   }
 
-  public async searchJiraIssues(cloudId: string, jql: string, fields: string[] = ["summary", "issuetype", "description"], maxResults: number = 10) {
+  public async searchJiraIssues(cloudId: string, jql: string, fields: string[] = ["summary", "issuetype", "description"], maxResults: number = 50) {
     const payload: MakeJiraRequestArgs = {
       cloudId,
       endpoint: "/search",
