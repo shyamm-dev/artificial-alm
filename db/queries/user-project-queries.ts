@@ -27,3 +27,23 @@ export function getUserResourcesAndProjects(userId: string) {
     }
   });
 }
+
+export function hasAccessToResource(userId: string, cloudId: string, projectId: string) {
+  return db.query.userAtlassianProjectAccess.findFirst({
+    where: (u, { eq, and }) => and(eq(u.userId, userId), eq(u.cloudId, cloudId), eq(u.projectId, projectId))
+  });
+}
+
+export function getUserAccessibleProjects(userId: string) {
+  return db.query.userAtlassianProjectAccess.findMany({
+    where: (u, { eq }) => eq(u.userId, userId),
+    with: {
+      project: {
+        with: {
+          issueTypes: true,
+          compliance: true
+        }
+      }
+    }
+  }).then(userAccess => userAccess.map(access => access.project!).filter(Boolean));
+}

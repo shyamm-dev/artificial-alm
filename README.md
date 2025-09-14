@@ -16,8 +16,9 @@ Using server actions for data fetching is discouraged because it issues an inter
 
 ### Data Access and Security
 
-- **Centralize Data Operations:** All third-party API calls and database interactions must be handled through a dedicated Data Access Layer (DAL), located in `/lib/data-access-layer`. This ensures a single source of truth for data fetching and mutations.
+- **Centralize Data Operations:** All third-party API calls and database interactions must be handled through a dedicated Data Access Layer (DAL), located in `/data-access-layer`. This ensures a single source of truth for data fetching and mutations.
 - **Third-Party API Access:** All external API calls must go through the DAL - never call third-party APIs directly from components or other parts of the application.
+- **Third-Party API Client Usage:** All third-party API calls must be made only through their respective DAL clients (e.g., `jiraClient` for Jira APIs). This applies to both React Server Components (RSC) and API routes. Never make direct fetch calls to third-party APIs.
 - **Session Verification:** Every method within the DAL must verify that a valid user session exists before proceeding with any operation.
 - **Access Token Validation:** For routes or methods that interact with protected third-party APIs, the access token must be retrieved and validated before making the external request.
 

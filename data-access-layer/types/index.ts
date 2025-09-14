@@ -55,6 +55,37 @@ export type JiraProjectsPaginatedResponse = {
   values: JiraProject[];
 };
 
+// ----- Jira Issue Search
+
+export interface JiraIssueDescription {
+  type: string;
+  version: number;
+  content: Array<{
+    type: string;
+    content: Array<{
+      type: string;
+      text: string;
+    }>;
+  }>;
+}
+
+export interface JiraIssue {
+  expand: string;
+  id: string;
+  self: string;
+  key: string;
+  fields: {
+    summary: string;
+    issuetype: JiraIssueType;
+    description?: JiraIssueDescription;
+  };
+}
+
+export interface JiraSearchResponse {
+  issues: JiraIssue[];
+  isLast: boolean;
+}
+
 // ----- Jira sites with projects
 
 export interface AtlassianResourceWithProjects extends AtlassianResource {

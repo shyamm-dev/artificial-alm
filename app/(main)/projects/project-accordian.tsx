@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { Input } from "@/components/ui/input"
 import { ExternalLinkIcon } from "lucide-react"
 import ProjectCard from "./project-card"
 import { COMPLIANCE_FRAMEWORKS } from "@/constants/compliance"
@@ -61,8 +62,8 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
   }
 
   const filteredSites = sites.map(site => {
-    const siteProjects = userAccessData.filter(access => 
-      access.resource.cloudId === site.cloudId && 
+    const siteProjects = userAccessData.filter(access =>
+      access.resource.cloudId === site.cloudId &&
       access.project &&
       access.project.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -72,12 +73,11 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
   return (
     <>
       <div className="mb-4">
-        <input
+        <Input
           type="text"
           placeholder="Search projects..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
         />
       </div>
       {filteredSites.length === 0 && searchQuery ? (

@@ -1,5 +1,5 @@
 import { getAtlassianAccessToken } from "@/lib/get-server-access-token";
-import type { AtlassianResourceResponse, AtlassianResourceWithProjects, JiraProjectsPaginatedResponse } from "../types";
+import type { AtlassianResourceResponse, AtlassianResourceWithProjects, JiraProjectsPaginatedResponse, JiraSearchResponse } from "../types";
 import { tryCatch } from "@/lib/try-catch";
 import { syncAtlassianDataWithDB } from "../atlassian-resource-sync/db-sync";
 
@@ -40,6 +40,8 @@ class JiraClient {
           });
           url += `?${params.toString()}`;
         }
+
+        console.log("body : ", JSON.stringify(args.options.body))
 
         const res = await fetch(url, {
           method: args.options.method,
@@ -121,14 +123,20 @@ class JiraClient {
     );
   }
 
-  public async getSearchedIssues(cloudId: string, projectKey: string, searchTerm: string, maxResults: number = 10, startAt: number = 0) {
-    const jql = `(project = "${projectKey}") AND (issueKey = "${searchTerm}" OR text ~ "${searchTerm}")`;
+  public async searchJiraIssues(cloudId: string, jql: string, fields: string[] = ["summary", "issuetype", "description"], maxResults: number = 10) {
     const payload: MakeJiraRequestArgs = {
-      cloudId: cloudId,
+      cloudId,
       endpoint: "/search",
-      options: { method: "POST", body: { jql, maxResults, startAt, fields: ["summary", "issuetype"] } }
+      options: {
+        method: "POST",
+        body: {
+          jql,
+          fields,
+          maxResults
+        }
+      }
     }
-    return this.makeRequest(payload);
+    return this.makeRequest<JiraSearchResponse>(payload);
   }
 
   public async syncAtlassianResourceAndJiraProjects() {

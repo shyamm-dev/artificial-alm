@@ -2,7 +2,16 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['api.atlassian.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.atlassian.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.atlassian.net',
+      },
+    ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;"
