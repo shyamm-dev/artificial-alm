@@ -8,11 +8,6 @@ function escapeJQLString(value: string): string {
   return value.trim().replace(/\\/g, "\\\\").replace(/"/g, '\\"')
 }
 
-function isPotentialIssueKey(value: string): boolean {
-  // Detects keys like "ABC-123" (case-insensitive)
-  return /^[A-Z][A-Z0-9_]+-\d+$/i.test(value.trim())
-}
-
 export function buildJQL(projectId: string, filters?: JiraFilters): string {
   let jql = `project = ${projectId}`
 
@@ -31,11 +26,7 @@ export function buildJQL(projectId: string, filters?: JiraFilters): string {
   if (filters?.text) {
     const text = escapeJQLString(filters.text)
     if (text) {
-      if (isPotentialIssueKey(text)) {
-        jql += ` AND (key = ${text.toUpperCase()} OR text ~ "${text}")`
-      } else {
-        jql += ` AND text ~ "${text}"`
-      }
+        jql += ` AND (key = "${text}" OR text ~ "${text}")`
     }
   }
 

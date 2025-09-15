@@ -123,10 +123,10 @@ class JiraClient {
     );
   }
 
-  public async searchJiraIssues(cloudId: string, jql: string, fields: string[] = ["summary", "issuetype", "description"], maxResults: number = 50) {
+  public async searchJiraIssues(cloudId: string, jql: string, fields: string[] = ["summary", "issuetype"], maxResults: number = 50) {
     const payload: MakeJiraRequestArgs = {
       cloudId,
-      endpoint: "/search",
+      endpoint: "/search/jql",
       options: {
         method: "POST",
         body: {
@@ -139,7 +139,7 @@ class JiraClient {
     return this.makeRequest<JiraSearchResponse>(payload);
   }
 
-  public async bulkFetchJiraIssues(cloudId: string, issueKeys: string[], fields: string[] = ["summary", "issuetype", "description", "attachment"]) {
+  public async bulkFetchJiraIssues(cloudId: string, issueKeys: string[], fields: string[] = ["summary", "issuetype", "description"]) {
     const payload: MakeJiraRequestArgs = {
       cloudId,
       endpoint: "/issue/bulkfetch",
