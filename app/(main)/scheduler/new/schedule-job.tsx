@@ -2,10 +2,9 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { useState, use, useEffect } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation } from "@tanstack/react-query"
 import { useDebounce } from "@uidotdev/usehooks"
 import Image from "next/image"
 import { getUserAccessibleProjects } from "@/db/queries/user-project-queries"
@@ -30,13 +29,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 
-const jobSchema = z.object({
-  jobName: z.string().min(3, "Job name is required"),
-  project: z.string().min(1, "Project is required"),
-  issueTypes: z.array(z.string()).optional(),
-  requirements: z.array(z.string()).optional(),
-})
+import { scheduleJobSchema } from "@/lib/schemas/schedule-job"
+import { z } from "zod"
 
+const jobSchema = scheduleJobSchema.omit({ cloudId: true })
 type JobFormData = z.infer<typeof jobSchema>
 interface ScheduleJobProps {
   userProjectsPromise: Promise<Awaited<ReturnType<typeof getUserAccessibleProjects>>>
@@ -49,6 +45,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
   const [issueTypesOpen, setIssueTypesOpen] = useState(false)
   const [requirementsOpen, setRequirementsOpen] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false)
   const [searchText, setSearchText] = useState("")
 
 
@@ -56,15 +53,38 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
     resolver: zodResolver(jobSchema),
     defaultValues: {
       jobName: "",
-      project: "",
-      issueTypes: [],
-      requirements: [],
+      projectId: "",
+      issueTypeIds: [],
+      issueIds: [],
     },
   })
 
-  const selectedProject = form.watch("project")
-  const selectedIssueTypes = form.watch("issueTypes")
-  const selectedRequirements = form.watch("requirements")
+  const scheduleJobMutation = useMutation({
+    mutationFn: async (data: JobFormData & { cloudId: string }) => {
+      const response = await fetch("/api/scheduler/scheduleNewJob", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      if (!response.ok) throw new Error("Failed to schedule job")
+      return response.json()
+    },
+    onSuccess: () => {
+      setSuccessDialogOpen(true)
+    }
+  })
+
+  const onSubmit = (data: JobFormData) => {
+    if (!currentProject?.cloudId) return
+    
+    const fullData = { ...data, cloudId: currentProject.cloudId }
+    const validatedData = scheduleJobSchema.parse(fullData)
+    scheduleJobMutation.mutate(validatedData)
+  }
+
+  const selectedProject = form.watch("projectId")
+  const selectedIssueTypes = form.watch("issueTypeIds")
+  const selectedRequirements = form.watch("issueIds")
   const currentProject = projects.find(p => p.id === selectedProject)
   const availableIssueTypes = currentProject?.issueTypes || []
 
@@ -99,14 +119,14 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
 
   // Clear requirements when project or issue types change
   useEffect(() => {
-    form.setValue("requirements", [])
+    form.setValue("issueIds", [])
   }, [selectedProject, selectedIssueTypes, form])
 
   return (
     <TooltipProvider>
       <div className="border rounded-lg p-6">
         <Form {...form}>
-        <form className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-4">
             {/* Job Name Field - Start */}
             <FormField
@@ -128,7 +148,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
               <div className="space-y-2">
                 <FormField
                   control={form.control}
-                  name="project"
+                  name="projectId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-base">Project</FormLabel>
@@ -161,9 +181,9 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                                     value={project.name}
                                     key={project.id}
                                     onSelect={() => {
-                                      form.setValue("project", project.id)
-                                      form.setValue("issueTypes", [])
-                                      form.setValue("requirements", [])
+                                      form.setValue("projectId", project.id)
+                                      form.setValue("issueTypeIds", [])
+                                      form.setValue("issueIds", [])
                                       setOpen(false)
                                     }}
                                     className="flex justify-start"
@@ -223,7 +243,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
               <div className="space-y-2">
                 <FormField
                   control={form.control}
-                  name="issueTypes"
+                  name="issueTypeIds"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-base">Issue Types (optional)</FormLabel>
@@ -262,7 +282,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                                       const newValues = isSelected
                                         ? currentValues.filter(id => id !== issueType.id)
                                         : [...currentValues, issueType.id]
-                                      form.setValue("issueTypes", newValues)
+                                      form.setValue("issueTypeIds", newValues)
                                     }}
                                     className="flex justify-between"
                                   >
@@ -321,7 +341,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
             <div className="w-full md:w-1/2">
               <FormField
                 control={form.control}
-                name="requirements"
+                name="issueIds"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-base">Requirements <span className="italic text-muted-foreground">(fetched based on selected project and issue types)</span></FormLabel>
@@ -366,7 +386,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                                     const newValues = isSelected
                                       ? currentValues.filter(id => id !== requirement.id)
                                       : [...currentValues, requirement.id]
-                                    form.setValue("requirements", newValues)
+                                    form.setValue("issueIds", newValues)
                                   }}
                                   className="flex justify-between items-center gap-2"
                                 >
@@ -429,7 +449,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => form.setValue("requirements", [])}>
+                          <AlertDialogAction onClick={() => form.setValue("issueIds", [])}>
                             Remove all
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -464,7 +484,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                             className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
                             onClick={() => {
                               const newValues = selectedRequirements.filter(id => id !== requirementId)
-                              form.setValue("requirements", newValues)
+                              form.setValue("issueIds", newValues)
                             }}
                           >
                             <XIcon className="h-3 w-3" />
@@ -501,10 +521,31 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button type="submit">Create Job</Button>
+            <Button type="submit" disabled={scheduleJobMutation.isPending}>
+              {scheduleJobMutation.isPending ? "Creating..." : "Create Job"}
+            </Button>
           </div>
         </form>
         </Form>
+        
+        <AlertDialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Success!</AlertDialogTitle>
+              <AlertDialogDescription>
+                Job scheduled successfully.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => {
+                setSuccessDialogOpen(false)
+                router.push("/scheduler")
+              }}>
+                OK
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </TooltipProvider>
   )

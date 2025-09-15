@@ -57,23 +57,16 @@ export type JiraProjectsPaginatedResponse = {
 
 // ----- Jira Issue Search
 
+export interface JiraIssueDescriptionNode {
+  type: string;
+  text?: string;
+  content?: JiraIssueDescriptionNode[];
+}
+
 export interface JiraIssueDescription {
   type: string;
   version: number;
-  content: Array<{
-    type: string;
-    content: Array<{
-      type: string;
-      text: string;
-    }>;
-  }>;
-}
-
-interface JiraIssueAttachment {
-  filename: string;
-  content: string;
-  size: number;
-  mimeType: string;
+  content: JiraIssueDescriptionNode[];
 }
 
 export interface JiraIssue {
@@ -84,8 +77,7 @@ export interface JiraIssue {
   fields: {
     summary: string;
     issuetype: JiraIssueType;
-    description?: JiraIssueDescription;
-    attachment?: JiraIssueAttachment[];
+    description?: JiraIssueDescription | null;
   };
 }
 
@@ -95,7 +87,9 @@ export interface JiraSearchResponse {
 }
 
 export interface BulkFetchJiraIssuesResponse {
+  expand: string;
   issues: JiraIssue[];
+  issueErrors: unknown[];
 }
 
 export interface AtlassianResourceWithProjects extends AtlassianResource {

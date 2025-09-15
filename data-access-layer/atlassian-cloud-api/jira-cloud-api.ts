@@ -41,8 +41,6 @@ class JiraClient {
           url += `?${params.toString()}`;
         }
 
-        console.log("body : ", JSON.stringify(args.options.body))
-
         const res = await fetch(url, {
           method: args.options.method,
           headers: {
@@ -127,14 +125,7 @@ class JiraClient {
     const payload: MakeJiraRequestArgs = {
       cloudId,
       endpoint: "/search/jql",
-      options: {
-        method: "POST",
-        body: {
-          jql,
-          fields,
-          maxResults
-        }
-      }
+      options: { method: "POST", body: { jql, fields, maxResults } }
     }
     return this.makeRequest<JiraSearchResponse>(payload);
   }
@@ -143,13 +134,7 @@ class JiraClient {
     const payload: MakeJiraRequestArgs = {
       cloudId,
       endpoint: "/issue/bulkfetch",
-      options: {
-        method: "POST",
-        body: {
-          issueIdsOrKeys: issueKeys,
-          fields
-        }
-      }
+      options: { method: "POST", body: { issueIdsOrKeys: issueKeys, fields } }
     }
     return this.makeRequest<BulkFetchJiraIssuesResponse>(payload);
   }
