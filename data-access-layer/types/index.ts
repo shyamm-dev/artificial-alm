@@ -77,7 +77,7 @@ export interface JiraIssue {
   fields: {
     summary: string;
     issuetype: JiraIssueType;
-    description?: JiraIssueDescription | null;
+    description?: JiraIssueDescription | string | null;
   };
 }
 

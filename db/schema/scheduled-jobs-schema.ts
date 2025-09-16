@@ -1,12 +1,13 @@
-import { sqliteTable, text, index, integer, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, index, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { user } from "@/auth-schema";
 import { jiraProject, jiraProjectIssueType } from "./jira-project-schema";
 import { timestamps } from "../helper/timestamp-helper";
 import { ScheduledJobIssueStatus } from "@/constants/shared-constants";
+import { randomUUID } from "crypto";
 
 export const scheduledJob = sqliteTable("scheduled_job", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: text("id").primaryKey().$defaultFn(() => randomUUID()),
   cloudId: text("cloud_id").notNull(),
   projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
@@ -21,14 +22,15 @@ export const scheduledJob = sqliteTable("scheduled_job", {
 );
 
 export const scheduledJobIssue = sqliteTable("scheduled_job_issue", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: text("id").primaryKey().$defaultFn(() => randomUUID()),
   jobId: text("job_id").notNull().references(() => scheduledJob.id, { onDelete: "cascade" }),
   issueId: text("issue_id").notNull(),
   issueKey: text("issue_key").notNull(),
   summary: text("summary").notNull(),
   description: text("description"),
-  issueTypeId: text("issue_type_id").notNull().references(() => jiraProjectIssueType.id, { onDelete: "cascade" }),
   status: text("status").$type<ScheduledJobIssueStatus>().notNull().default("pending"),
+
+  issueTypeId: text("issue_type_id").notNull().references(() => jiraProjectIssueType.id, { onDelete: "cascade" }),
 
   ...timestamps,
 },
@@ -40,7 +42,7 @@ export const scheduledJobIssue = sqliteTable("scheduled_job_issue", {
 );
 
 export const scheduledJobIssueTestCase = sqliteTable("scheduled_job_issue_test_case", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: text("id").primaryKey().$defaultFn(() => randomUUID()),
   issueId: text("issue_id").notNull().references(() => scheduledJobIssue.id, { onDelete: "cascade" }),
   summary: text("summary").notNull(),
   description: text("description").notNull(),

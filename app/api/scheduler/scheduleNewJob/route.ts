@@ -3,6 +3,8 @@ import { jiraClient } from "@/data-access-layer/atlassian-cloud-api/jira-cloud-a
 import { hasAccessToResource } from "@/db/queries/user-project-queries"
 import { getServerSession } from "@/lib/get-server-session"
 import { scheduleJobSchema } from "@/lib/schemas/schedule-job"
+import { createScheduledJobWithIssues } from "@/db/queries/scheduled-jobs-queries"
+import { transformJiraIssues } from "@/db/helper/sync-helpers"
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,6 +30,19 @@ export async function POST(request: NextRequest) {
     if (result.error) {
       return NextResponse.json({ error: result.error.message }, { status: 500 })
     }
+
+    if (!result.data) {
+      return NextResponse.json({ error: "No data returned from Jira" }, { status: 500 })
+    }
+
+    const transformedIssues = transformJiraIssues(result.data.issues)
+
+    await createScheduledJobWithIssues({
+      cloudId: validatedData.cloudId,
+      projectId: validatedData.projectId,
+      name: validatedData.jobName,
+      createdByUserId: session.user.id
+    }, transformedIssues)
 
     return NextResponse.json({ message: "Job scheduled successfully" })
   } catch (error) {

@@ -2,9 +2,9 @@ import { createInsertSchema } from "drizzle-zod";
 import { atlassianResource } from "@/db/schema/atlassian-resource-schema";
 import { jiraProject, jiraProjectIssueType } from "@/db/schema/jira-project-schema";
 import { userAtlassianProjectAccess } from "@/db/schema/user-resource-join-schema";
-import { AtlassianResourceWithProjects, JiraProject, JiraIssueType } from "@/data-access-layer/types";
+import { AtlassianResourceWithProjects, JiraProject, JiraIssueType, JiraIssue, JiraIssueDescription } from "@/data-access-layer/types";
+import { transformJiraDescriptionToText } from "@/lib/jira-description-transformer";
 
-// --- Zod Insert schemas validators from tables
 export const atlassianResourceInsertSchema = createInsertSchema(atlassianResource);
 export const jiraProjectInsertSchema = createInsertSchema(jiraProject);
 export const jiraIssueTypeInsertSchema = createInsertSchema(jiraProjectIssueType);
@@ -63,4 +63,16 @@ export function transformIssueType(issue: JiraIssueType, projectId: string) {
 
 export function transformUserAccess(userId: string, cloudId: string, projectId: string | null) {
   return { userId, cloudId, projectId };
+}
+
+export function transformJiraIssues(issues: JiraIssue[]): JiraIssue[] {
+  return issues.map(issue => ({
+    ...issue,
+    fields: {
+      ...issue.fields,
+      description: issue.fields.description && typeof issue.fields.description === 'object'
+        ? transformJiraDescriptionToText((issue.fields.description as JiraIssueDescription).content)
+        : issue.fields.description
+    }
+  }))
 }
