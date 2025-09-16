@@ -4,7 +4,7 @@ import { jiraClient } from "@/data-access-layer/atlassian-cloud-api/jira-cloud-a
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "@/lib/get-server-session";
 import { upsertProjectCompliance } from "@/db/queries/user-project-queries";
-import { ComplianceFramework } from "@/constants/compliance";
+import { ComplianceFramework } from "@/constants/shared-constants";
 import { tryCatch } from "@/lib/try-catch";
 
 export async function syncAtlassianResource() {

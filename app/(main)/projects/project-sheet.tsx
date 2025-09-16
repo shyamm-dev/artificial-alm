@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner";
 import { saveProjectCompliance } from "./actions/sync-actions";
 import { useState } from "react";
-import { ComplianceFramework } from "@/constants/compliance";
+import { ComplianceFramework } from "@/constants/shared-constants";
 
 export default function ProjectSheet({
   project,

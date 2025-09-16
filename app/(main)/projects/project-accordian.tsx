@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { ExternalLinkIcon } from "lucide-react"
 import ProjectCard from "./project-card"
-import { COMPLIANCE_FRAMEWORKS } from "@/constants/compliance"
+import { COMPLIANCE_FRAMEWORKS } from "@/constants/shared-constants"
 import { getUserResourcesAndProjects } from "@/db/queries/user-project-queries"
 
 

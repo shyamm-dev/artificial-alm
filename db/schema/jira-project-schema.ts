@@ -2,7 +2,8 @@ import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { atlassianResource } from "./atlassian-resource-schema";
 import { timestamps } from "../helper/timestamp-helper";
-import { ComplianceFramework } from "@/constants/compliance";
+import { ComplianceFramework } from "@/constants/shared-constants";
+import { scheduledJob, scheduledJobIssue } from "./scheduled-jobs-schema";
 
 export const jiraProject = sqliteTable("jira_project", {
   id: text("id").primaryKey(),
@@ -71,13 +72,15 @@ export const jiraProjectRelations = relations(jiraProject, ({ one, many }) => ({
     fields: [jiraProject.id],
     references: [jiraProjectCompliance.projectId],
   }),
+  scheduledJobs: many(scheduledJob),
 }));
 
-export const jiraProjectIssueTypeRelations = relations(jiraProjectIssueType, ({ one }) => ({
+export const jiraProjectIssueTypeRelations = relations(jiraProjectIssueType, ({ one, many }) => ({
   project: one(jiraProject, {
     fields: [jiraProjectIssueType.projectId],
     references: [jiraProject.id],
   }),
+  scheduledJobIssues: many(scheduledJobIssue),
 }));
 
 export const jiraProjectComplianceRelations = relations(jiraProjectCompliance, ({ one }) => ({
