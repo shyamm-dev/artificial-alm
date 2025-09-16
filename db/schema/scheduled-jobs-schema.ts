@@ -6,20 +6,11 @@ import { timestamps } from "../helper/timestamp-helper";
 import { ScheduledJobIssueStatus } from "@/constants/shared-constants";
 
 export const scheduledJob = sqliteTable("scheduled_job", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-
+  id: integer("id").primaryKey({ autoIncrement: true }),
   cloudId: text("cloud_id").notNull(),
-  projectId: text("project_id")
-    .notNull()
-    .references(() => jiraProject.id, { onDelete: "cascade" }),
-
+  projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-
-  createdByUserId: text("created_by_user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "set null" }),
+  createdByUserId: text("created_by_user_id").notNull().references(() => user.id, { onDelete: "set null" }),
 
   ...timestamps,
 },
@@ -30,23 +21,13 @@ export const scheduledJob = sqliteTable("scheduled_job", {
 );
 
 export const scheduledJobIssue = sqliteTable("scheduled_job_issue", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-
-  jobId: text("job_id")
-    .notNull()
-    .references(() => scheduledJob.id, { onDelete: "cascade" }),
-
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  jobId: text("job_id").notNull().references(() => scheduledJob.id, { onDelete: "cascade" }),
   issueId: text("issue_id").notNull(),
   issueKey: text("issue_key").notNull(),
   summary: text("summary").notNull(),
   description: text("description"),
-
-  issueTypeId: text("issue_type_id")
-    .notNull()
-    .references(() => jiraProjectIssueType.id, { onDelete: "cascade" }),
-
+  issueTypeId: text("issue_type_id").notNull().references(() => jiraProjectIssueType.id, { onDelete: "cascade" }),
   status: text("status").$type<ScheduledJobIssueStatus>().notNull().default("pending"),
 
   ...timestamps,
@@ -59,22 +40,12 @@ export const scheduledJobIssue = sqliteTable("scheduled_job_issue", {
 );
 
 export const scheduledJobIssueTestCase = sqliteTable("scheduled_job_issue_test_case", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-
-  issueId: text("issue_id")
-    .notNull()
-    .references(() => scheduledJobIssue.id, { onDelete: "cascade" }),
-
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  issueId: text("issue_id").notNull().references(() => scheduledJobIssue.id, { onDelete: "cascade" }),
   summary: text("summary").notNull(),
   description: text("description").notNull(),
-
   linkedTo: text("linked_to"),
-
-  modifiedByUserId: text("modified_by_user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "set null" }),
+  modifiedByUserId: text("modified_by_user_id").notNull().references(() => user.id, { onDelete: "set null" }),
 
   ...timestamps,
 },
