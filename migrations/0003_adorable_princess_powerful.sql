@@ -1,0 +1,1 @@
+ALTER TABLE `scheduled_job` DROP COLUMN `status`;

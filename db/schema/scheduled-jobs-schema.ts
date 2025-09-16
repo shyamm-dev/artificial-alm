@@ -21,8 +21,6 @@ export const scheduledJob = sqliteTable("scheduled_job", {
     .notNull()
     .references(() => user.id, { onDelete: "set null" }),
 
-  status: text("status").notNull().default("pending"),
-
   ...timestamps,
 },
   (table) => [
