@@ -4,7 +4,6 @@ import { atlassianResource } from "./atlassian-resource-schema";
 import { user } from "@/auth-schema";
 import { timestamps } from "../helper/timestamp-helper";
 import { jiraProject } from "./jira-project-schema";
-import { scheduledJob, scheduledJobIssueTestCase } from "./scheduled-jobs-schema";
 
 export const userAtlassianProjectAccess = sqliteTable("user_atlassian_project_access", {
 
