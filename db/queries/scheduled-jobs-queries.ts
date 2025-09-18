@@ -60,6 +60,7 @@ export async function getScheduledJobIssues(
       status: scheduledJobIssue.status,
       jobName: scheduledJob.name,
       issueTypeIconUrl: jiraProjectIssueType.iconUrl,
+      issueTypeName: jiraProjectIssueType.name, // Add issueTypeName
       createdAt: scheduledJobIssue.createdAt,
       updatedAt: scheduledJobIssue.updatedAt
     })
