@@ -7,6 +7,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 
+
 import {
   Table,
   TableBody,
@@ -25,6 +26,7 @@ export default function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+
   const table = useReactTable({
     data,
     columns,
