@@ -36,12 +36,12 @@ export default function DataTable<TData, TValue>({
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
+            <TableRow key={headerGroup.id} className="bg-muted/50">
+              {headerGroup.headers.map((header, index) => {
                 return (
                   <TableHead
                     key={header.id}
-                    className="border-r last:border-r-0"
+                    className={`text-foreground ${index === 0 ? 'pl-4' : ''}`}
                     style={{ width: header.getSize() }}
                   >
                     {header.isPlaceholder
@@ -63,10 +63,10 @@ export default function DataTable<TData, TValue>({
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
-                {row.getVisibleCells().map((cell) => (
+                {row.getVisibleCells().map((cell, index) => (
                   <TableCell
                     key={cell.id}
-                    className="border-r last:border-r-0"
+                    className={`${index === 0 ? 'pl-4' : ''}`}
                     style={{ width: cell.column.getSize() }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

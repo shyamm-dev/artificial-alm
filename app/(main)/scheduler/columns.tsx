@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ScheduledJobIssueStatus } from "@/constants/shared-constants"
 import Image from "next/image"
+import { Clock, Zap, CheckCircle, XCircle, HelpCircle } from "lucide-react"
 import {
   Tooltip,
   TooltipContent,
@@ -25,7 +26,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
   {
     accessorKey: "issueKey",
     header: "Issue Key",
-    size: 50,
+    size: 100,
     cell: ({ row }) => {
       const issueKey: string = row.getValue("issueKey");
       const iconUrl: string | null = row.original.issueTypeIconUrl;
@@ -48,12 +49,13 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
   {
     accessorKey: "summary",
     header: "Summary",
+    size: 400,
     cell: ({ row }) => {
       const summary: string = row.getValue("summary");
       return (
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger className="truncate max-w-[300px] block">
+            <TooltipTrigger className="truncate block">
               {summary}
             </TooltipTrigger>
             <TooltipContent>
@@ -67,16 +69,16 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    size: 120,
+    size: 130,
     cell: ({ row }) => {
       const status: ScheduledJobIssueStatus = row.getValue("status");
-      const { text, backgroundColor, textColor, icon } = getStatusIndicator(status);
+      const { text, icon } = getStatusIndicator(status);
       return (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger className="flex items-center gap-2">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${backgroundColor} ${textColor}`}>
-                {icon && <span className="text-lg mr-1">{icon}</span>}
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-transparent text-foreground">
+                {icon && <span className="mr-1">{icon}</span>}
                 {text}
               </span>
             </TooltipTrigger>
@@ -91,9 +93,33 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
   {
     accessorKey: "createdAt",
     header: "Scheduled At",
-    size: 100,
+    size: 160,
     cell: ({ row }) => {
       const value = row.getValue("createdAt");
+      const date = new Date(value as string);
+      const formattedDate = date.toLocaleDateString("en-US");
+      const formattedTime = date.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
+      const fullDateTime = `${formattedDate} ${formattedTime}`;
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="block">
+              {fullDateTime}
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{fullDateTime}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    },
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Updated At",
+    size: 160,
+    cell: ({ row }) => {
+      const value = row.getValue("updatedAt");
       const date = new Date(value as string);
       const formattedDate = date.toLocaleDateString("en-US");
       const formattedTime = date.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
@@ -117,14 +143,14 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
 const getStatusIndicator = (status: ScheduledJobIssueStatus) => {
   switch (status) {
     case "pending":
-      return { text: "Pending", backgroundColor: "bg-yellow-500 dark:bg-yellow-700", textColor: "text-black dark:text-white", icon: "●" };
+      return { text: "Pending", icon: <Clock className="h-3 w-3" /> };
     case "in_progress":
-      return { text: "Running", backgroundColor: "bg-blue-500 dark:bg-blue-700", textColor: "text-white dark:text-white", icon: "●" }; // Could animate this later
+      return { text: "Running", icon: <Zap className="h-3 w-3" /> };
     case "completed":
-      return { text: "Success", backgroundColor: "bg-green-500 dark:bg-green-700", textColor: "text-white dark:text-white", icon: "✔" };
+      return { text: "Success", icon: <CheckCircle className="h-3 w-3" /> };
     case "failed":
-      return { text: "Failed", backgroundColor: "bg-red-500 dark:bg-red-700", textColor: "text-white dark:text-white", icon: "✖" };
+      return { text: "Failed", icon: <XCircle className="h-3 w-3" /> };
     default:
-      return { text: "Unknown", backgroundColor: "bg-gray-500 dark:bg-gray-700", textColor: "text-white dark:text-white", icon: "?" };
+      return { text: "Unknown", icon: <HelpCircle className="h-3 w-3" /> };
   }
 };
