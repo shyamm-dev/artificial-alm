@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ScheduledJobIssueStatus } from "@/constants/shared-constants"
 import Image from "next/image"
 import { Clock, Zap, CheckCircle, XCircle, HelpCircle } from "lucide-react"
+
 import {
   Tooltip,
   TooltipContent,
@@ -75,19 +76,38 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
       const status: ScheduledJobIssueStatus = row.getValue("status");
       const { text, icon } = getStatusIndicator(status);
       return (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="flex items-center gap-2">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-transparent text-foreground">
-                {icon && <span className="mr-1">{icon}</span>}
-                {text}
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{text}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex items-center gap-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-2 border-dashed bg-transparent text-foreground">
+                  {icon && <span className="mr-1">{icon}</span>}
+                  {text}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{text}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          {status === "completed" && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 cursor-pointer h-6 px-2"
+                    onClick={() => console.log('Review clicked for:', row.original.id)}
+                  >
+                    Review
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Testcase generation completed. Review the testcase</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
       );
     },
   },
@@ -152,14 +172,14 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
 const getStatusIndicator = (status: ScheduledJobIssueStatus) => {
   switch (status) {
     case "pending":
-      return { text: "Pending", icon: <Clock className="h-3 w-3" /> };
+      return { text: "Pending", icon: <Clock className="h-3 w-3 text-yellow-600" /> };
     case "in_progress":
-      return { text: "Running", icon: <Zap className="h-3 w-3" /> };
+      return { text: "Running", icon: <Zap className="h-3 w-3 text-blue-600" /> };
     case "completed":
-      return { text: "Success", icon: <CheckCircle className="h-3 w-3" /> };
+      return { text: "Success", icon: <CheckCircle className="h-3 w-3 text-green-600" /> };
     case "failed":
-      return { text: "Failed", icon: <XCircle className="h-3 w-3" /> };
+      return { text: "Failed", icon: <XCircle className="h-3 w-3 text-red-600" /> };
     default:
-      return { text: "Unknown", icon: <HelpCircle className="h-3 w-3" /> };
+      return { text: "Unknown", icon: <HelpCircle className="h-3 w-3 text-gray-600" /> };
   }
 };

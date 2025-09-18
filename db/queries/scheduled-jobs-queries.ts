@@ -1,7 +1,7 @@
 import { db } from "@/db/drizzle";
 import { scheduledJob, scheduledJobIssue } from "@/db/schema/scheduled-jobs-schema";
 import { userAtlassianProjectAccess } from "@/db/schema/user-resource-join-schema";
-import { jiraProjectIssueType } from "@/db/schema/jira-project-schema";
+import { jiraProjectIssueType, jiraProject } from "@/db/schema/jira-project-schema";
 import { createInsertSchema } from "drizzle-zod";
 import { stripUndefined } from "@/db/helper/sync-helpers";
 import { eq, and, isNotNull, desc, asc, count, inArray, like, or } from "drizzle-orm";
@@ -31,14 +31,15 @@ export function createScheduledJobWithIssues(jobData: typeof scheduledJob.$infer
 export async function getScheduledJobIssues(
   userId: string,
   pagination: { page: number; pageSize: number },
-  filters?: { search?: string; sortBy?: string; sortOrder?: 'asc' | 'desc' }
+  filters?: { search?: string; sortBy?: string; sortOrder?: 'asc' | 'desc'; status?: string; projectId?: string; jobName?: string }
 ) {
   const userProjectsSubquery = db.select({ projectId: userAtlassianProjectAccess.projectId })
     .from(userAtlassianProjectAccess)
     .where(
       and(
         eq(userAtlassianProjectAccess.userId, userId),
-        isNotNull(userAtlassianProjectAccess.projectId)
+        isNotNull(userAtlassianProjectAccess.projectId),
+        filters?.projectId ? eq(userAtlassianProjectAccess.projectId, filters.projectId) : undefined
       )
     )
 
@@ -47,7 +48,9 @@ export async function getScheduledJobIssues(
     filters?.search ? or(
       like(scheduledJobIssue.issueKey, `%${filters.search}%`),
       like(scheduledJobIssue.summary, `%${filters.search}%`)
-    ) : undefined
+    ) : undefined,
+    filters?.status ? eq(scheduledJobIssue.status, filters.status as ScheduledJobIssueStatus) : undefined,
+    filters?.jobName ? like(scheduledJob.name, `%${filters.jobName}%`) : undefined
   )
 
   return Promise.all([
@@ -67,7 +70,7 @@ export async function getScheduledJobIssues(
       .innerJoin(jiraProjectIssueType, eq(scheduledJobIssue.issueTypeId, jiraProjectIssueType.id))
       .where(whereClause)
       .orderBy(
-        filters?.sortBy === 'createdAt' 
+        filters?.sortBy === 'createdAt'
           ? (filters.sortOrder === 'asc' ? asc(scheduledJobIssue.createdAt) : desc(scheduledJobIssue.createdAt))
           : filters?.sortBy === 'updatedAt'
           ? (filters.sortOrder === 'asc' ? asc(scheduledJobIssue.updatedAt) : desc(scheduledJobIssue.updatedAt))
@@ -82,4 +85,40 @@ export async function getScheduledJobIssues(
       .innerJoin(jiraProjectIssueType, eq(scheduledJobIssue.issueTypeId, jiraProjectIssueType.id))
       .where(whereClause)
   ]).then(([data, [{ total }]]) => ({ data, total }))
+}
+
+export async function getUserProjects(userId: string) {
+  return db.select({
+    id: jiraProject.id,
+    name: jiraProject.name,
+    key: jiraProject.key,
+    avatarUrl: jiraProject.avatar24
+  })
+    .from(userAtlassianProjectAccess)
+    .innerJoin(jiraProject, eq(userAtlassianProjectAccess.projectId, jiraProject.id))
+    .where(
+      and(
+        eq(userAtlassianProjectAccess.userId, userId),
+        isNotNull(userAtlassianProjectAccess.projectId)
+      )
+    )
+    .orderBy(jiraProject.name)
+}
+
+export async function getJobNames(userId: string) {
+  const result = await db.select({
+    name: scheduledJob.name
+  })
+    .from(scheduledJob)
+    .innerJoin(userAtlassianProjectAccess, eq(scheduledJob.projectId, userAtlassianProjectAccess.projectId))
+    .where(
+      and(
+        eq(userAtlassianProjectAccess.userId, userId),
+        isNotNull(userAtlassianProjectAccess.projectId)
+      )
+    )
+    .groupBy(scheduledJob.name)
+    .orderBy(scheduledJob.name)
+  
+  return result.map(r => r.name)
 }

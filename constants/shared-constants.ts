@@ -6,9 +6,6 @@ export const COMPLIANCE_FRAMEWORKS = [
   "PCI-DSS",
 ] as const;
 
-
-export type ComplianceFramework = typeof COMPLIANCE_FRAMEWORKS[number];
-
 export const SCHEDULED_JOB_ISSUE_STATUS = [
   "pending",
   "in_progress",
@@ -17,5 +14,5 @@ export const SCHEDULED_JOB_ISSUE_STATUS = [
   "deployed_to_jira"
 ] as const;
 
-
+export type ComplianceFramework = typeof COMPLIANCE_FRAMEWORKS[number];
 export type ScheduledJobIssueStatus = typeof SCHEDULED_JOB_ISSUE_STATUS[number];

@@ -1,0 +1,30 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { FilterX } from "lucide-react"
+import { useRouter, useSearchParams } from "next/navigation"
+
+export function ClearFilters() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  const hasFilters = searchParams.get("search") || searchParams.get("status") || searchParams.get("projectId") || searchParams.get("jobName")
+
+  const handleClearFilters = () => {
+    router.push(window.location.pathname)
+  }
+
+  if (!hasFilters) return null
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleClearFilters}
+      className="h-10"
+    >
+      <FilterX className="h-4 w-4 mr-2" />
+      Clear Filters
+    </Button>
+  )
+}
