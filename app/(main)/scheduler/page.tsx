@@ -6,7 +6,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { SchedulerTable } from "./scheduler-table"
 import { SchedulerSkeleton } from "./scheduler-skeleton"
-import { getScheduledJobIssues, getUserProjects, getJobNames } from "@/db/queries/scheduled-jobs-queries"
+import { getScheduledJobIssues, getUserProjects, getJobNames, getIssueKeysAndSummaries } from "@/db/queries/scheduled-jobs-queries"
 import { getPaginationParams } from "@/lib/search-params"
 
 
@@ -25,13 +25,14 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
   const dataPromise = Promise.all([
     getScheduledJobIssues(session.user.id, { page, pageSize }, { search, sortBy, sortOrder, status, projectId, jobName }),
     getUserProjects(session.user.id),
-    getJobNames(session.user.id)
+    getJobNames(session.user.id),
+    getIssueKeysAndSummaries(session.user.id)
   ]);
 
   return (
     <div className="px-4 lg:px-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Scheduled Job Issues</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Track Progress</h1>
         <Link href="/scheduler/new">
           <Button size="sm" className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />

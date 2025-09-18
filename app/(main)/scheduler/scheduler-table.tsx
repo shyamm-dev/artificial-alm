@@ -2,7 +2,7 @@ import { use } from "react"
 import DataTable from "./data-table"
 import { columns } from "./columns"
 import { Pagination } from "./pagination"
-import { SearchBar } from "./search-bar"
+import { IssueSearchFilter } from "./issue-search-filter"
 import { StatusFilter } from "./status-filter"
 import { ProjectFilter } from "./project-filter"
 import { JobNameFilter } from "./job-name-filter"
@@ -14,20 +14,21 @@ interface SchedulerTableProps {
   dataPromise: Promise<[
     Awaited<ReturnType<typeof getScheduledJobIssues>>,
     { id: string; name: string; key: string; avatarUrl: string | null }[],
-    string[]
+    string[],
+    { issueKey: string; summary: string; issueTypeIconUrl: string | null; issueTypeName: string | null }[]
   ]>
   searchParams: Record<string, string | string[] | undefined>
 }
 
 export function SchedulerTable({ dataPromise, searchParams }: SchedulerTableProps) {
-  const [{ data, total }, projects, jobNames] = use(dataPromise)
+  const [{ data, total }, projects, jobNames, issues] = use(dataPromise)
   const { page, pageSize } = getPaginationParams(searchParams)
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
         <div className="w-full lg:w-96">
-          <SearchBar />
+          <IssueSearchFilter issues={issues} />
         </div>
         <div className="flex flex-wrap gap-2 lg:gap-4">
           <StatusFilter />

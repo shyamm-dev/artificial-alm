@@ -122,3 +122,23 @@ export async function getJobNames(userId: string) {
   
   return result.map(r => r.name)
 }
+
+export async function getIssueKeysAndSummaries(userId: string) {
+  return db.select({
+    issueKey: scheduledJobIssue.issueKey,
+    summary: scheduledJobIssue.summary,
+    issueTypeIconUrl: jiraProjectIssueType.iconUrl,
+    issueTypeName: jiraProjectIssueType.name
+  })
+    .from(scheduledJobIssue)
+    .innerJoin(scheduledJob, eq(scheduledJobIssue.jobId, scheduledJob.id))
+    .innerJoin(jiraProjectIssueType, eq(scheduledJobIssue.issueTypeId, jiraProjectIssueType.id))
+    .innerJoin(userAtlassianProjectAccess, eq(scheduledJob.projectId, userAtlassianProjectAccess.projectId))
+    .where(
+      and(
+        eq(userAtlassianProjectAccess.userId, userId),
+        isNotNull(userAtlassianProjectAccess.projectId)
+      )
+    )
+    .orderBy(scheduledJobIssue.issueKey)
+}
