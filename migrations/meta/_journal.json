@@ -57,6 +57,13 @@
       "when": 1758018329756,
       "tag": "0007_keen_archangel",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1758178055838,
+      "tag": "0008_careless_blue_blade",
+      "breakpoints": true
     }
   ]
 }
