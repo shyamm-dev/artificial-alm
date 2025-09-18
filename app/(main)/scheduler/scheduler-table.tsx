@@ -2,6 +2,7 @@ import { use } from "react"
 import DataTable from "./data-table"
 import { columns } from "./columns"
 import { Pagination } from "./pagination"
+import { SearchBar } from "./search-bar"
 import { getPaginationParams } from "@/lib/search-params"
 import { getScheduledJobIssues } from "@/db/queries/scheduled-jobs-queries"
 
@@ -16,6 +17,9 @@ export function SchedulerTable({ promise, searchParams }: SchedulerTableProps) {
 
   return (
     <div className="space-y-4">
+      <div className="w-96">
+        <SearchBar />
+      </div>
       <DataTable columns={columns} data={data} />
       <Pagination total={total} page={page} pageSize={pageSize} />
     </div>

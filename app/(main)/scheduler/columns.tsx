@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { SortableHeader } from "./sortable-header"
 
 export type ScheduledJobIssue = {
   id: string
@@ -92,7 +93,11 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: "Scheduled At",
+    header: () => {
+      return (
+        <SortableHeader title="Scheduled At" sortKey="createdAt" />
+      )
+    },
     size: 160,
     cell: ({ row }) => {
       const value = row.getValue("createdAt");
@@ -116,7 +121,11 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
   },
   {
     accessorKey: "updatedAt",
-    header: "Updated At",
+    header: () => {
+      return (
+        <SortableHeader title="Updated At" sortKey="updatedAt" />
+      )
+    },
     size: 160,
     cell: ({ row }) => {
       const value = row.getValue("updatedAt");

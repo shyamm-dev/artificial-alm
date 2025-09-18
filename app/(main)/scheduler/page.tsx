@@ -11,7 +11,7 @@ import { getPaginationParams } from "@/lib/search-params"
 
 
 interface SchedulerPageProps {
-  searchParams: Promise<{ page?: string; per_page?: string }>
+  searchParams: Promise<{ page?: string; per_page?: string; search?: string; sortBy?: string; sortOrder?: string }>
 }
 
 export default async function SchedulerPage({ searchParams }: SchedulerPageProps) {
@@ -21,8 +21,8 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
   }
 
   const params = await searchParams;
-  const { page, pageSize } = getPaginationParams(params);
-  const promise = getScheduledJobIssues(session.user.id, { page, pageSize });
+  const { page, pageSize, search, sortBy, sortOrder } = getPaginationParams(params);
+  const promise = getScheduledJobIssues(session.user.id, { page, pageSize }, { search, sortBy, sortOrder });
 
   return (
     <div className="px-4 lg:px-6">
