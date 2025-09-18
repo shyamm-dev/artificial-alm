@@ -25,14 +25,16 @@ export function SchedulerTable({ dataPromise, searchParams }: SchedulerTableProp
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4 items-center">
-        <div className="w-96">
+      <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
+        <div className="w-full lg:w-96">
           <SearchBar />
         </div>
-        <StatusFilter />
-        <ProjectFilter projects={projects} />
-        <JobNameFilter jobNames={jobNames} />
-        <ClearFilters />
+        <div className="flex flex-wrap gap-2 lg:gap-4">
+          <StatusFilter />
+          <ProjectFilter projects={projects} />
+          <JobNameFilter jobNames={jobNames} />
+          <ClearFilters />
+        </div>
       </div>
       <DataTable columns={columns} data={data} />
       <Pagination total={total} page={page} pageSize={pageSize} />

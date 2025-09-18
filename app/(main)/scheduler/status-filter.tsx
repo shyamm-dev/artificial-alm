@@ -28,7 +28,7 @@ export function StatusFilter() {
 
   return (
     <Select value={currentStatus} onValueChange={handleStatusChange}>
-      <SelectTrigger className="w-40">
+      <SelectTrigger className="w-full sm:w-40">
         <SelectValue placeholder="Select status...">
           {selectedStatusInfo && (
             <div className="flex items-center gap-2">

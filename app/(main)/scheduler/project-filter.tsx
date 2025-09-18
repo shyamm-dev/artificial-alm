@@ -47,7 +47,7 @@ export function ProjectFilter({ projects }: ProjectFilterProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-64 justify-between"
+          className="w-full sm:w-64 justify-between"
         >
           <div className="flex items-center gap-2 truncate">
             {selectedProject ? (
@@ -70,7 +70,7 @@ export function ProjectFilter({ projects }: ProjectFilterProps) {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-0">
+      <PopoverContent className="w-full sm:w-64 p-0">
         <Command>
           <CommandInput placeholder="Search projects..." />
           <CommandList>

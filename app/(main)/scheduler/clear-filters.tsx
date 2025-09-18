@@ -21,7 +21,7 @@ export function ClearFilters() {
       variant="ghost"
       size="sm"
       onClick={handleClearFilters}
-      className="h-10"
+      className="h-10 w-full sm:w-auto"
     >
       <FilterX className="h-4 w-4 mr-2" />
       Clear Filters

@@ -30,10 +30,10 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
 
   return (
     <div className="px-4 lg:px-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Scheduled Job Issues</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Scheduled Job Issues</h1>
         <Link href="/scheduler/new">
-          <Button size="sm">
+          <Button size="sm" className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Schedule Job
           </Button>
