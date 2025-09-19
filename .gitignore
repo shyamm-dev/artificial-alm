@@ -44,3 +44,8 @@ next-env.d.ts
 # local db
 *.db
 *.db-*
+
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+build

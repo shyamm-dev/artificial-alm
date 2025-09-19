@@ -1,0 +1,22 @@
+swagger: '2.0'
+info:
+  title: testcase-generation-event-dispatcher-api
+  description: api
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /dispatch:
+    post:
+      summary: Dispatch a job
+      description: Dispatch a job
+      operationId: dispatch
+      x-google-backend:
+        address: ${backend_url}
+      responses:
+        '200':
+          description: A successful response
+          schema:
+            type: string
