@@ -119,12 +119,12 @@ export async function getJobNames(userId: string) {
     )
     .groupBy(scheduledJob.name)
     .orderBy(scheduledJob.name)
-  
+
   return result.map(r => r.name)
 }
 
 export async function getIssueKeysAndSummaries(userId: string) {
-  return db.select({
+  return db.selectDistinct({
     issueKey: scheduledJobIssue.issueKey,
     summary: scheduledJobIssue.summary,
     issueTypeIconUrl: jiraProjectIssueType.iconUrl,

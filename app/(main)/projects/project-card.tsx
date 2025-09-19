@@ -126,7 +126,7 @@ export default function ProjectCard({
           </div>
           {project.compliance?.lastUpdatedByName && (
             <div className="text-xs text-muted-foreground">
-              Updated by {project.compliance.lastUpdatedByName} on {project.compliance.updatedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              Updated by {project.compliance.lastUpdatedByName} on {new Date(project.compliance.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
             </div>
           )}
         </div>

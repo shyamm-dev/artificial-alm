@@ -3,7 +3,7 @@ import { relations } from "drizzle-orm";
 import { user } from "@/auth-schema";
 import { jiraProject, jiraProjectIssueType } from "./jira-project-schema";
 import { timestamps } from "../helper/timestamp-helper";
-import { ScheduledJobIssueStatus } from "@/constants/shared-constants";
+import { ScheduledJobIssueStatus, TestCaseGeneratedBy } from "@/constants/shared-constants";
 import { randomUUID } from "crypto";
 
 export const scheduledJob = sqliteTable("scheduled_job", {
@@ -46,8 +46,8 @@ export const scheduledJobIssueTestCase = sqliteTable("scheduled_job_issue_test_c
   issueId: text("issue_id").notNull().references(() => scheduledJobIssue.id, { onDelete: "cascade" }),
   summary: text("summary").notNull(),
   description: text("description").notNull(),
-  linkedTo: text("linked_to"),
-  modifiedByUserId: text("modified_by_user_id").notNull().references(() => user.id, { onDelete: "set null" }),
+  generatedBy: text("generated_by").$type<TestCaseGeneratedBy>().notNull().default("ai"),
+  modifiedByUserId: text("modified_by_user_id").references(() => user.id, { onDelete: "set null" }),
 
   ...timestamps,
 },

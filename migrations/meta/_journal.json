@@ -64,6 +64,20 @@
       "when": 1758178055838,
       "tag": "0008_careless_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1758278520282,
+      "tag": "0009_ordinary_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1758288044952,
+      "tag": "0010_misty_doctor_faustus",
+      "breakpoints": true
     }
   ]
 }

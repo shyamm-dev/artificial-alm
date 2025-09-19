@@ -35,7 +35,7 @@ export default function ProjectSheet({
     complianceStandards: string[]
     compliance?: {
       lastUpdatedByName: string | null
-      updatedAt: Date
+      updatedAt: string
     } | null
   }
   siteName: string
