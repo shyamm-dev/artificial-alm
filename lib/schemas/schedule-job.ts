@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const scheduleJobSchema = z.object({
-  jobName: z.string().min(3, "Job name is required"),
+  jobName: z.string().min(3, "Job name is required").max(100, "Job name cannot exceed 100 characters"),
   projectId: z.string().min(1, "Project is required"),
   cloudId: z.string().min(1, "Cloud ID is required"),
   issueTypeIds: z.array(z.string()).optional(),

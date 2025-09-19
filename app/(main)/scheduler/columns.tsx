@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ScheduledJobIssueStatus } from "@/constants/shared-constants"
 import Image from "next/image"
 import { Clock, Zap, CheckCircle, XCircle, HelpCircle } from "lucide-react"
+import { useState, useEffect } from "react"
 
 import {
   Tooltip,
@@ -18,6 +19,7 @@ export type ScheduledJobIssue = {
   issueKey: string
   summary: string
   status: ScheduledJobIssueStatus
+  jobName: string
   issueTypeIconUrl: string | null
   issueTypeName: string | null
   createdAt: string
@@ -38,7 +40,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
           <Tooltip>
             <TooltipTrigger className="flex items-center gap-2">
               {iconUrl && <Image src={iconUrl} alt="Issue Type Icon" width={20} height={20} />}
-              <span className="truncate max-w-[100px]">{issueKey}</span>
+              <span>{issueKey}</span>
             </TooltipTrigger>
             <TooltipContent>
               <p>{issueTypeName ? `${issueTypeName} - ` : ""}{issueKey}</p>
@@ -62,6 +64,26 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
             </TooltipTrigger>
             <TooltipContent>
               <p>{summary}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    },
+  },
+  {
+    accessorKey: "jobName",
+    header: "Job Name",
+    size: 150,
+    cell: ({ row }) => {
+      const jobName: string = row.getValue("jobName");
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger className="truncate block max-w-[150px]">
+              {jobName}
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{jobName}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -120,23 +142,36 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
     },
     size: 160,
     cell: ({ row }) => {
-      const value = row.getValue("createdAt");
-      const date = new Date(value as string);
-      const formattedDate = date.toLocaleDateString("en-US");
-      const formattedTime = date.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
-      const fullDateTime = `${formattedDate} ${formattedTime}`;
-      return (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="block">
-              {fullDateTime}
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{fullDateTime}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
+      const DateCell = () => {
+        const [mounted, setMounted] = useState(false);
+        const value = row.getValue("createdAt");
+        const date = new Date(value as string);
+        
+        useEffect(() => {
+          setMounted(true);
+        }, []);
+        
+        if (!mounted) {
+          return <span>Loading...</span>;
+        }
+        
+        const fullDateTime = date.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+        
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="block">
+                {fullDateTime}
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{fullDateTime}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      };
+      
+      return <DateCell />;
     },
   },
   {
@@ -148,23 +183,36 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
     },
     size: 160,
     cell: ({ row }) => {
-      const value = row.getValue("updatedAt");
-      const date = new Date(value as string);
-      const formattedDate = date.toLocaleDateString("en-US");
-      const formattedTime = date.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' });
-      const fullDateTime = `${formattedDate} ${formattedTime}`;
-      return (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="block">
-              {fullDateTime}
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{fullDateTime}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      );
+      const DateCell = () => {
+        const [mounted, setMounted] = useState(false);
+        const value = row.getValue("updatedAt");
+        const date = new Date(value as string);
+        
+        useEffect(() => {
+          setMounted(true);
+        }, []);
+        
+        if (!mounted) {
+          return <span>Loading...</span>;
+        }
+        
+        const fullDateTime = date.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+        
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="block">
+                {fullDateTime}
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{fullDateTime}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      };
+      
+      return <DateCell />;
     },
   },
 ]
@@ -179,6 +227,8 @@ const getStatusIndicator = (status: ScheduledJobIssueStatus) => {
       return { text: "Success", icon: <CheckCircle className="h-3 w-3 text-green-600" /> };
     case "failed":
       return { text: "Failed", icon: <XCircle className="h-3 w-3 text-red-600" /> };
+    case "deployed_to_jira":
+      return { text: "Deployed", icon: <CheckCircle className="h-3 w-3 text-purple-600" /> };
     default:
       return { text: "Unknown", icon: <HelpCircle className="h-3 w-3 text-gray-600" /> };
   }

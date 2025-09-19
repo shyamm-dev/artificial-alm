@@ -79,6 +79,7 @@ export interface JiraIssue {
     issuetype: JiraIssueType;
     description?: JiraIssueDescription | string | null;
   };
+  scheduledStatus?: string | null;
 }
 
 export interface JiraSearchResponse {

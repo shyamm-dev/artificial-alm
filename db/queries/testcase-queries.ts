@@ -28,11 +28,13 @@ export function getTestCasesByIssueId(issueId: string, userId: string) {
   return Promise.all([
     db.select({
       id: scheduledJobIssue.id,
+      issueId: scheduledJobIssue.issueId,
       issueKey: scheduledJobIssue.issueKey,
       summary: scheduledJobIssue.summary,
       projectName: jiraProject.name,
       projectId: jiraProject.id,
       projectAvatar: jiraProject.avatar24,
+      cloudId: jiraProject.cloudId,
       jobName: scheduledJob.name,
       issueTypeIcon: jiraProjectIssueType.iconUrl,
       issueTypeName: jiraProjectIssueType.name

@@ -4,6 +4,9 @@ import { hasAccessToResource } from "@/db/queries/user-project-queries"
 import { getServerSession } from "@/lib/get-server-session"
 import { buildJQL } from "@/lib/jql-builder"
 import { jiraIssueSearchSchema } from "@/lib/schemas/jira-search"
+import { db } from "@/db/drizzle"
+import { scheduledJobIssue } from "@/db/schema/scheduled-jobs-schema"
+import { inArray } from "drizzle-orm"
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,7 +41,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: result.error.message }, { status: 500 })
     }
 
-    return NextResponse.json(result.data)
+    // Get already scheduled issue IDs with their status
+    const scheduledIssues = await db
+      .select({ 
+        issueId: scheduledJobIssue.issueId, 
+        status: scheduledJobIssue.status 
+      })
+      .from(scheduledJobIssue)
+      .where(inArray(scheduledJobIssue.status, ["pending", "in_progress", "completed"]))
+
+    const scheduledIssueMap = new Map(
+      scheduledIssues.map(item => [item.issueId, item.status])
+    )
+
+    // Add scheduled status to issues
+    const issuesWithStatus = result.data.issues.map(issue => ({
+      ...issue,
+      scheduledStatus: scheduledIssueMap.get(issue.id) || null
+    }))
+
+    return NextResponse.json({
+      ...result.data,
+      issues: issuesWithStatus
+    })
   } catch (error) {
     console.error("Jira search error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

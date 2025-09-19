@@ -139,6 +139,47 @@ class JiraClient {
     return this.makeRequest<BulkFetchJiraIssuesResponse>(payload);
   }
 
+  public async bulkCreateIssues(cloudId: string, issues: Array<{
+    summary: string;
+    description: string;
+    projectId: string;
+    issueTypeId: string;
+    parentId?: string;
+  }>) {
+    const issueUpdates = issues.map(issue => ({
+      fields: {
+        project: { id: issue.projectId },
+        issuetype: { id: issue.issueTypeId },
+        summary: issue.summary,
+        description: {
+          content: [
+            {
+              content: [
+                {
+                  text: issue.description,
+                  type: "text"
+                }
+              ],
+              type: "paragraph"
+            }
+          ],
+          type: "doc",
+          version: 1
+        }
+      }
+    }));
+
+    const payload: MakeJiraRequestArgs = {
+      cloudId,
+      endpoint: "/issue/bulk",
+      options: { method: "POST", body: { issueUpdates } }
+    };
+
+    console.log("Bulk create issues request:", JSON.stringify(payload, null, 2));
+
+    return this.makeRequest(payload);
+  }
+
   public async syncAtlassianResourceAndJiraProjects() {
     return tryCatch(
       (async () => {

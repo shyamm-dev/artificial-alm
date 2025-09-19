@@ -114,7 +114,8 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
     id: issue.key,
     name: issue.fields.summary,
     iconUrl: issue.fields.issuetype.iconUrl,
-    issueTypeId: issue.fields.issuetype.id
+    issueTypeId: issue.fields.issuetype.id,
+    scheduledStatus: issue.scheduledStatus || null
   })) || []
 
   // Clear requirements when project or issue types change
@@ -184,6 +185,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                                       form.setValue("projectId", project.id)
                                       form.setValue("issueTypeIds", [])
                                       form.setValue("issueIds", [])
+                                      form.clearErrors("projectId")
                                       setOpen(false)
                                     }}
                                     className="flex justify-start"
@@ -338,95 +340,98 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
             </div>
             <Separator />
             {/* Requirements Field - Start */}
-            <div className="w-full md:w-1/2">
-              <FormField
-                control={form.control}
-                name="issueIds"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-base">Requirements <span className="italic text-muted-foreground">(fetched based on selected project and issue types)</span></FormLabel>
-                    <Popover open={requirementsOpen} onOpenChange={setRequirementsOpen}>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            disabled={!selectedProject}
-                            className={cn(
-                              "w-full justify-between",
-                              !field.value?.length && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value?.length
-                              ? `${field.value.length} selected`
-                              : "Select requirements..."}
-                            <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-screen max-w-md p-0">
-                        <Command shouldFilter={false}>
-                          <CommandInput
-                            placeholder="Type to search requirements..."
-                            value={searchText}
-                            onValueChange={(value) => setSearchText(value.trim())}
-                          />
-                          <CommandList>
-                            <CommandEmpty>
-                              {isLoading ? "Loading..." : error ? "Error loading requirements" : "No requirement found."}
-                            </CommandEmpty>
-                            <CommandGroup>
-                              {requirementOptions.map((requirement) => (
-                                <CommandItem
-                                  value={requirement.name}
-                                  key={requirement.id}
-                                  onSelect={() => {
-                                    const currentValues = field.value || []
-                                    const isSelected = currentValues.includes(requirement.id)
-                                    const newValues = isSelected
-                                      ? currentValues.filter(id => id !== requirement.id)
-                                      : [...currentValues, requirement.id]
-                                    form.setValue("issueIds", newValues)
-                                  }}
-                                  className="flex justify-between items-center gap-2"
-                                >
-                                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                                    <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
-                                      {requirement.iconUrl && (
-                                        <Image src={requirement.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <FormField
+                  control={form.control}
+                  name="issueIds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base">Requirements <span className="italic text-muted-foreground">(fetched based on selected project and issue types)</span></FormLabel>
+                      <Popover open={requirementsOpen} onOpenChange={setRequirementsOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              disabled={!selectedProject}
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value?.length && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value?.length
+                                ? `${field.value.length} selected`
+                                : "Select requirements..."}
+                              <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-screen max-w-md p-0">
+                          <Command shouldFilter={false}>
+                            <CommandInput
+                              placeholder="Type to search requirements..."
+                              value={searchText}
+                              onValueChange={(value) => setSearchText(value.trim())}
+                            />
+                            <CommandList>
+                              <CommandEmpty>
+                                {isLoading ? "Loading..." : error ? "Error loading requirements" : "No requirement found."}
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {requirementOptions.map((requirement) => {
+                                  const isScheduled = requirement.scheduledStatus !== null
+                                  
+                                  return (
+                                  <CommandItem
+                                    key={requirement.id}
+                                    value={requirement.id}
+                                    disabled={isScheduled}
+                                    onSelect={() => {
+                                      if (isScheduled) return
+                                      const currentValues = field.value || []
+                                      const isSelected = currentValues.includes(requirement.id)
+                                      const newValues = isSelected
+                                        ? currentValues.filter(id => id !== requirement.id)
+                                        : [...currentValues, requirement.id]
+                                      form.setValue("issueIds", newValues)
+                                      if (newValues.length > 0) {
+                                        form.clearErrors("issueIds")
+                                      }
+                                    }}
+                                    className={`flex justify-between items-center gap-2 ${isScheduled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                                      <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
+                                        {requirement.iconUrl && (
+                                          <Image src={requirement.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
+                                        )}
+                                        {requirement.id}
+                                      </Badge>
+                                      <span className="truncate">{requirement.name}</span>
+                                    </div>
+                                    <CheckIcon
+                                      className={cn(
+                                        "h-4 w-4",
+                                        field.value?.includes(requirement.id)
+                                          ? "opacity-100"
+                                          : "opacity-0"
                                       )}
-                                      {requirement.id}
-                                    </Badge>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <span className="truncate">{requirement.name}</span>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>{requirement.name}</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </div>
-                                  <CheckIcon
-                                    className={cn(
-                                      "h-4 w-4",
-                                      field.value?.includes(requirement.id)
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {selectedRequirements && selectedRequirements.length > 0 && (
-                <div className="mt-2 space-y-1">
+                                    />
+                                  </CommandItem>
+                                  )
+                                })}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {selectedRequirements && selectedRequirements.length > 0 && (
+                  <div className="mt-2 space-y-1">
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm font-medium text-muted-foreground">Requirements added so far</h4>
                     <AlertDialog>
@@ -493,8 +498,18 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                       </Badge>
                     ) : null
                   })}
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p className="font-medium">Note:</p>
+                <p>Disabled options indicate issues that are already scheduled:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Issues that are pending execution</li>
+                  <li>Issues currently in progress</li>
+                  <li>Issues completed and requiring review</li>
+                </ul>
+              </div>
             </div>
             {/* Requirements Field - End */}
           </div>
