@@ -1,17 +1,18 @@
-resource "random_id" "archive_prefix" {
-  byte_length = 4
-}
-
 data "archive_file" "event_dispatcher_function_zip" {
   type        = "zip"
-  output_path = "${path.module}/build/${random_id.archive_prefix.hex}-event-dispatcher-function.zip"
+  output_path = "build/event-dispatcher-function.zip"
   source_dir  = "${path.module}/../src/event_dispatcher/"
 }
 
+locals {
+  zip_md5 = md5(filebase64(data.archive_file.event_dispatcher_function_zip.output_path))
+}
+
 resource "google_storage_bucket_object" "event_dispatcher_function_zip" {
-  name   = data.archive_file.event_dispatcher_function_zip.output_path
+  name   = "event-dispatcher-${local.zip_md5}.zip"
   bucket = var.bucket_name
   source = data.archive_file.event_dispatcher_function_zip.output_path
+
 }
 
 resource "google_cloudfunctions2_function" "event_dispatcher" {
@@ -36,5 +37,5 @@ resource "google_cloudfunctions2_function" "event_dispatcher" {
     timeout_seconds    = 60
     ingress_settings = "ALLOW_ALL"
   }
-
+  depends_on = [google_storage_bucket_object.event_dispatcher_function_zip]
 }

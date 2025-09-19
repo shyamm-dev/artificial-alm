@@ -19,7 +19,6 @@ def handler(request):
         data = request.get_json(silent=True)
         if not data:
             return {"success": False, "error": "Missing JSON body"}, 400
-
         # Add timestamp for tracking
         data["timestamp"] = datetime.now(timezone.utc).isoformat()
         message_bytes = json.dumps(data).encode("utf-8")
