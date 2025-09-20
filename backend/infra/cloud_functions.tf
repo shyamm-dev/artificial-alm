@@ -89,6 +89,11 @@ resource "google_cloudfunctions2_function" "test_case_gen" {
     available_memory   = "256M"
     timeout_seconds    = 60
     ingress_settings = "ALLOW_ALL"
+    environment_variables = {
+      TURSO_DATABASE_URL   = var.TURSO_DATABASE_URL
+      GOOGLE_CLOUD_API_KEY = var.GOOGLE_CLOUD_API_KEY
+      TURSO_AUTH_TOKEN     = var.TURSO_AUTH_TOKEN
+    }
   }
   depends_on = [google_storage_bucket_object.test_case_gen_function_zip]
 }

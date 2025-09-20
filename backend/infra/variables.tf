@@ -15,3 +15,16 @@ variable "bucket_name" {
   type        = string
   default     = "testcase-generation-tf-bucket"
 }
+
+variable "TURSO_DATABASE_URL" {
+}
+
+variable "GOOGLE_CLOUD_API_KEY" {
+}
+
+variable "TURSO_AUTH_TOKEN" {
+}
+
+output "name" {
+  value = var.TURSO_DATABASE_URL
+}
