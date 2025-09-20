@@ -18,3 +18,4 @@ topic_path: str = publisher.topic_path(project_id, topic_name)
 @http
 def handler(request: Request) -> Tuple[Dict[str, Any], int]:
     print("Received request:", request)
+    return {"success": True}, 200

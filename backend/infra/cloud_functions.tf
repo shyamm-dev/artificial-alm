@@ -37,6 +37,10 @@ resource "google_cloudfunctions2_function" "event_dispatcher" {
     available_memory   = "256M"
     timeout_seconds    = 60
     ingress_settings = "ALLOW_ALL"
+    environment_variables = {
+      TOPIC_NAME = google_pubsub_topic.testcase_generation_issue_events.name
+      PROJECT_ID = var.project_id
+    }
   }
 
   
