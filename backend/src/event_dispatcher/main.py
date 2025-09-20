@@ -1,31 +1,52 @@
+"""Event Dispatcher: Cloud Run Function to publish messages to Pub/Sub."""
 import os
 import json
-from functions_framework import http
-from google.cloud import pubsub_v1
 from datetime import datetime, timezone
+from typing import Any, Dict, Tuple
 
-# Initialize Pub/Sub publisher
-publisher = pubsub_v1.PublisherClient()
-topic_name = os.environ.get("TOPIC_NAME", "my-topic")
-project_id = os.environ.get("GCP_PROJECT")
-topic_path = publisher.topic_path(project_id, topic_name)
+from functions_framework import http
+from flask import Request
+from google.cloud import pubsub_v1
+from google.api_core.exceptions import GoogleAPICallError, RetryError, NotFound, Forbidden
+
+publisher: pubsub_v1.PublisherClient = pubsub_v1.PublisherClient()
+topic_name: str = os.environ.get("TOPIC_NAME", "")
+project_id: str = os.environ.get("PROJECT_ID", "")
+topic_path: str = publisher.topic_path(project_id, topic_name)
+
 
 @http
-def handler(request):
-    """
-    Cloud Run Function: reads JSON body and publishes to Pub/Sub
-    """
+def handler(request: Request) -> Tuple[Dict[str, Any], int]:
     try:
-        data = request.get_json(silent=True)
+        data: Dict[str, Any] | None = request.get_json(silent=True)
+
         if not data:
             return {"success": False, "error": "Missing JSON body"}, 400
-        # Add timestamp for tracking
-        data["timestamp"] = datetime.now(timezone.utc).isoformat()
-        message_bytes = json.dumps(data).encode("utf-8")
 
-        message_id = publisher.publish(topic_path, message_bytes).result()
+        job_id: str = data.get("jobId")
+        issue_ids: list[str] = data.get("issueIds")
 
-        return {"success": True, "messageId": message_id}, 200
+        unprocessed_issues: list[str] = []
+
+        for issue_id in issue_ids:
+            try:
+                # Add timestamp for tracking
+                event = {
+                    "jobId": job_id,
+                    "issueId": issue_id,
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                }
+                message_bytes: bytes = json.dumps(event).encode("utf-8")
+                publisher.publish(topic_path, message_bytes)
+            except (GoogleAPICallError, RetryError, NotFound, Forbidden) as e:
+                unprocessed_issues.append([issue_id, str(e)])
+
+        response_data: Dict[str, Any] = {
+            "success": True,
+            "errors": len(unprocessed_issues) > 0,
+            "unprocessedIssues": unprocessed_issues,
+        }
+        return response_data, 200
 
     except Exception as e:
         return {"success": False, "error": str(e)}, 500

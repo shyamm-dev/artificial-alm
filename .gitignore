@@ -45,7 +45,11 @@ next-env.d.ts
 *.db
 *.db-*
 
+# terraform states and build files
 .terraform/
 .terraform.lock.hcl
 *.tfstate
 build
+
+# python environment
+venv/
