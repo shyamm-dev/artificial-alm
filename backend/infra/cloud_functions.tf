@@ -33,7 +33,7 @@ resource "google_cloudfunctions2_function" "event_dispatcher" {
 
   service_config {
     service_account_email = google_service_account.event_dispatcher_cloud_function_sa.email
-    max_instance_count = 3
+    max_instance_count = 20
     available_memory   = "256M"
     timeout_seconds    = 60
     ingress_settings = "ALLOW_ALL"
@@ -85,9 +85,9 @@ resource "google_cloudfunctions2_function" "test_case_gen" {
 
   service_config {
     service_account_email = google_service_account.test_case_gen_cloud_function_sa.email
-    max_instance_count = 3
     available_memory   = "256M"
-    timeout_seconds    = 60
+    max_instance_count = 20
+    timeout_seconds    = 240
     ingress_settings = "ALLOW_ALL"
     environment_variables = {
       TURSO_DATABASE_URL   = var.TURSO_DATABASE_URL

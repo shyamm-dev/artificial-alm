@@ -23,18 +23,14 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
         if not data:
             return {"success": False, "error": "Missing JSON body"}, 400
 
-        job_id: str = data.get("jobId")
         issue_ids: list[str] = data.get("issueIds")
 
         unprocessed_issues: list[str] = []
 
         for issue_id in issue_ids:
             try:
-                # Add timestamp for tracking
                 event = {
-                    "jobId": job_id,
-                    "issueId": issue_id,
-                    "timestamp": datetime.now(timezone.utc).isoformat()
+                    "issueId": issue_id
                 }
                 message_bytes: bytes = json.dumps(event).encode("utf-8")
                 publisher.publish(topic_path, message_bytes).result()

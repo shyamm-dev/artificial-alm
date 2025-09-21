@@ -18,7 +18,7 @@ GOOGLE_CLOUD_API_KEY = os.getenv("GOOGLE_CLOUD_API_KEY")
 def handler(request: Request) -> Tuple[Dict[str, Any], int]:
     """HTTP Cloud Run Function to generate test cases."""
     data: Dict[str, Any] | None = request.get_json(silent=True)
-    pubsub_message = base64.b64decode(data).decode()
+    pubsub_message = base64.b64decode(data["message"]["data"]).decode()
     message_data = json.loads(pubsub_message)
 
     issue_id: str = message_data.get("issueId")
