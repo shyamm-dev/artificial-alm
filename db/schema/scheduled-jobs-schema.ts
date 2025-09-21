@@ -29,6 +29,7 @@ export const scheduledJobIssue = sqliteTable("scheduled_job_issue", {
   summary: text("summary").notNull(),
   description: text("description"),
   status: text("status").$type<ScheduledJobIssueStatus>().notNull().default("pending"),
+  reason: text("reason"),
 
   issueTypeId: text("issue_type_id").notNull().references(() => jiraProjectIssueType.id, { onDelete: "cascade" }),
 

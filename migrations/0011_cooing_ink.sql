@@ -1,0 +1,1 @@
+ALTER TABLE `scheduled_job_issue` ADD `reason` text;
