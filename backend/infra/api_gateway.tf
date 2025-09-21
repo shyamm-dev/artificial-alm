@@ -6,7 +6,7 @@ resource "google_api_gateway_api" "testcase_generation_event_dispatcher_api" {
 resource "google_api_gateway_api_config" "testcase_generation_event_dispatcher_api_config" {
   provider = google-beta
   api      = google_api_gateway_api.testcase_generation_event_dispatcher_api.api_id
-  api_config_id = "v2"
+  api_config_id = "v1"
 
   openapi_documents {
     document {
