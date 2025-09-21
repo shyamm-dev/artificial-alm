@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { useState, use, useEffect } from "react"
+import { useState, use, useEffect, useMemo } from "react"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { useDebounce } from "@uidotdev/usehooks"
 import Image from "next/image"
@@ -76,7 +76,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
 
   const onSubmit = (data: JobFormData) => {
     if (!currentProject?.cloudId) return
-    
+
     const fullData = { ...data, cloudId: currentProject.cloudId }
     const validatedData = scheduleJobSchema.parse(fullData)
     scheduleJobMutation.mutate(validatedData)
@@ -110,13 +110,44 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
     refetchOnWindowFocus: false
   })
 
-  const requirementOptions = jiraIssues?.issues?.map((issue) => ({
-    id: issue.key,
-    name: issue.fields.summary,
-    iconUrl: issue.fields.issuetype.iconUrl,
-    issueTypeId: issue.fields.issuetype.id,
-    scheduledStatus: issue.scheduledStatus || null
-  })) || []
+  const searchResults = useMemo(() => {
+    return jiraIssues?.issues?.map((issue) => ({
+      id: issue.key,
+      name: issue.fields.summary,
+      iconUrl: issue.fields.issuetype.iconUrl,
+      issueTypeId: issue.fields.issuetype.id,
+      scheduledStatus: issue.scheduledStatus || null
+    })) || []
+  }, [jiraIssues?.issues])
+
+  // Keep track of selected requirements to show them even during loading
+  const [selectedRequirementCache, setSelectedRequirementCache] = useState<Map<string, {
+    id: string;
+    name: string;
+    iconUrl: string;
+    issueTypeId: string;
+    scheduledStatus: string | null;
+  }>>(new Map())
+
+  // Update cache when search results change
+  useEffect(() => {
+    if (searchResults.length > 0) {
+      setSelectedRequirementCache(prev => {
+        const newCache = new Map(prev)
+        searchResults.forEach(result => {
+          newCache.set(result.id, result)
+        })
+        return newCache
+      })
+    }
+  }, [searchResults])
+
+  // Memoized selected requirement details
+  const selectedRequirementDetails = useMemo(() => {
+    return selectedRequirements.map(id => selectedRequirementCache.get(id)).filter(Boolean)
+  }, [selectedRequirements, selectedRequirementCache])
+
+  const requirementOptions = searchResults
 
   // Clear requirements when project or issue types change
   useEffect(() => {
@@ -381,7 +412,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                               <CommandGroup>
                                 {requirementOptions.map((requirement) => {
                                   const isScheduled = requirement.scheduledStatus !== null
-                                  
+
                                   return (
                                   <CommandItem
                                     key={requirement.id}
@@ -462,7 +493,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                     </AlertDialog>
                   </div>
                   {selectedRequirements.map((requirementId) => {
-                    const requirement = requirementOptions.find(req => req.id === requirementId)
+                    const requirement = selectedRequirementDetails.find(req => req?.id === requirementId) || requirementOptions.find(req => req.id === requirementId)
                     return requirement ? (
                       <Badge key={requirementId} variant="outline" className="block w-full text-left justify-start p-2 h-auto">
                         <div className="flex items-center justify-between gap-2 min-w-0">
@@ -542,7 +573,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
           </div>
         </form>
         </Form>
-        
+
         <AlertDialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
