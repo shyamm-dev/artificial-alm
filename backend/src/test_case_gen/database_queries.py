@@ -15,4 +15,4 @@ STATUS_UPDATE_WITH_REASON = """UPDATE scheduled_job_issue
                      SET status = ?, reason = ?
                         WHERE id = ?;"""
 
-INSERT_TEST_CASES = """INSERT INTO test_case (issue_id, job_id, summary, description)"""
+INSERT_TEST_CASES = """INSERT INTO scheduled_job_issue_test_case (id, issue_id, summary, description) VALUES (?, ?, ?, ?);"""

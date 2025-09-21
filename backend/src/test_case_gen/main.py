@@ -7,8 +7,8 @@ from typing import Any, Dict, Tuple
 from functions_framework import http
 from flask import Request
 
-from .database import Database
-from .google_gen_ai import GoogleGenAI
+from database import Database
+from google_gen_ai import GoogleGenAI
 
 TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
@@ -25,7 +25,7 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
     try:
         database = Database(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
     except Exception as e:
-        return {"error": f"Database connection failed: {str(e)}"}, 500
+        return {"success": True}, 200 # this has to be changed in future maybe for retry
 
     try:
         compliance_list_string, summary, description = database.fetch_issue_data(issue_id)
@@ -49,8 +49,11 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
             database.update_status_with_reason("failed", reason, issue_id)
             return {"success": True}, 200
 
-        # Process the generated test cases as needed
+        test_cases = response_json.get("data", [])
 
+        database.insert_test_cases(issue_id, test_cases)
+
+        database.update_status("completed", issue_id)
 
     except Exception as e:
         database.update_status_with_reason("failed", str(e), issue_id)
