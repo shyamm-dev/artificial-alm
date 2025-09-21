@@ -24,7 +24,3 @@ variable "GOOGLE_CLOUD_API_KEY" {
 
 variable "TURSO_AUTH_TOKEN" {
 }
-
-output "name" {
-  value = var.TURSO_DATABASE_URL
-}
