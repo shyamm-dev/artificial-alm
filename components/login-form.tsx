@@ -21,7 +21,7 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
   const atlassianLogin = async () => {
     setIsLoading(true);
-    await authClient.signIn.social({ provider: "atlassian", callbackURL: "/dashboard" });
+    await authClient.signIn.social({ provider: "atlassian", callbackURL: "/projects" });
     setIsLoading(false);
   }
 

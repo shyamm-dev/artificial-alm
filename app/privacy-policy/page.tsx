@@ -5,7 +5,7 @@ const PrivacyPolicyPage = () => {
     return (
         <div className="container mx-auto p-8 relative">
             <div className="absolute top-4 right-4">
-                <Link href="/dashboard" passHref>
+                <Link href="/projects" passHref>
                     <Button>Go to App</Button>
                 </Link>
             </div>
