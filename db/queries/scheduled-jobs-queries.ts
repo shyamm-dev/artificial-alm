@@ -24,7 +24,8 @@ export function createScheduledJobWithIssues(jobData: typeof scheduledJob.$infer
       issueTypeId: issue.fields.issuetype.id
     }))) as typeof scheduledJobIssue.$inferInsert[]
 
-    await tx.insert(scheduledJobIssue).values(issuesData)
+    const insertedIssues = await tx.insert(scheduledJobIssue).values(issuesData).returning({ id: scheduledJobIssue.id })
+    return insertedIssues.map(issue => issue.id)
   })
 }
 

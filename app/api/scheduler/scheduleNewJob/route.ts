@@ -5,6 +5,7 @@ import { getServerSession } from "@/lib/get-server-session"
 import { scheduleJobSchema } from "@/lib/schemas/schedule-job"
 import { createScheduledJobWithIssues } from "@/db/queries/scheduled-jobs-queries"
 import { transformJiraIssues } from "@/db/helper/sync-helpers"
+import scheduledAiTestcaseGenJob from "@/data-access-layer/job-scheduler-api/job-scheduler"
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,12 +38,14 @@ export async function POST(request: NextRequest) {
 
     const transformedIssues = transformJiraIssues(result.data.issues)
 
-    await createScheduledJobWithIssues({
+    const issueIds = await createScheduledJobWithIssues({
       cloudId: validatedData.cloudId,
       projectId: validatedData.projectId,
       name: validatedData.jobName,
       createdByUserId: session.user.id
     }, transformedIssues)
+
+    await scheduledAiTestcaseGenJob(issueIds.map(id => id.toString()))
 
     return NextResponse.json({ message: "Job scheduled successfully" })
   } catch (error) {
