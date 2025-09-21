@@ -53,3 +53,6 @@ build
 
 # python environment
 venv/
+
+__pycache__/
+test.py
