@@ -49,10 +49,10 @@ next-env.d.ts
 .terraform/
 .terraform.lock.hcl
 *.tfstate
+*.tfvars
 build
 
 # python environment
 venv/
-
 __pycache__/
 test.py
