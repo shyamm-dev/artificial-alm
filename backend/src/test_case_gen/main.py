@@ -14,6 +14,8 @@ TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
 GOOGLE_CLOUD_API_KEY = os.getenv("GOOGLE_CLOUD_API_KEY")
 
+database = Database(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
+
 @http
 def handler(request: Request) -> Tuple[Dict[str, Any], int]:
     """HTTP Cloud Run Function to generate test cases."""
@@ -22,10 +24,6 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
     message_data = json.loads(pubsub_message)
 
     issue_id: str = message_data.get("issueId")
-    try:
-        database = Database(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
-    except Exception as e:
-        return {"success": True}, 200 # this has to be changed in future maybe for retry
 
     try:
         compliance_list_string, summary, description = database.fetch_issue_data(issue_id)
@@ -57,8 +55,6 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
 
     except Exception as e:
         database.update_status_with_reason("failed", str(e), issue_id)
-    finally:
-        database.close_connection()
     return {"success": True}, 200
 
 
