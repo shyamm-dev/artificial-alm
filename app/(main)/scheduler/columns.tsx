@@ -19,6 +19,7 @@ export type ScheduledJobIssue = {
   issueKey: string
   summary: string
   status: ScheduledJobIssueStatus
+  reason: string | null
   jobName: string
   issueTypeIconUrl: string | null
   issueTypeName: string | null
@@ -112,7 +113,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {status === "completed" && (
+          {(status === "completed" || status === "failed") && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -124,7 +125,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Testcase generation completed. Review the testcase</p>
+                  <p>{status === "completed" ? "Testcase generation completed. Review the testcase" : "Testcase generation failed. Review the details"}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

@@ -60,6 +60,7 @@ export async function getScheduledJobIssues(
       issueKey: scheduledJobIssue.issueKey,
       summary: scheduledJobIssue.summary,
       status: scheduledJobIssue.status,
+      reason: scheduledJobIssue.reason,
       jobName: scheduledJob.name,
       issueTypeIconUrl: jiraProjectIssueType.iconUrl,
       issueTypeName: jiraProjectIssueType.name,

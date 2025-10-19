@@ -23,7 +23,7 @@ export default async function ReviewPage({ searchParams }: ReviewPageProps) {
 
   const [issue, issueTypes, testCases] = await getTestCasesByIssueId(issueId, session.user.id)
 
-  if (testCases.length === 0) {
+  if (issue.length === 0 || (testCases.length === 0 && issue[0].status !== "failed")) {
     redirect("/scheduler")
   }
 

@@ -1,9 +1,9 @@
 export const COMPLIANCE_FRAMEWORKS = [
-  "SOC2",
-  "HIPAA",
-  "ISO27001",
-  "GDPR",
-  "PCI-DSS",
+  "FDA",
+  "IEC 62304",
+  "ISO 9001",
+  "ISO 13485",
+  "ISO 27001"
 ] as const;
 
 export const SCHEDULED_JOB_ISSUE_STATUS = [

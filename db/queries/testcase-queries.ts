@@ -31,6 +31,8 @@ export function getTestCasesByIssueId(issueId: string, userId: string) {
       issueId: scheduledJobIssue.issueId,
       issueKey: scheduledJobIssue.issueKey,
       summary: scheduledJobIssue.summary,
+      status: scheduledJobIssue.status,
+      reason: scheduledJobIssue.reason,
       projectName: jiraProject.name,
       projectId: jiraProject.id,
       projectAvatar: jiraProject.avatar24,

@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { Save, Download, Upload, RotateCcw, Plus, Trash2, Bot, User, ChevronDown, Loader2, ArrowLeft } from "lucide-react"
+import { Save, Download, Upload, RotateCcw, Plus, Trash2, Bot, User, ChevronDown, Loader2, ArrowLeft, XCircle } from "lucide-react"
 import { exportTestCasesToMarkdown, exportTestCasesToPlainText } from "@/lib/export-utils"
 import { saveTestCasesDraft } from "./actions"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -32,6 +32,8 @@ interface Issue {
   issueId: string
   issueKey: string
   summary: string
+  status: string
+  reason: string | null
   projectName: string
   projectId: string
   projectAvatar: string | null
@@ -113,7 +115,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
-    setTestCases(prev => [...prev, newTestCase])
+    setTestCases(prev => [newTestCase, ...prev])
   }
 
   const removeTestCase = (id: string) => {
@@ -257,7 +259,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" disabled={issue?.status === "failed"}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
                 <ChevronDown className="h-4 w-4 ml-2" />
@@ -272,7 +274,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={handleDeployToJira} disabled={isDeploying}>
+          <Button onClick={handleDeployToJira} disabled={isDeploying || issue?.status === "failed"}>
             {isDeploying ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
@@ -311,6 +313,23 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
           </div>
         </div>
       </div>
+
+      {issue?.status === "failed" && (
+        <div className="border rounded-lg p-4 bg-muted/20">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-red-600" />
+              <h3 className="text-lg font-semibold text-foreground">Test Case Generation Failed</h3>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              <p className="font-medium mb-2">Failure Reason:</p>
+              <p className="bg-muted p-3 rounded border">
+                {issue.reason || "No specific reason provided"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <AlertDialog open={backDialogOpen} onOpenChange={setBackDialogOpen}>
         <AlertDialogContent>
@@ -373,40 +392,42 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Generated Test Cases (Total : {testCases.length})</h2>
-        <div className="flex gap-2">
-          <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Reset All
+      {(testCases.length > 0 || issue?.status !== "failed") && (
+        <>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-foreground">Generated Test Cases (Total : {testCases.length})</h2>
+            <div className="flex gap-2">
+              <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Reset All
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset all changes?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will remove all modifications and additionally added test cases. Are you sure you want to continue?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={resetAll} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Reset All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <Button variant="outline" size="sm" onClick={addTestCase}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Test Case
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Reset all changes?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will remove all modifications and additionally added test cases. Are you sure you want to continue?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={resetAll} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                  Reset All
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <Button variant="outline" size="sm" onClick={addTestCase}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Test Case
-          </Button>
-        </div>
-      </div>
+            </div>
+          </div>
 
-      <div className="space-y-4">
-        {testCases.map((testCase) => {
+          <div className="space-y-4">
+            {testCases.map((testCase) => {
           const original = baselineTestCases.find(tc => tc.id === testCase.id)
           const isModified = original ? JSON.stringify(testCase) !== JSON.stringify(original) : true
           const isNewTestCase = !original
@@ -489,7 +510,9 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
             </div>
           )
         })}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
