@@ -29,7 +29,7 @@ export function LoginForm({
 
   const googleLogin = async () => {
     setIsGoogleLoading(true);
-    await authClient.signIn.social({ provider: "google", callbackURL: "/home" });
+    await authClient.signIn.social({ provider: "google", callbackURL: "/projects" });
     setIsGoogleLoading(false);
   }
 

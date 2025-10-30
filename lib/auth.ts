@@ -22,6 +22,7 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       accessType: "offline",
+      prompt: "select_account consent"
     },
   },
 
@@ -45,6 +46,5 @@ export const auth = betterAuth({
     }
   },
 
-  // nextCookies must be set as the last plugin. used for signInEmail or signUpEmail
-  plugins: [nextCookies()],
+  plugins: [nextCookies()]
 });

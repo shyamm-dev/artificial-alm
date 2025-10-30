@@ -16,24 +16,14 @@ export async function JiraProjects({ hasAtlassian, userId }: JiraProjectsProps) 
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Atlassian Account Required</CardTitle>
-          <CardDescription>
-            Link your Atlassian account to access Jira projects
-          </CardDescription>
+          <CardTitle>Manage Jira projects and compliance</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            To use Jira features, you need to link your Atlassian account. This will allow you to:
+            Checkout Atlassian integration to use this feature.
           </p>
-          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 ml-2 mb-4">
-            <li>Access your Jira projects</li>
-            <li>Sync issues and requirements</li>
-            <li>Deploy test cases back to Jira</li>
-            <li>Manage compliance frameworks at project level</li>
-            <li>Bulk testcase generation</li>
-          </ul>
           <Link href="/integrations/atlassian">
-            <Button>Link Atlassian Account</Button>
+            <Button>Go to Integrations</Button>
           </Link>
         </CardContent>
       </Card>

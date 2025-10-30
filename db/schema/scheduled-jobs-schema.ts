@@ -11,7 +11,7 @@ export const scheduledJob = sqliteTable("scheduled_job", {
   cloudId: text("cloud_id").notNull(),
   projectId: text("project_id").notNull().references(() => jiraProject.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-  createdByUserId: text("created_by_user_id").notNull().references(() => user.id, { onDelete: "set null" }),
+  createdByUserId: text("created_by_user_id").references(() => user.id, { onDelete: "set null" }),
 
   ...timestamps,
 },

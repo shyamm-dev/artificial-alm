@@ -81,33 +81,27 @@ export default function ProjectAccordian({ sitesWithProjectsPromise, searchQuery
           return (
             <AccordionItem key={site.cloudId} value={site.cloudId} className="border rounded-lg">
               <AccordionTrigger className="px-4 md:px-6 py-4 hover:no-underline">
-                <div className="flex flex-col md:flex-row md:items-center justify-between w-full mr-4 gap-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={site.avatarUrl || undefined} alt={site.name} />
-                      <AvatarFallback>{site.name.charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div className="text-left text-sm space-y-1">
-                      <div>
-                        <span className="font-medium text-foreground">Org Name: </span>
-                        <span className="text-muted-foreground font-semibold">{site.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <span className="font-medium text-foreground">Org URL: </span>
-                        <a href={site.url} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">
-                          {site.url}
-                        </a>
-                        <ExternalLinkIcon className="h-3 w-3 flex-shrink-0" />
-                      </div>
+                <div className="flex items-center gap-3 w-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={site.avatarUrl || undefined} alt={site.name} />
+                    <AvatarFallback>{site.name.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="text-left text-sm space-y-1">
+                    <div>
+                      <span className="font-medium text-foreground">Org Name: </span>
+                      <span className="text-muted-foreground font-semibold">{site.name}</span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      Atlassian
-                    </Badge>
-                    <Badge variant="outline">
-                      {siteProjects.length} Project{siteProjects.length !== 1 ? 's' : ''}
-                    </Badge>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <span className="font-medium text-foreground">Org URL: </span>
+                      <a href={site.url} target="_blank" rel="noopener noreferrer" className="hover:underline truncate">
+                        {site.url}
+                      </a>
+                      <ExternalLinkIcon className="h-3 w-3 flex-shrink-0" />
+                    </div>
+                    <div>
+                      <span className="font-medium text-foreground">Projects you can access: </span>
+                      <span className="text-muted-foreground font-semibold">{siteProjects.length}</span>
+                    </div>
                   </div>
                 </div>
               </AccordionTrigger>

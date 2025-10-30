@@ -3,7 +3,6 @@
 import {
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -16,7 +15,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { navOptions } from "@/lib/navigation"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronRight } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 export function NavMain({ hasAtlassian }: { hasAtlassian: boolean }) {
@@ -30,20 +29,20 @@ export function NavMain({ hasAtlassian }: { hasAtlassian: boolean }) {
           {items.map((item) => {
             if (item.isGroup && item.items) {
               return (
-                <Collapsible key={item.title} asChild defaultOpen={true}>
-                  <SidebarMenuItem>
+                <SidebarMenuItem key={item.title}>
+                  <Collapsible defaultOpen={false} className="group/collapsible">
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton tooltip={item.title}>
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
-                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        <ChevronDown className="ml-auto transition-transform duration-200 group-data-[state=closed]/collapsible:-rotate-90" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
                         {item.items.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild>
+                            <SidebarMenuSubButton asChild isActive={pathname === subItem.url}>
                               <Link href={subItem.url} className="flex items-center justify-between w-full">
                                 <div className="flex items-center">
                                   {subItem.title === "Atlassian" ? (
@@ -70,11 +69,11 @@ export function NavMain({ hasAtlassian }: { hasAtlassian: boolean }) {
                         ))}
                       </SidebarMenuSub>
                     </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
+                  </Collapsible>
+                </SidebarMenuItem>
               )
             }
-            
+
             return (
               <SidebarMenuItem key={item.title}>
                 <Link href={item.url}>

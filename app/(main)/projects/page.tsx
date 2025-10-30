@@ -4,7 +4,8 @@ import { hasAtlassianAccount } from "@/lib/check-atlassian-account";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { TabNavigation } from "./tab-navigation";
 import { JiraProjects } from "./jira-projects";
-import { StandaloneProjects } from "./standalone-projects";
+import { StandaloneProjectsServer } from "./standalone-projects-server";
+import { createDefaultStandaloneProject } from "@/db/queries/standalone-project-queries";
 
 interface ProjectsPageProps {
   searchParams: Promise<{ tab?: string }>;
@@ -15,6 +16,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   if (!session)
     redirect("/login");
 
+  await createDefaultStandaloneProject(session.user.id);
+
   const hasAtlassian = await hasAtlassianAccount();
   const params = await searchParams;
   const tab = params.tab || "standalone";
@@ -24,10 +27,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       <h1 className="text-2xl font-bold mb-6">Projects</h1>
       
       <Tabs value={tab}>
-        <TabNavigation hasAtlassian={hasAtlassian} />
+        <TabNavigation />
         
         <TabsContent value="standalone" className="mt-6">
-          <StandaloneProjects />
+          <StandaloneProjectsServer userId={session.user.id} />
         </TabsContent>
         
         <TabsContent value="jira" className="mt-6">

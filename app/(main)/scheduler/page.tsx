@@ -11,6 +11,8 @@ import { StandaloneProjectsProgress } from "./standalone-projects-progress"
 import { SchedulerSkeleton } from "./scheduler-skeleton"
 import { getScheduledJobIssues, getUserProjects, getJobNames, getIssueKeysAndSummaries } from "@/db/queries/scheduled-jobs-queries"
 import { getPaginationParams } from "@/lib/search-params"
+import { hasAtlassianAccount } from "@/lib/check-atlassian-account"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 
 interface SchedulerPageProps {
@@ -23,6 +25,7 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
     redirect("/login");
   }
 
+  const hasAtlassian = await hasAtlassianAccount();
   const params = await searchParams;
   const tab = params.tab || "standalone";
   const { page, pageSize, search, sortBy, sortOrder, status, projectId, jobName } = getPaginationParams(params);
@@ -53,9 +56,25 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
         </TabsContent>
         
         <TabsContent value="jira" className="mt-6">
-          <React.Suspense fallback={<SchedulerSkeleton />}>
-            <JiraProjectsProgress dataPromise={dataPromise} searchParams={params} />
-          </React.Suspense>
+          {hasAtlassian ? (
+            <React.Suspense fallback={<SchedulerSkeleton />}>
+              <JiraProjectsProgress dataPromise={dataPromise} searchParams={params} />
+            </React.Suspense>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Schedule testcase generation jobs from Jira projects and track them</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Checkout Atlassian integration to use this feature.
+                </p>
+                <Link href="/integrations/atlassian">
+                  <Button>Go to Integrations</Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </div>
