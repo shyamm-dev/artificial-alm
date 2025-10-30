@@ -16,7 +16,7 @@ function SyncButtonContent() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" className="flex items-center gap-2" size="sm" disabled={pending}>
+    <Button type="submit" className="flex items-center gap-2" disabled={pending}>
       {pending ? (
         <IconLoader2 className="h-4 w-4 animate-spin" />
       ) : (

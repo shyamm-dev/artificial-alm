@@ -5,7 +5,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { Input } from "@/components/ui/input"
 import { ExternalLinkIcon } from "lucide-react"
 import ProjectCard from "./project-card"
 import { COMPLIANCE_FRAMEWORKS } from "@/constants/shared-constants"
@@ -16,7 +15,7 @@ const availableStandards = [...COMPLIANCE_FRAMEWORKS];
 
 type UserAccessData = Awaited<ReturnType<typeof getUserResourcesAndProjects>>;
 
-export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWithProjectsPromise: Promise<UserAccessData> }) {
+export default function ProjectAccordian({ sitesWithProjectsPromise, searchQuery = "" }: { sitesWithProjectsPromise: Promise<UserAccessData>, searchQuery?: string }) {
   const userAccessData = use(sitesWithProjectsPromise);
 
   const sites = (() => {
@@ -40,7 +39,6 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
     return initialCompliance;
   });
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const handleComplianceStandardToggle = (standard: string) => {
     if (!selectedProjectId) return;
@@ -72,14 +70,6 @@ export default function ProjectAccordian({ sitesWithProjectsPromise }: { sitesWi
 
   return (
     <>
-      <div className="mb-4">
-        <Input
-          type="text"
-          placeholder="Search projects..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
       {filteredSites.length === 0 && searchQuery ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No projects found matching &quot;{searchQuery}&quot;</p>

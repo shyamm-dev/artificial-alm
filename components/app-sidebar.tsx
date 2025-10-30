@@ -1,11 +1,9 @@
-"use client";
-
 import {
   IconInnerShadowTop,
 } from "@tabler/icons-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -14,11 +12,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { navOptions } from "@/lib/navigation";
+} from "@/components/ui/sidebar";
 import { Suspense } from "react";
+import { hasAtlassianAccount } from "@/lib/check-atlassian-account";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const hasAtlassian = await hasAtlassianAccount();
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -38,7 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navOptions} />
+        <NavMain hasAtlassian={hasAtlassian} />
       </SidebarContent>
       <SidebarFooter>
         <Suspense>

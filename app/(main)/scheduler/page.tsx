@@ -4,14 +4,17 @@ import { getServerSession } from "@/lib/get-server-session"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { SchedulerTable } from "./scheduler-table"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
+import { ProgressTabNavigation } from "./progress-tab-navigation"
+import { JiraProjectsProgress } from "./jira-projects-progress"
+import { StandaloneProjectsProgress } from "./standalone-projects-progress"
 import { SchedulerSkeleton } from "./scheduler-skeleton"
 import { getScheduledJobIssues, getUserProjects, getJobNames, getIssueKeysAndSummaries } from "@/db/queries/scheduled-jobs-queries"
 import { getPaginationParams } from "@/lib/search-params"
 
 
 interface SchedulerPageProps {
-  searchParams: Promise<{ page?: string; per_page?: string; search?: string; sortBy?: string; sortOrder?: string; status?: string; projectId?: string; jobName?: string }>
+  searchParams: Promise<{ page?: string; per_page?: string; search?: string; sortBy?: string; sortOrder?: string; status?: string; projectId?: string; jobName?: string; tab?: string }>
 }
 
 export default async function SchedulerPage({ searchParams }: SchedulerPageProps) {
@@ -21,6 +24,7 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
   }
 
   const params = await searchParams;
+  const tab = params.tab || "standalone";
   const { page, pageSize, search, sortBy, sortOrder, status, projectId, jobName } = getPaginationParams(params);
   const dataPromise = Promise.all([
     getScheduledJobIssues(session.user.id, { page, pageSize }, { search, sortBy, sortOrder, status, projectId, jobName }),
@@ -31,20 +35,29 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
 
   return (
     <div className="px-4 lg:px-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Track Progress</h1>
-        <Link href="/scheduler/new">
-          <Button size="sm" className="w-full sm:w-auto">
-            <Plus className="h-4 w-4 mr-2" />
-            Schedule Job
-          </Button>
-        </Link>
-      </div>
-      <div className="mt-8">
-        <React.Suspense fallback={<SchedulerSkeleton />}>
-          <SchedulerTable dataPromise={dataPromise} searchParams={params} />
-        </React.Suspense>
-      </div>
+      <h1 className="text-2xl font-bold mb-6">Track Progress</h1>
+      
+      <Tabs value={tab}>
+        <div className="flex items-center justify-between">
+          <ProgressTabNavigation />
+          <Link href="/scheduler/new">
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Schedule Job
+            </Button>
+          </Link>
+        </div>
+        
+        <TabsContent value="standalone" className="mt-6">
+          <StandaloneProjectsProgress />
+        </TabsContent>
+        
+        <TabsContent value="jira" className="mt-6">
+          <React.Suspense fallback={<SchedulerSkeleton />}>
+            <JiraProjectsProgress dataPromise={dataPromise} searchParams={params} />
+          </React.Suspense>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
