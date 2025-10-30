@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { LinkAtlassianButton } from "./link-button";
+import { SyncHandler } from "./sync-handler";
 
 export default async function AtlassianIntegrationPage() {
   const session = await getServerSession();
@@ -15,6 +16,7 @@ export default async function AtlassianIntegrationPage() {
 
   return (
     <div className="px-4 lg:px-6">
+      <SyncHandler />
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Atlassian Integration</h1>
         <p className="text-muted-foreground">Connect your Atlassian account to access Jira projects</p>

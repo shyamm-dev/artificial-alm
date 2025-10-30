@@ -10,7 +10,7 @@ export function LinkAtlassianButton() {
 
   const handleLink = async () => {
     setIsLoading(true);
-    await authClient.linkSocial({ provider: "atlassian", callbackURL: "/integrations/atlassian" });
+    await authClient.linkSocial({ provider: "atlassian", callbackURL: "/integrations/atlassian?sync=true" });
     setIsLoading(false);
   };
 
@@ -34,3 +34,5 @@ export function LinkAtlassianButton() {
     </Button>
   );
 }
+
+

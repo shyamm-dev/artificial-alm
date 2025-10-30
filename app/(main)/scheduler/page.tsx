@@ -13,6 +13,7 @@ import { getScheduledJobIssues, getUserProjects, getJobNames, getIssueKeysAndSum
 import { getPaginationParams } from "@/lib/search-params"
 import { hasAtlassianAccount } from "@/lib/check-atlassian-account"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { getStandaloneProjects } from "@/db/queries/standalone-project-queries"
 
 
 interface SchedulerPageProps {
@@ -26,8 +27,10 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
   }
 
   const hasAtlassian = await hasAtlassianAccount();
+  const standaloneProjects = await getStandaloneProjects(session.user.id);
   const params = await searchParams;
   const tab = params.tab || "standalone";
+  const hasStandaloneProjects = standaloneProjects.length > 0;
   const { page, pageSize, search, sortBy, sortOrder, status, projectId, jobName } = getPaginationParams(params);
   const dataPromise = Promise.all([
     getScheduledJobIssues(session.user.id, { page, pageSize }, { search, sortBy, sortOrder, status, projectId, jobName }),
@@ -39,22 +42,22 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
   return (
     <div className="px-4 lg:px-6">
       <h1 className="text-2xl font-bold mb-6">Track Progress</h1>
-      
+
       <Tabs value={tab}>
         <div className="flex items-center justify-between">
           <ProgressTabNavigation />
           <Link href="/scheduler/new">
-            <Button size="sm">
+            <Button size="sm" disabled={tab === "standalone" && !hasStandaloneProjects}>
               <Plus className="h-4 w-4 mr-2" />
               Schedule Job
             </Button>
           </Link>
         </div>
-        
+
         <TabsContent value="standalone" className="mt-6">
-          <StandaloneProjectsProgress />
+          <StandaloneProjectsProgress hasProjects={hasStandaloneProjects} />
         </TabsContent>
-        
+
         <TabsContent value="jira" className="mt-6">
           {hasAtlassian ? (
             <React.Suspense fallback={<SchedulerSkeleton />}>
@@ -63,7 +66,7 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Schedule testcase generation jobs from Jira projects and track them</CardTitle>
+                <CardTitle>Schedule & Track testcase generation progress for requirements available in Jira projects</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">

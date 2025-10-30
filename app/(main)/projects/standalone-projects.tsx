@@ -1,9 +1,8 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { StandaloneSearch } from "./standalone-search";
 import { StandaloneProjectsClient } from "./standalone-projects-client";
+import { CreateProjectDialog } from "./create-project-dialog";
 import { useState } from "react";
 import { standaloneProject, standaloneProjectCompliance } from "@/db/schema";
 
@@ -26,10 +25,7 @@ export function StandaloneProjectsWrapper({ projectsData }: StandaloneProjectsPr
       </div>
       <div className="flex items-center justify-between mb-4">
         <StandaloneSearch onSearchChange={setSearchQuery} />
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          New Project
-        </Button>
+        <CreateProjectDialog />
       </div>
       <StandaloneProjectsClient projectsData={projectsData} searchQuery={searchQuery} />
     </>

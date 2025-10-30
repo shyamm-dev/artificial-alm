@@ -4,3 +4,4 @@ export * from './jira-project-schema';
 export * from './user-resource-join-schema';
 export * from './scheduled-jobs-schema';
 export * from './standalone-project-schema';
+export * from './standalone-scheduled-jobs-schema';

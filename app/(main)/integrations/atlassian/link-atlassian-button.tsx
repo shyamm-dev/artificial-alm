@@ -2,11 +2,23 @@
 
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { syncAtlassianResource } from "@/app/(main)/projects/actions/sync-actions";
+import { toast } from "sonner";
 
-export function LinkAtlassianButton() {
+export function LinkAtlassianButton({ userId, hasAtlassian }: { userId: string; hasAtlassian: boolean }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [shouldSync, setShouldSync] = useState(false);
+
+  useEffect(() => {
+    if (shouldSync && hasAtlassian) {
+      syncAtlassianResource().then(() => {
+        toast.success("Atlassian resources synced successfully!");
+        setShouldSync(false);
+      });
+    }
+  }, [shouldSync, hasAtlassian]);
 
   const handleLink = async () => {
     setIsLoading(true);
@@ -14,6 +26,7 @@ export function LinkAtlassianButton() {
       provider: "atlassian", 
       callbackURL: "/integrations/atlassian" 
     });
+    setShouldSync(true);
     setIsLoading(false);
   };
 
