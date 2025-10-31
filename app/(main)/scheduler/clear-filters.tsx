@@ -11,7 +11,9 @@ export function ClearFilters() {
   const hasFilters = searchParams.get("search") || searchParams.get("status") || searchParams.get("projectId") || searchParams.get("jobName")
 
   const handleClearFilters = () => {
-    router.push(window.location.pathname)
+    const tab = searchParams.get("tab")
+    const url = tab ? `${window.location.pathname}?tab=${tab}` : window.location.pathname
+    router.push(url)
   }
 
   if (!hasFilters) return null

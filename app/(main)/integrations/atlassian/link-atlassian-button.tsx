@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { syncAtlassianResource } from "@/app/(main)/projects/actions/sync-actions";
 import { toast } from "sonner";
 
-export function LinkAtlassianButton({ userId, hasAtlassian }: { userId: string; hasAtlassian: boolean }) {
+export function LinkAtlassianButton({ hasAtlassian }: { userId: string; hasAtlassian: boolean }) {
   const [isLoading, setIsLoading] = useState(false);
   const [shouldSync, setShouldSync] = useState(false);
 

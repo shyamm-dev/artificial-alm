@@ -1,24 +1,19 @@
 "use client"
 
-import { useForm } from "react-hook-form"
+import { useForm, type UseFormReturn, type FieldValues } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { useState, use, useEffect, useMemo } from "react"
-import { useQuery, useMutation } from "@tanstack/react-query"
-import { useDebounce } from "@uidotdev/usehooks"
-import Image from "next/image"
+import { useState, use, useRef } from "react"
+import { useMutation } from "@tanstack/react-query"
 import { getUserAccessibleProjects } from "@/db/queries/user-project-queries"
-import type { JiraSearchResponse } from "@/data-access-layer/types"
-import { type JiraIssueSearchParams } from "@/lib/schemas/jira-search"
+import { getStandaloneProjects } from "@/db/queries/standalone-project-queries"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react"
+import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
+import { CheckIcon, ChevronsUpDownIcon, FolderIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Form,
@@ -28,31 +23,48 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-
-import { scheduleJobSchema } from "@/lib/schemas/schedule-job"
+import { JiraSourceFields } from "./jira-source-fields"
+import { StandaloneSourceFields } from "./standalone-source-fields"
+import { scheduleJobFormSchema } from "@/lib/schemas/schedule-job"
+import { standaloneScheduleJobSchema } from "@/lib/schemas/standalone-schedule-job"
 import { z } from "zod"
 
-const jobSchema = scheduleJobSchema.omit({ cloudId: true })
-type JobFormData = z.infer<typeof jobSchema>
+type JobFormData = z.infer<typeof scheduleJobFormSchema> | z.infer<typeof standaloneScheduleJobSchema>
 interface ScheduleJobProps {
   userProjectsPromise: Promise<Awaited<ReturnType<typeof getUserAccessibleProjects>>>
+  standaloneProjectsPromise: Promise<Awaited<ReturnType<typeof getStandaloneProjects>>>
 }
 
-export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
-  const projects = use(userProjectsPromise)
+export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: ScheduleJobProps) {
+  const jiraProjects = use(userProjectsPromise)
+  const standaloneProjectsData = use(standaloneProjectsPromise)
+  const standaloneProjects = standaloneProjectsData.map(item => ({
+    id: item.project.id,
+    name: item.project.name,
+    description: item.project.description,
+    compliance: item.compliance
+  }))
   const router = useRouter()
-  const [open, setOpen] = useState(false)
-  const [issueTypesOpen, setIssueTypesOpen] = useState(false)
-  const [requirementsOpen, setRequirementsOpen] = useState(false)
+  const [sourceOpen, setSourceOpen] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [successDialogOpen, setSuccessDialogOpen] = useState(false)
-  const [searchText, setSearchText] = useState("")
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [successSource, setSuccessSource] = useState<"jira" | "standalone">("jira")
+  const standaloneValidateRef = useRef<{ validate: () => boolean; getRequirements: () => Array<{ id: string; name: string; content: string; file: File | null }> }>({
+    validate: () => true,
+    getRequirements: () => []
+  })
 
 
   const form = useForm<JobFormData>({
-    resolver: zodResolver(jobSchema),
+    resolver: async (values, context, options) => {
+      const schema = values.source === "standalone" ? standaloneScheduleJobSchema : scheduleJobFormSchema
+      return zodResolver(schema)(values, context, options)
+    },
     defaultValues: {
       jobName: "",
+      source: "",
       projectId: "",
       issueTypeIds: [],
       issueIds: [],
@@ -60,7 +72,7 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
   })
 
   const scheduleJobMutation = useMutation({
-    mutationFn: async (data: JobFormData & { cloudId: string }) => {
+    mutationFn: async (data: JobFormData) => {
       const response = await fetch("/api/scheduler/scheduleNewJob", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -70,479 +82,210 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
       return response.json()
     },
     onSuccess: () => {
+      setSuccessSource("jira")
       setSuccessDialogOpen(true)
     }
   })
 
-  const onSubmit = (data: JobFormData) => {
-    if (!currentProject?.cloudId) return
-
-    const fullData = { ...data, cloudId: currentProject.cloudId }
-    const validatedData = scheduleJobSchema.parse(fullData)
-    scheduleJobMutation.mutate(validatedData)
-  }
-
-  const selectedProject = form.watch("projectId")
-  const selectedIssueTypes = form.watch("issueTypeIds")
-  const selectedRequirements = form.watch("issueIds")
-  const currentProject = projects.find(p => p.id === selectedProject)
-  const availableIssueTypes = currentProject?.issueTypes || []
-
-  const debouncedSearchText = useDebounce(searchText, 500);
-
-  const { data: jiraIssues, isLoading, error } = useQuery<JiraSearchResponse>({
-    queryKey: ["searchJiraIssues", currentProject?.cloudId, selectedProject, selectedIssueTypes, debouncedSearchText],
-    queryFn: async () => {
-      const requestBody: JiraIssueSearchParams = {
-        cloudId: currentProject!.cloudId,
-        projectId: selectedProject,
-        filters: { text: debouncedSearchText, issueType: selectedIssueTypes }
-      }
-      const response = await fetch("/api/atlassian/searchJiraIssues", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody)
+  const scheduleStandaloneJobMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      console.log('[mutation] Sending request')
+      const response = await fetch('/api/scheduler/scheduleStandaloneJob', {
+        method: 'POST',
+        body: formData
       })
-      if (!response.ok) throw new Error("Failed to fetch issues")
-      return response.json()
+      console.log('[mutation] Response status:', response.status)
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('[mutation] Error:', error)
+        throw new Error(error.error || 'Failed to schedule standalone job')
+      }
+      const result = await response.json()
+      console.log('[mutation] Success:', result)
+      return result
     },
-    enabled: !!currentProject?.cloudId && !!currentProject?.id,
-    refetchOnWindowFocus: false
+    onSuccess: (data) => {
+      console.log('[mutation] onSuccess:', data)
+      setSuccessSource("standalone")
+      setSuccessDialogOpen(true)
+    },
+    onError: (error) => {
+      console.error('[mutation] onError:', error)
+      setErrorMessage(error.message)
+      setErrorDialogOpen(true)
+    }
   })
 
-  const searchResults = useMemo(() => {
-    return jiraIssues?.issues?.map((issue) => ({
-      id: issue.key,
-      name: issue.fields.summary,
-      iconUrl: issue.fields.issuetype.iconUrl,
-      issueTypeId: issue.fields.issuetype.id,
-      scheduledStatus: issue.scheduledStatus || null
-    })) || []
-  }, [jiraIssues?.issues])
+  const selectedSource = form.watch("source")
 
-  // Keep track of selected requirements to show them even during loading
-  const [selectedRequirementCache, setSelectedRequirementCache] = useState<Map<string, {
-    id: string;
-    name: string;
-    iconUrl: string;
-    issueTypeId: string;
-    scheduledStatus: string | null;
-  }>>(new Map())
-
-  // Update cache when search results change
-  useEffect(() => {
-    if (searchResults.length > 0) {
-      setSelectedRequirementCache(prev => {
-        const newCache = new Map(prev)
-        searchResults.forEach(result => {
-          newCache.set(result.id, result)
-        })
-        return newCache
+  const onSubmit = (data: JobFormData) => {
+    console.log('[onSubmit] Called with data:', data)
+    if (data.source === "standalone") {
+      console.log('[onSubmit] Standalone source detected')
+      const isValid = standaloneValidateRef.current.validate()
+      console.log('[onSubmit] Validation result:', isValid)
+      if (!isValid) {
+        console.log('[onSubmit] Validation failed, stopping')
+        return
+      }
+      const requirements = standaloneValidateRef.current.getRequirements()
+      console.log('[onSubmit] Requirements:', requirements)
+      
+      const formData = new FormData()
+      formData.append('jobName', data.jobName)
+      formData.append('projectId', data.projectId)
+      
+      requirements.forEach((req, index) => {
+        formData.append(`requirements[${index}][name]`, req.name)
+        formData.append(`requirements[${index}][content]`, req.content)
+        if (req.file) {
+          formData.append(`requirements[${index}][file]`, req.file)
+        }
       })
+      
+      console.log('[onSubmit] Calling mutation')
+      scheduleStandaloneJobMutation.mutate(formData)
+      return
     }
-  }, [searchResults])
-
-  // Memoized selected requirement details
-  const selectedRequirementDetails = useMemo(() => {
-    return selectedRequirements.map(id => selectedRequirementCache.get(id)).filter(Boolean)
-  }, [selectedRequirements, selectedRequirementCache])
-
-  const requirementOptions = searchResults
-
-  // Clear requirements when project or issue types change
-  useEffect(() => {
-    form.setValue("issueIds", [])
-  }, [selectedProject, selectedIssueTypes, form])
+    if (data.source === "jira") {
+      const currentProject = jiraProjects.find(p => p.id === data.projectId)
+      if (!currentProject?.cloudId) return
+      const fullData = { ...data, cloudId: currentProject.cloudId }
+      scheduleJobMutation.mutate(fullData)
+    }
+  }
 
   return (
     <TooltipProvider>
       <div className="border rounded-lg p-6">
         <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={(e) => {
+          console.log('[form] Submit event triggered')
+          e.preventDefault()
+          const values = form.getValues()
+          console.log('[form] Form values:', values)
+          
+          // For standalone, bypass form validation and use custom validation
+          if (values.source === "standalone") {
+            console.log('[form] Standalone - bypassing form validation')
+            onSubmit(values as JobFormData)
+            return
+          }
+          
+          // For jira, use normal form validation
+          console.log('[form] Jira - using form validation')
+          form.handleSubmit(
+            (data) => {
+              console.log('[form] Validation passed, calling onSubmit')
+              onSubmit(data)
+            },
+            (errors) => {
+              console.log('[form] Validation failed:', errors)
+            }
+          )()
+        }} className="space-y-4">
           <div className="space-y-4">
-            {/* Job Name Field - Start */}
-            <FormField
-              control={form.control}
-              name="jobName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base">Job Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter job name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Job Name Field - End */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              {/* Project Field - Start */}
-              <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="projectId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base">Project</FormLabel>
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? projects.find((project) => project.id === field.value)?.name
-                                : "Select project..."}
-                              <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-screen max-w-md p-0">
-                          <Command>
-                            <CommandInput placeholder="Search project..." />
-                            <CommandList>
-                              <CommandEmpty>No project found.</CommandEmpty>
-                              <CommandGroup>
-                                {projects.map((project) => (
-                                  <CommandItem
-                                    value={project.name}
-                                    key={project.id}
-                                    onSelect={() => {
-                                      form.setValue("projectId", project.id)
-                                      form.setValue("issueTypeIds", [])
-                                      form.setValue("issueIds", [])
-                                      form.clearErrors("projectId")
-                                      setOpen(false)
-                                    }}
-                                    className="flex justify-start"
-                                  >
-                                    <div className="flex justify-between items-center w-full">
-                                      <div className="flex items-center min-w-0 flex-1">
-                                        {project.avatar24 && (
-                                          <Image src={project.avatar24} alt="" width={24} height={24} className="w-6 h-6 mr-2 rounded-full flex-shrink-0" />
-                                        )}
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <span className="truncate">{project.name}</span>
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            <p>{project.name}</p>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      </div>
-                                      <CheckIcon
-                                        className={cn("h-4 w-4",
-                                          project.id === field.value
-                                            ? "opacity-100"
-                                            : "opacity-0"
-                                        )}
-                                      />
-                                    </div>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {currentProject && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Compliance:</span>
-                    {currentProject.compliance?.frameworks?.length ? (
-                      <div className="flex flex-wrap gap-1">
-                        {currentProject.compliance.frameworks.map((framework, index) => (
-                          <Badge key={index} variant="secondary">
-                            {framework}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">NA</span>
-                    )}
-                  </div>
-                )}
-              </div>
-              {/* Project Field - End */}
-              {/* Issue Types Field - Start */}
-              <div className="space-y-2">
-                <FormField
-                  control={form.control}
-                  name="issueTypeIds"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base">Issue Types (optional)</FormLabel>
-                      <Popover open={issueTypesOpen} onOpenChange={setIssueTypesOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              disabled={!selectedProject}
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value?.length && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value?.length
-                                ? `${field.value.length} selected`
-                                : "All options selected by default"}
-                              <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-screen max-w-md p-0">
-                          <Command>
-                            <CommandInput placeholder="Search issue types..." />
-                            <CommandList>
-                              <CommandEmpty>No issue type found.</CommandEmpty>
-                              <CommandGroup>
-                                {availableIssueTypes.map((issueType) => (
-                                  <CommandItem
-                                    value={issueType.name}
-                                    key={issueType.id}
-                                    onSelect={() => {
-                                      const currentValues = field.value || []
-                                      const isSelected = currentValues.includes(issueType.id)
-                                      const newValues = isSelected
-                                        ? currentValues.filter(id => id !== issueType.id)
-                                        : [...currentValues, issueType.id]
-                                      form.setValue("issueTypeIds", newValues)
-                                    }}
-                                    className="flex justify-between"
-                                  >
-                                    <div className="flex items-center min-w-0 flex-1">
-                                      {issueType.iconUrl && (
-                                        <Image src={issueType.iconUrl} alt="" width={16} height={16} className="w-4 h-4 mr-2 flex-shrink-0" />
-                                      )}
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <span className="truncate">{issueType.name}</span>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>{issueType.name}</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </div>
-                                    <CheckIcon
-                                      className={cn(
-                                        "h-4 w-4",
-                                        field.value?.includes(issueType.id)
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {selectedIssueTypes && selectedIssueTypes.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {selectedIssueTypes.map((issueTypeId) => {
-                      const issueType = availableIssueTypes.find(it => it.id === issueTypeId)
-                      return issueType ? (
-                        <Badge key={issueTypeId} variant="secondary" className="flex items-center gap-1">
-                          {issueType.iconUrl && (
-                            <Image src={issueType.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
-                          )}
-                          {issueType.name}
-                        </Badge>
-                      ) : null
-                    })}
-                  </div>
-                )}
-              </div>
-              {/* Issue Types Field - End */}
-            </div>
-            <Separator />
-            {/* Requirements Field - Start */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <FormField
-                  control={form.control}
-                  name="issueIds"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base">Requirements <span className="italic text-muted-foreground">(fetched based on selected project and issue types)</span></FormLabel>
-                      <Popover open={requirementsOpen} onOpenChange={setRequirementsOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              disabled={!selectedProject}
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value?.length && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value?.length
-                                ? `${field.value.length} selected`
-                                : "Select requirements..."}
-                              <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-screen max-w-md p-0">
-                          <Command shouldFilter={false}>
-                            <CommandInput
-                              placeholder="Type to search requirements..."
-                              value={searchText}
-                              onValueChange={(value) => setSearchText(value.trim())}
-                            />
-                            <CommandList>
-                              <CommandEmpty>
-                                {isLoading ? "Loading..." : error ? "Error loading requirements" : "No requirement found."}
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {requirementOptions.map((requirement) => {
-                                  const isScheduled = requirement.scheduledStatus !== null
-
-                                  return (
-                                  <CommandItem
-                                    key={requirement.id}
-                                    value={requirement.id}
-                                    disabled={isScheduled}
-                                    onSelect={() => {
-                                      if (isScheduled) return
-                                      const currentValues = field.value || []
-                                      const isSelected = currentValues.includes(requirement.id)
-                                      const newValues = isSelected
-                                        ? currentValues.filter(id => id !== requirement.id)
-                                        : [...currentValues, requirement.id]
-                                      form.setValue("issueIds", newValues)
-                                      if (newValues.length > 0) {
-                                        form.clearErrors("issueIds")
-                                      }
-                                    }}
-                                    className={`flex justify-between items-center gap-2 ${isScheduled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                  >
-                                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                                      <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
-                                        {requirement.iconUrl && (
-                                          <Image src={requirement.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
-                                        )}
-                                        {requirement.id}
-                                      </Badge>
-                                      <span className="truncate">{requirement.name}</span>
-                                    </div>
-                                    <CheckIcon
-                                      className={cn(
-                                        "h-4 w-4",
-                                        field.value?.includes(requirement.id)
-                                          ? "opacity-100"
-                                          : "opacity-0"
-                                      )}
-                                    />
-                                  </CommandItem>
-                                  )
-                                })}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {selectedRequirements && selectedRequirements.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-medium text-muted-foreground">Requirements added so far</h4>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          Remove all
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Remove all requirements?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will remove all selected requirements. You can add them back by selecting from the dropdown.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => form.setValue("issueIds", [])}>
-                            Remove all
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                  {selectedRequirements.map((requirementId) => {
-                    const requirement = selectedRequirementDetails.find(req => req?.id === requirementId) || requirementOptions.find(req => req.id === requirementId)
-                    return requirement ? (
-                      <Badge key={requirementId} variant="outline" className="block w-full text-left justify-start p-2 h-auto">
-                        <div className="flex items-center justify-between gap-2 min-w-0">
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
-                              {requirement.iconUrl && (
-                                <Image src={requirement.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
-                              )}
-                              {requirement.id}
-                            </Badge>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="truncate">{requirement.name}</span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{requirement.name}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                            onClick={() => {
-                              const newValues = selectedRequirements.filter(id => id !== requirementId)
-                              form.setValue("issueIds", newValues)
-                            }}
-                          >
-                            <XIcon className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </Badge>
-                    ) : null
-                  })}
-                  </div>
+              {/* Job Name Field - Start */}
+              <FormField
+                control={form.control}
+                name="jobName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-base">Job Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter job name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </div>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p className="font-medium">Note:</p>
-                <p>Disabled options indicate issues that are already scheduled:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Issues that are pending execution</li>
-                  <li>Issues currently in progress</li>
-                  <li>Issues completed and requiring review</li>
-                </ul>
-              </div>
+              />
+              {/* Job Name Field - End */}
+              {/* Source Field - Start */}
+              <FormField
+                control={form.control}
+                name="source"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel className="text-base">Source</FormLabel>
+                    <Popover open={sourceOpen} onOpenChange={setSourceOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground",
+                              fieldState.error && "!border-destructive"
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              {field.value === "jira" && (
+                                <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+                                  <path d="M108.023 16H61.805c0 11.52 9.324 20.848 20.847 20.848h8.5v8.226c0 11.52 9.328 20.848 20.848 20.848V19.977A3.98 3.98 0 00108.023 16zm0 0" fill="currentColor" />
+                                  <path d="M85.121 39.04H38.902c0 11.519 9.325 20.847 20.844 20.847h8.504v8.226c0 11.52 9.328 20.848 20.848 20.848V43.016a3.983 3.983 0 00-3.977-3.977zm0 0" fill="currentColor" />
+                                  <path d="M62.219 62.078H16c0 11.524 9.324 20.848 20.848 20.848h8.5v8.23c0 11.52 9.328 20.844 20.847 20.844V66.059a3.984 3.984 0 00-3.976-3.98zm0 0" fill="currentColor" />
+                                </svg>
+                              )}
+                              {field.value === "standalone" && <FolderIcon className="h-4 w-4" />}
+                              <span>{field.value === "jira" ? "Jira Project" : field.value === "standalone" ? "Standalone Project" : "Select source..."}</span>
+                            </div>
+                            <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandList>
+                            <CommandGroup>
+                              <CommandItem
+                                value="standalone"
+                                onSelect={() => {
+                                  form.setValue("source", "standalone")
+                                  form.clearErrors("source")
+                                  setSourceOpen(false)
+                                }}
+                                className="flex justify-between"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <FolderIcon className="h-4 w-4" />
+                                  Standalone Project
+                                </div>
+                                <CheckIcon className={cn("h-4 w-4", field.value === "standalone" ? "opacity-100" : "opacity-0")} />
+                              </CommandItem>
+                              <CommandItem
+                                value="jira"
+                                onSelect={() => {
+                                  form.setValue("source", "jira")
+                                  form.clearErrors("source")
+                                  setSourceOpen(false)
+                                }}
+                                className="flex justify-between"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+                                    <path d="M108.023 16H61.805c0 11.52 9.324 20.848 20.847 20.848h8.5v8.226c0 11.52 9.328 20.848 20.848 20.848V19.977A3.98 3.98 0 00108.023 16zm0 0" fill="currentColor" />
+                                    <path d="M85.121 39.04H38.902c0 11.519 9.325 20.847 20.844 20.847h8.504v8.226c0 11.52 9.328 20.848 20.848 20.848V43.016a3.983 3.983 0 00-3.977-3.977zm0 0" fill="currentColor" />
+                                    <path d="M62.219 62.078H16c0 11.524 9.324 20.848 20.848 20.848h8.5v8.23c0 11.52 9.328 20.844 20.847 20.844V66.059a3.984 3.984 0 00-3.976-3.98zm0 0" fill="currentColor" />
+                                  </svg>
+                                  Jira Project
+                                </div>
+                                <CheckIcon className={cn("h-4 w-4", field.value === "jira" ? "opacity-100" : "opacity-0")} />
+                              </CommandItem>
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* Source Field - End */}
             </div>
-            {/* Requirements Field - End */}
+            {selectedSource === "jira" && <JiraSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={jiraProjects} />}
+            {selectedSource === "standalone" && <StandaloneSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={standaloneProjects} validateRef={standaloneValidateRef} />}
           </div>
           <div className="flex justify-end gap-2">
             <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
@@ -567,8 +310,8 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button type="submit" disabled={scheduleJobMutation.isPending}>
-              {scheduleJobMutation.isPending ? "Creating..." : "Create Job"}
+            <Button type="submit" disabled={scheduleJobMutation.isPending || scheduleStandaloneJobMutation.isPending}>
+              {(scheduleJobMutation.isPending || scheduleStandaloneJobMutation.isPending) ? "Creating..." : "Create Job"}
             </Button>
           </div>
         </form>
@@ -585,8 +328,24 @@ export function ScheduleJob({ userProjectsPromise }: ScheduleJobProps) {
             <AlertDialogFooter>
               <AlertDialogAction onClick={() => {
                 setSuccessDialogOpen(false)
-                router.push("/scheduler")
+                router.push(`/scheduler?tab=${successSource}`)
               }}>
+                OK
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Error</AlertDialogTitle>
+              <AlertDialogDescription>
+                {errorMessage}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => setErrorDialogOpen(false)}>
                 OK
               </AlertDialogAction>
             </AlertDialogFooter>

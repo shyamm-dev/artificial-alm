@@ -10,9 +10,10 @@ import { JiraProjectsProgress } from "./jira-projects-progress"
 import { StandaloneProjectsProgress } from "./standalone-projects-progress"
 import { SchedulerSkeleton } from "./scheduler-skeleton"
 import { getScheduledJobIssues, getUserProjects, getJobNames, getIssueKeysAndSummaries } from "@/db/queries/scheduled-jobs-queries"
+import { getStandaloneScheduledJobRequirements, getStandaloneUserProjects, getStandaloneJobNames, getStandaloneRequirementNames } from "@/db/queries/standalone-scheduled-jobs-queries"
 import { getPaginationParams } from "@/lib/search-params"
 import { hasAtlassianAccount } from "@/lib/check-atlassian-account"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getStandaloneProjects } from "@/db/queries/standalone-project-queries"
 
 
@@ -32,12 +33,20 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
   const tab = params.tab || "standalone";
   const hasStandaloneProjects = standaloneProjects.length > 0;
   const { page, pageSize, search, sortBy, sortOrder, status, projectId, jobName } = getPaginationParams(params);
-  const dataPromise = Promise.all([
+  
+  const jiraDataPromise = Promise.all([
     getScheduledJobIssues(session.user.id, { page, pageSize }, { search, sortBy, sortOrder, status, projectId, jobName }),
     getUserProjects(session.user.id),
     getJobNames(session.user.id),
     getIssueKeysAndSummaries(session.user.id)
   ]);
+  
+  const standaloneDataPromise = hasStandaloneProjects ? Promise.all([
+    getStandaloneScheduledJobRequirements(session.user.id, { page, pageSize }, { search, sortBy, sortOrder, status, projectId, jobName }),
+    getStandaloneUserProjects(session.user.id),
+    getStandaloneJobNames(session.user.id),
+    getStandaloneRequirementNames(session.user.id)
+  ]) : undefined;
 
   return (
     <div className="px-4 lg:px-6">
@@ -55,13 +64,19 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
         </div>
 
         <TabsContent value="standalone" className="mt-6">
-          <StandaloneProjectsProgress hasProjects={hasStandaloneProjects} />
+          {hasStandaloneProjects && standaloneDataPromise ? (
+            <React.Suspense fallback={<SchedulerSkeleton />}>
+              <StandaloneProjectsProgress hasProjects={hasStandaloneProjects} dataPromise={standaloneDataPromise} searchParams={params} />
+            </React.Suspense>
+          ) : (
+            <StandaloneProjectsProgress hasProjects={hasStandaloneProjects} />
+          )}
         </TabsContent>
 
         <TabsContent value="jira" className="mt-6">
           {hasAtlassian ? (
             <React.Suspense fallback={<SchedulerSkeleton />}>
-              <JiraProjectsProgress dataPromise={dataPromise} searchParams={params} />
+              <JiraProjectsProgress dataPromise={jiraDataPromise} searchParams={params} />
             </React.Suspense>
           ) : (
             <Card>

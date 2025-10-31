@@ -1,5 +1,5 @@
 import { getUserResourcesAndProjects } from "@/db/queries/user-project-queries";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { JiraProjectsWrapper } from "./jira-projects-wrapper";
