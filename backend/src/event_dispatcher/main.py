@@ -24,13 +24,15 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
             return {"success": False, "error": "Missing JSON body"}, 400
 
         issue_ids: list[str] = data.get("issueIds")
+        source: str = data.get("source")
 
         unprocessed_issues: list[str] = []
 
         for issue_id in issue_ids:
             try:
                 event = {
-                    "issueId": issue_id
+                    "issueId": issue_id,
+                    "source": source
                 }
                 message_bytes: bytes = json.dumps(event).encode("utf-8")
                 publisher.publish(topic_path, message_bytes).result()

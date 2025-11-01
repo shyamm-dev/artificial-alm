@@ -15,7 +15,6 @@ TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
 GOOGLE_CLOUD_API_KEY = os.getenv("GOOGLE_CLOUD_API_KEY")
 
-database = Database(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
 
 @http
 def handler(request: Request) -> Tuple[Dict[str, Any], int]:
@@ -26,7 +25,7 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
     message_data = json.loads(pubsub_message)
 
     issue_id: str = message_data.get("issueId")
-    source: str = message_data.get("source", "jira")
+    source: str = message_data.get("source")
 
     with Database(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN) as conn:
 
@@ -40,7 +39,7 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
 
             compliance_list = json.loads(compliance_list_string) if compliance_list_string else []
 
-            repo.update_status("in_progress", issue_id)
+            repo.update_issue_status("in_progress", issue_id)
 
             vertex_ai = GoogleGenAI(GOOGLE_CLOUD_API_KEY)
 
@@ -54,16 +53,16 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
 
             if not response_json.get("success"):
                 reason = response_json.get("issue", "Unknown error")
-                repo.update_status_with_reason("failed", reason, issue_id)
+                repo.update_issue_status_with_reason("failed", reason, issue_id)
                 return {"success": True}, 200
 
             test_cases = response_json.get("data", [])
 
-            repo.insert_test_cases(issue_id, test_cases)
-            repo.update_status("completed", issue_id)
+            repo.insert_issue_test_cases(issue_id, test_cases)
+            repo.update_issue_status("completed", issue_id)
 
         except Exception as e:
-            repo.update_status_with_reason("failed", str(e), issue_id)
+            repo.update_issue_status_with_reason("failed", str(e), issue_id)
 
     return {"success": True}, 200
 
