@@ -8,6 +8,7 @@ from functions_framework import http
 from flask import Request
 
 from database import Database
+from issue_repository import IssueRepository, JIRAIssueRepository, ManualUploadIssueRepository
 from google_gen_ai import GoogleGenAI
 
 TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
@@ -19,42 +20,51 @@ database = Database(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
 @http
 def handler(request: Request) -> Tuple[Dict[str, Any], int]:
     """HTTP Cloud Run Function to generate test cases."""
+
     data: Dict[str, Any] | None = request.get_json(silent=True)
     pubsub_message = base64.b64decode(data["message"]["data"]).decode()
     message_data = json.loads(pubsub_message)
 
     issue_id: str = message_data.get("issueId")
+    source: str = message_data.get("source", "jira")
 
-    try:
-        compliance_list_string, summary, description = database.fetch_issue_data(issue_id)
+    with Database(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN) as conn:
 
-        compliance_list = json.loads(compliance_list_string)
+        if source == "jira":
+            repo: IssueRepository = JIRAIssueRepository(conn)
+        else:
+            repo: IssueRepository = ManualUploadIssueRepository(conn)
 
-        database.update_status("in_progress", issue_id)
+        try:
+            compliance_list_string, summary, description = repo.fetch_issue_data(issue_id)
 
-        vertex_ai = GoogleGenAI(GOOGLE_CLOUD_API_KEY)
+            compliance_list = json.loads(compliance_list_string) if compliance_list_string else []
 
-        prompt = generate_markdown_format(summary, description, compliance_list)
-        with open("./system_instruction.md", "r", encoding='utf-8') as f:
-            system_instruction = f.read()
+            repo.update_status("in_progress", issue_id)
 
-        response_text = vertex_ai.generate(prompt, system_instruction)
+            vertex_ai = GoogleGenAI(GOOGLE_CLOUD_API_KEY)
 
-        response_json = json.loads(response_text)
+            prompt = generate_markdown_format(summary, description, compliance_list)
 
-        if not response_json.get("success"):
-            reason = response_json.get("issue", "Unknown error")
-            database.update_status_with_reason("failed", reason, issue_id)
-            return {"success": True}, 200
+            with open("./system_instruction.md", "r", encoding='utf-8') as f:
+                system_instruction = f.read()
 
-        test_cases = response_json.get("data", [])
+            response_text = vertex_ai.generate(prompt, system_instruction)
+            response_json = json.loads(response_text)
 
-        database.insert_test_cases(issue_id, test_cases)
+            if not response_json.get("success"):
+                reason = response_json.get("issue", "Unknown error")
+                repo.update_status_with_reason("failed", reason, issue_id)
+                return {"success": True}, 200
 
-        database.update_status("completed", issue_id)
+            test_cases = response_json.get("data", [])
 
-    except Exception as e:
-        database.update_status_with_reason("failed", str(e), issue_id)
+            repo.insert_test_cases(issue_id, test_cases)
+            repo.update_status("completed", issue_id)
+
+        except Exception as e:
+            repo.update_status_with_reason("failed", str(e), issue_id)
+
     return {"success": True}, 200
 
 
