@@ -5,14 +5,14 @@ interface JobSchedulerResponse {
   unprocessedIssues: [string, string][];
 }
 
-export default async function scheduledAiTestcaseGenJob(issueIds: string[]): Promise<JobSchedulerResponse> {
+export default async function scheduledAiTestcaseGenJob(issueIds: string[], source: "jira" | "standalone"): Promise<JobSchedulerResponse> {
   const response = await fetch(`${process.env.JOB_SCHEDULER_ENDPOINT}/dispatch`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'x-api-key': process.env.JOB_SCHEDULER_API_KEY!
     },
-    body: JSON.stringify({ issueIds })
+    body: JSON.stringify({ issueIds, source })
   });
 
   if (!response.ok) {

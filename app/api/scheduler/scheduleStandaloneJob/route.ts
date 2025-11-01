@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm"
 import mammoth from "mammoth"
 import { db } from "@/db/drizzle"
 import extract from "pdf-extraction"
+import scheduledAiTestcaseGenJob from "@/data-access-layer/job-scheduler-api/job-scheduler"
 
 export async function POST(request: NextRequest) {
   try {
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
       createdByUserId: session.user.id,
     }).returning()
 
-    await db.insert(standaloneScheduledJobRequirement).values(
+    const insertedRequirements = await db.insert(standaloneScheduledJobRequirement).values(
       processedRequirements.map((req) => ({
         jobId: job.id,
         name: req.name,
@@ -98,7 +99,10 @@ export async function POST(request: NextRequest) {
         status: req.status,
         reason: req.reason,
       }))
-    )
+    ).returning({ id: standaloneScheduledJobRequirement.id })
+
+    const requirementIds = insertedRequirements.map(req => req.id)
+    await scheduledAiTestcaseGenJob(requirementIds, "standalone");
 
     return NextResponse.json({ message: "Job scheduled successfully", jobId: job.id })
   } catch (error) {

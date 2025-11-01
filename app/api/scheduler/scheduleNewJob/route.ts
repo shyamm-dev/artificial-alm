@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       createdByUserId: session.user.id
     }, transformedIssues)
 
-    await scheduledAiTestcaseGenJob(issueIds.map(id => id.toString()))
+    await scheduledAiTestcaseGenJob(issueIds.map(id => id.toString()), "jira")
 
     return NextResponse.json({ message: "Job scheduled successfully" })
   } catch (error) {
