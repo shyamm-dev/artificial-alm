@@ -1,11 +1,11 @@
 import { z } from "zod"
 
 export const standaloneScheduleJobSchema = z.object({
-  jobName: z.string().min(3, "Job name is required").max(100, "Job name cannot exceed 100 characters"),
+  jobName: z.string().trim().min(3, "Job name is required").max(100, "Job name cannot exceed 100 characters").refine(val => !/^\d+$/.test(val), "Name cannot contain only numbers"),
   source: z.string().min(1, "Source is required"),
   projectId: z.string().min(1, "Project is required"),
   requirements: z.array(z.object({
-    name: z.string().min(3, "Name is required"),
+    name: z.string().trim().min(3, "Name is required").refine(val => !/^\d+$/.test(val), "Name cannot contain only numbers"),
     content: z.string(),
     file: z.instanceof(File).nullable().optional(),
   })).min(1, "At least one requirement is needed"),

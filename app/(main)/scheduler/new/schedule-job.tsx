@@ -3,7 +3,7 @@
 import { useForm, type UseFormReturn, type FieldValues } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import { useState, use, useRef } from "react"
+import { useState, use, useRef, useEffect } from "react"
 import { useMutation } from "@tanstack/react-query"
 import { getUserAccessibleProjects } from "@/db/queries/user-project-queries"
 import { getStandaloneProjects } from "@/db/queries/standalone-project-queries"
@@ -117,6 +117,19 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
   })
 
   const selectedSource = form.watch("source")
+
+  useEffect(() => {
+    if (selectedSource) {
+      const currentJobName = form.getValues("jobName")
+      form.reset({
+        jobName: currentJobName,
+        source: selectedSource,
+        projectId: "",
+        issueTypeIds: [],
+        issueIds: [],
+      })
+    }
+  }, [selectedSource, form])
 
   const onSubmit = (data: JobFormData) => {
     console.log('[onSubmit] Called with data:', data)

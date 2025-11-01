@@ -1,6 +1,5 @@
-interface TestCase {
+interface BaseTestCase {
   id: string
-  issueId: string
   summary: string
   description: string
   generatedBy: 'ai' | 'manual'
@@ -16,9 +15,9 @@ interface IssueData {
   summary?: string
 }
 
-export function exportTestCasesToMarkdown(
-  testCases: TestCase[],
-  initialTestCases: TestCase[],
+export function exportTestCasesToMarkdown<T extends BaseTestCase>(
+  testCases: T[],
+  initialTestCases: T[],
   issue: IssueData | null
 ) {
   const markdownContent = `# Test Cases Export
@@ -59,9 +58,9 @@ ${tc.description}
   URL.revokeObjectURL(url)
 }
 
-export function exportTestCasesToPlainText(
-  testCases: TestCase[],
-  initialTestCases: TestCase[],
+export function exportTestCasesToPlainText<T extends BaseTestCase>(
+  testCases: T[],
+  initialTestCases: T[],
   issue: IssueData | null
 ) {
   const textContent = `TEST CASES EXPORT

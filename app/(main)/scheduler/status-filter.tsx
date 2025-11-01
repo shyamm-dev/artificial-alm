@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select"
 import { useRouter, useSearchParams } from "next/navigation"
 import { SCHEDULED_JOB_ISSUE_STATUS, ScheduledJobIssueStatus } from "@/constants/shared-constants"
-import { Clock, Zap, CheckCircle, XCircle, HelpCircle } from "lucide-react"
+import { Clock, Zap, CheckCircle, XCircle, HelpCircle, Archive } from "lucide-react"
 
 export function StatusFilter() {
   const router = useRouter()
@@ -67,6 +67,8 @@ const getStatusIndicator = (status: ScheduledJobIssueStatus) => {
       return { text: "Failed", icon: <XCircle className="h-3 w-3 text-red-600" /> };
     case "deployed_to_jira":
       return { text: "Deployed", icon: <CheckCircle className="h-3 w-3 text-purple-600" /> };
+    case "stale":
+      return { text: "Stale", icon: <Archive className="h-3 w-3 text-gray-500" /> };
     default:
       return { text: "Unknown", icon: <HelpCircle className="h-3 w-3 text-gray-600" /> };
   }

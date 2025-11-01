@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ScheduledJobIssueStatus } from "@/constants/shared-constants"
 import Image from "next/image"
-import { Clock, Zap, CheckCircle, XCircle, HelpCircle } from "lucide-react"
+import { Clock, Zap, CheckCircle, XCircle, HelpCircle, Archive } from "lucide-react"
 import { useState, useEffect } from "react"
 
 import {
@@ -113,7 +113,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {(status === "completed" || status === "failed") && (
+          {(status === "completed" || status === "failed" || status === "stale") && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -125,7 +125,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{status === "completed" ? "Testcase generation completed. Review the testcase" : "Testcase generation failed. Review the details"}</p>
+                  <p>{status === "completed" ? "Testcase generation completed. Review the testcase" : status === "failed" ? "Testcase generation failed. Review the details" : "Previous testcase generation marked as stale. Review the testcase"}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -230,6 +230,8 @@ const getStatusIndicator = (status: ScheduledJobIssueStatus) => {
       return { text: "Failed", icon: <XCircle className="h-3 w-3 text-red-600" /> };
     case "deployed_to_jira":
       return { text: "Deployed", icon: <CheckCircle className="h-3 w-3 text-purple-600" /> };
+    case "stale":
+      return { text: "Stale", icon: <Archive className="h-3 w-3 text-gray-500" /> };
     default:
       return { text: "Unknown", icon: <HelpCircle className="h-3 w-3 text-gray-600" /> };
   }

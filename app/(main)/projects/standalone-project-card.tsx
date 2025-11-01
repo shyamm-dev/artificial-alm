@@ -18,12 +18,14 @@ export default function StandaloneProjectCard({
   project,
   onSettingsClick,
   availableStandards,
-  onComplianceStandardToggle
+  onComplianceStandardToggle,
+  onResetCompliance
 }: {
   project: StandaloneProjectWithCompliance
   onSettingsClick: (project: StandaloneProjectWithCompliance) => void
   availableStandards: string[]
   onComplianceStandardToggle: (standard: string) => void
+  onResetCompliance: (projectId: string) => void
 }) {
   return (
     <Card className="relative">
@@ -43,6 +45,7 @@ export default function StandaloneProjectCard({
             project={project}
             availableStandards={availableStandards}
             onComplianceStandardToggle={onComplianceStandardToggle}
+            onResetCompliance={onResetCompliance}
           >
             <Button variant="ghost" size="sm" onClick={() => onSettingsClick(project)}>
               <SettingsIcon className="h-4 w-4" />

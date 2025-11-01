@@ -37,6 +37,13 @@ export function StandaloneProjectsClient({ projectsData, searchQuery = "" }: { p
     setProjectCompliance(prev => new Map(prev.set(selectedProjectId, updatedStandards)));
   };
 
+  const handleResetCompliance = (projectId: string) => {
+    const originalProject = projectsData.find(({ project }) => project.id === projectId);
+    if (originalProject) {
+      setProjectCompliance(prev => new Map(prev.set(projectId, originalProject.compliance?.frameworks || [])));
+    }
+  };
+
   const filteredProjects = projectsData.filter(({ project }) =>
     project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -81,6 +88,7 @@ export function StandaloneProjectsClient({ projectsData, searchQuery = "" }: { p
                   onSettingsClick={(proj) => setSelectedProjectId(proj.id)}
                   availableStandards={availableStandards}
                   onComplianceStandardToggle={handleComplianceStandardToggle}
+                  onResetCompliance={handleResetCompliance}
                 />
               );
             })}

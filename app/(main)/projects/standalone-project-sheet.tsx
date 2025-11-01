@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -35,6 +34,7 @@ export function StandaloneProjectSheet({
   project,
   availableStandards,
   onComplianceStandardToggle,
+  onResetCompliance,
   children
 }: {
   project: {
@@ -48,16 +48,23 @@ export function StandaloneProjectSheet({
   }
   availableStandards: string[]
   onComplianceStandardToggle: (standard: string) => void
+  onResetCompliance: (projectId: string) => void
   children: React.ReactNode
 }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description || "");
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSaveChanges = async () => {
-    if (!name.trim()) {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
       toast.error("Project name is required");
+      return;
+    }
+    if (/^\d+$/.test(trimmedName)) {
+      toast.error("Project name cannot contain only numbers");
       return;
     }
     setIsSaving(true);
@@ -86,8 +93,19 @@ export function StandaloneProjectSheet({
     setIsDeleting(false);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !isSaving) {
+      // Reset compliance state when closing without saving
+      onResetCompliance(project.id);
+      // Reset form fields
+      setName(project.name);
+      setDescription(project.description || "");
+    }
+    setIsOpen(open);
+  };
+
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
@@ -182,11 +200,9 @@ export function StandaloneProjectSheet({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <SheetClose asChild>
-            <Button onClick={handleSaveChanges} disabled={isSaving} className="flex-1">
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-          </SheetClose>
+          <Button onClick={handleSaveChanges} disabled={isSaving} className="flex-1">
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
         </div>
       </SheetContent>
     </Sheet>

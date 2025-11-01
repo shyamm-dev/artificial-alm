@@ -11,6 +11,7 @@ export const SCHEDULED_JOB_ISSUE_STATUS = [
   "in_progress",
   "completed",
   "failed",
+  "stale",
   "deployed_to_jira"
 ] as const;
 

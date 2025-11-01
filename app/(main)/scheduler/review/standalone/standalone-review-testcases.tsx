@@ -6,19 +6,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { Save, Download, Upload, RotateCcw, Plus, Trash2, Bot, User, ChevronDown, Loader2, ArrowLeft, XCircle, Archive } from "lucide-react"
+import { Save, Download, RotateCcw, Plus, Trash2, Bot, User, ChevronDown, Loader2, ArrowLeft, XCircle } from "lucide-react"
 import { exportTestCasesToMarkdown, exportTestCasesToPlainText } from "@/lib/export-utils"
-import { saveTestCasesDraft } from "./actions"
+import { saveStandaloneTestCasesDraft } from "./actions"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { TestCaseGeneratedBy } from "@/constants/shared-constants"
-import Image from "next/image"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
-interface TestCase {
+interface StandaloneTestCase {
   id: string
-  issueId: string
+  requirementId: string
   summary: string
   description: string
   generatedBy: TestCaseGeneratedBy
@@ -27,61 +25,44 @@ interface TestCase {
   updatedAt: string
 }
 
-interface Issue {
+interface StandaloneRequirement {
   id: string
-  issueId: string
-  issueKey: string
-  summary: string
+  requirementName: string
   status: string
   reason: string | null
   projectName: string
   projectId: string
-  projectAvatar: string | null
-  cloudId: string
   jobName: string
-  issueTypeIcon: string | null
-  issueTypeName: string
 }
 
-interface IssueType {
-  id: string
-  name: string
-  iconUrl: string | null
-}
-
-interface ReviewTestCasesProps {
-  issue: Issue
-  issueTypes: IssueType[]
-  testCases: TestCase[]
+interface StandaloneReviewTestCasesProps {
+  requirement: StandaloneRequirement
+  testCases: StandaloneTestCase[]
   tab: string
 }
 
-export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases, tab }: ReviewTestCasesProps) {
+export function StandaloneReviewTestCases({ requirement, testCases: initialTestCases, tab }: StandaloneReviewTestCasesProps) {
   const router = useRouter()
   const [testCases, setTestCases] = useState(initialTestCases)
   const [baselineTestCases, setBaselineTestCases] = useState(initialTestCases)
   const [resetDialogOpen, setResetDialogOpen] = useState(false)
   const [backDialogOpen, setBackDialogOpen] = useState(false)
-  const [deployDialogOpen, setDeployDialogOpen] = useState(false)
-  const [selectedIssueTypeId, setSelectedIssueTypeId] = useState("")
   const [isSaving, setIsSaving] = useState(false)
-  const [isDeploying, setIsDeploying] = useState(false)
   const [validationErrors, setValidationErrors] = useState<Record<string, { summary?: string; description?: string }>>({})
 
-  if (!issue) {
+  if (!requirement) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">Issue not found</p>
+        <p className="text-muted-foreground">Requirement not found</p>
       </div>
     )
   }
 
-  const updateTestCase = (id: string, field: keyof TestCase, value: string) => {
+  const updateTestCase = (id: string, field: keyof StandaloneTestCase, value: string) => {
     setTestCases(prev => prev.map(tc =>
       tc.id === id ? { ...tc, [field]: value, updatedAt: new Date().toISOString() } : tc
     ))
     
-    // Clear validation error for this field if value is not empty
     const trimmedValue = value.trim()
     if (trimmedValue && validationErrors[id]?.[field as 'summary' | 'description']) {
       setValidationErrors(prev => {
@@ -107,9 +88,9 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
   }
 
   const addTestCase = () => {
-    const newTestCase: TestCase = {
+    const newTestCase: StandaloneTestCase = {
       id: `new-${Date.now()}`,
-      issueId: issue?.id || '',
+      requirementId: requirement?.id || '',
       summary: '',
       description: '',
       generatedBy: 'manual' as TestCaseGeneratedBy,
@@ -169,7 +150,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
     
     setIsSaving(true)
     try {
-      await saveTestCasesDraft(testCases)
+      await saveStandaloneTestCasesDraft(testCases)
       setBaselineTestCases(testCases)
       setValidationErrors({})
       toast.success("Changes saved successfully!")
@@ -182,50 +163,21 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
   }
 
   const handleExportMarkdown = () => {
-    exportTestCasesToMarkdown(testCases, initialTestCases, issue)
+    exportTestCasesToMarkdown(testCases, initialTestCases, { 
+      issueKey: requirement.requirementName, 
+      summary: requirement.requirementName,
+      jobName: requirement.jobName,
+      projectName: requirement.projectName
+    })
   }
 
   const handleExportPlainText = () => {
-    exportTestCasesToPlainText(testCases, initialTestCases, issue)
-  }
-
-  const handleDeployToJira = () => {
-    if (!validateTestCases()) {
-      toast.error("Please fix validation errors before deploying.")
-      return
-    }
-    setDeployDialogOpen(true)
-  }
-
-  const confirmDeploy = async () => {
-    if (!selectedIssueTypeId) {
-      toast.error("Please select an issue type.")
-      return
-    }
-
-    setIsDeploying(true)
-    try {
-      const { deployTestCasesToJira } = await import("./deploy-actions")
-      await deployTestCasesToJira({
-        issueId: issue.id,
-        issueTypeId: selectedIssueTypeId,
-        testCases: testCases.map(tc => ({
-          id: tc.id,
-          summary: tc.summary,
-          description: tc.description
-        }))
-      })
-      
-      setDeployDialogOpen(false)
-      setSelectedIssueTypeId("")
-      toast.success("Test cases deployed to Jira successfully!")
-      router.push("/scheduler")
-    } catch (error) {
-      console.error("Failed to deploy to Jira:", error)
-      toast.error("Failed to deploy test cases to Jira. Please try again.")
-    } finally {
-      setIsDeploying(false)
-    }
+    exportTestCasesToPlainText(testCases, initialTestCases, { 
+      issueKey: requirement.requirementName, 
+      summary: requirement.requirementName,
+      jobName: requirement.jobName,
+      projectName: requirement.projectName
+    })
   }
 
   const handleBack = () => {
@@ -264,7 +216,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" disabled={issue?.status === "failed"}>
+              <Button variant="outline" disabled={requirement?.status === "failed"}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
                 <ChevronDown className="h-4 w-4 ml-2" />
@@ -279,14 +231,6 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={handleDeployToJira} disabled={isDeploying || issue?.status === "failed" || issue?.status === "stale"}>
-            {isDeploying ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Upload className="h-4 w-4 mr-2" />
-            )}
-            {isDeploying ? "Deploying..." : "Deploy to Jira"}
-          </Button>
         </div>
       </div>
 
@@ -294,32 +238,20 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
         <div className="space-y-3 text-sm">
           <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
             <span className="font-medium text-muted-foreground">Job Name</span>
-            <p className="font-semibold">: {issue?.jobName}</p>
+            <p className="font-semibold">: {requirement?.jobName}</p>
           </div>
           <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
             <span className="font-medium text-muted-foreground">Project Name</span>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold">:</span>
-              {issue?.projectAvatar && (
-                <Image src={issue.projectAvatar} alt="Project" width={16} height={16} className="rounded" />
-              )}
-              <p className="font-semibold">{issue?.projectName}</p>
-            </div>
+            <p className="font-semibold">: {requirement?.projectName}</p>
           </div>
           <div className="grid grid-cols-[120px_1fr] gap-2 items-center">
             <span className="font-medium text-muted-foreground">Requirement</span>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold">:</span>
-              {issue?.issueTypeIcon && (
-                <Image src={issue.issueTypeIcon} alt="Issue Type" width={16} height={16} />
-              )}
-              <p className="font-semibold">{issue?.issueKey} - {issue?.summary}</p>
-            </div>
+            <p className="font-semibold">: {requirement?.requirementName}</p>
           </div>
         </div>
       </div>
 
-      {issue?.status === "failed" && (
+      {requirement?.status === "failed" && (
         <div className="border rounded-lg p-4 bg-muted/20">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
@@ -329,24 +261,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
             <div className="text-sm text-muted-foreground">
               <p className="font-medium mb-2">Failure Reason:</p>
               <p className="bg-muted p-3 rounded border">
-                {issue.reason || "No specific reason provided"}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {issue?.status === "stale" && (
-        <div className="border rounded-lg p-4 bg-gray-200 border-gray-400">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Archive className="h-5 w-5 text-gray-700" />
-              <h3 className="text-lg font-semibold text-gray-900">Stale Test Cases</h3>
-            </div>
-            <div className="text-sm text-gray-800">
-              <p className="font-medium mb-2">Notice:</p>
-              <p className="bg-gray-300 p-3 rounded border border-gray-400">
-                This testcase generation has been marked as stale because updated testcases for this issue are available. These testcases cannot be deployed to Jira but can still be exported for reference.
+                {requirement.reason || "No specific reason provided"}
               </p>
             </div>
           </div>
@@ -370,58 +285,14 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={deployDialogOpen} onOpenChange={setDeployDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Deploy Test Cases to Jira</AlertDialogTitle>
-            <AlertDialogDescription>
-              Select the issue type for the test cases that will be created in Jira.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="py-4">
-            <label className="text-sm font-medium mb-2 block">Select Issue Type to Create</label>
-            <Select value={selectedIssueTypeId} onValueChange={setSelectedIssueTypeId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select an issue type..." />
-              </SelectTrigger>
-              <SelectContent>
-                {issueTypes.map(type => (
-                  <SelectItem key={type.id} value={type.id}>
-                    <div className="flex items-center gap-2">
-                      {type.iconUrl && (
-                        <Image src={type.iconUrl} alt={type.name} width={16} height={16} />
-                      )}
-                      {type.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeploying}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeploy} disabled={isDeploying || !selectedIssueTypeId}>
-              {isDeploying ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Deploying...
-                </>
-              ) : (
-                "Deploy"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {(testCases.length > 0 || issue?.status !== "failed") && (
+      {(testCases.length > 0 || requirement?.status !== "failed") && (
         <>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Generated Test Cases (Total : {testCases.length})</h2>
             <div className="flex gap-2">
               <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" disabled={issue?.status === "stale"}>
+                  <Button variant="outline" size="sm">
                     <RotateCcw className="h-4 w-4 mr-2" />
                     Reset All
                   </Button>
@@ -441,7 +312,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              <Button variant="outline" size="sm" onClick={addTestCase} disabled={issue?.status === "stale"}>
+              <Button variant="outline" size="sm" onClick={addTestCase}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Test Case
               </Button>
@@ -493,7 +364,6 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                         size="sm"
                         onClick={() => resetTestCase(testCase.id)}
                         title="Reset to original"
-                        disabled={issue?.status === "stale"}
                       >
                         <RotateCcw className="h-4 w-4 mr-1" />
                         Reset
@@ -506,7 +376,6 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                       onClick={() => removeTestCase(testCase.id)}
                       title="Remove test case"
                       className="text-red-600 hover:text-red-700 hover:border-red-300"
-                      disabled={issue?.status === "stale"}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -528,8 +397,6 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                     <p className="text-sm text-red-500 mt-1">{validationErrors[testCase.id].description}</p>
                   )}
                 </div>
-
-
               </form>
             </div>
           )
@@ -540,4 +407,3 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
     </div>
   )
 }
-

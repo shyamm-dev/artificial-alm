@@ -13,6 +13,23 @@ const scheduledJobIssueInsertSchema = createInsertSchema(scheduledJobIssue);
 
 export function createScheduledJobWithIssues(jobData: typeof scheduledJob.$inferInsert, issues: JiraIssue[]) {
   return db.transaction(async (tx) => {
+    // Mark existing scheduled job issues as stale for the same issue keys
+    const issueKeys = issues.map(issue => issue.key)
+    if (issueKeys.length > 0) {
+      await tx.update(scheduledJobIssue)
+        .set({ status: "stale" as ScheduledJobIssueStatus })
+        .where(
+          and(
+            inArray(scheduledJobIssue.issueKey, issueKeys),
+            or(
+              eq(scheduledJobIssue.status, "pending" as ScheduledJobIssueStatus),
+              eq(scheduledJobIssue.status, "completed" as ScheduledJobIssueStatus),
+              eq(scheduledJobIssue.status, "failed" as ScheduledJobIssueStatus)
+            )
+          )
+        )
+    }
+
     const [{ id }] = await tx.insert(scheduledJob).values(stripUndefined(scheduledJobInsertSchema.parse(jobData))).returning({ id: scheduledJob.id })
 
     const issuesData = issues.map(issue => stripUndefined(scheduledJobIssueInsertSchema.parse({

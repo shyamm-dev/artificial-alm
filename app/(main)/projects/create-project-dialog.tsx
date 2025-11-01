@@ -28,8 +28,13 @@ export function CreateProjectDialog() {
   const [isCreating, setIsCreating] = useState(false)
 
   const handleCreate = async () => {
-    if (!name.trim()) {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
       toast.error("Project name is required")
+      return
+    }
+    if (/^\d+$/.test(trimmedName)) {
+      toast.error("Project name cannot contain only numbers")
       return
     }
 

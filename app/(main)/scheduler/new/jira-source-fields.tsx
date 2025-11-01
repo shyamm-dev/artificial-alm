@@ -50,7 +50,7 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
   const selectedIssueTypes = form.watch("issueTypeIds")
   const selectedRequirements = form.watch("issueIds")
   const currentProject = projects.find(p => p.id === selectedProject)
-  const availableIssueTypes = currentProject?.issueTypes || []
+  const availableIssueTypes = useMemo(() => currentProject?.issueTypes || [], [currentProject?.issueTypes])
 
   const debouncedSearchText = useDebounce(searchText, 500)
 
@@ -106,7 +106,15 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
 
   useEffect(() => {
     form.setValue("issueIds", [])
-  }, [selectedProject, selectedIssueTypes, form])
+
+    // Set Story as default issue type if available
+    if (selectedProject && availableIssueTypes.length > 0) {
+      const storyIssueType = availableIssueTypes.find(type => type.name.toLowerCase() === 'story')
+      if (storyIssueType && (!selectedIssueTypes || selectedIssueTypes.length === 0)) {
+        form.setValue("issueTypeIds", [storyIssueType.id])
+      }
+    }
+  }, [selectedProject, availableIssueTypes, form, selectedIssueTypes])
 
   return (
     <>
@@ -343,45 +351,45 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
                         </CommandEmpty>
                         <CommandGroup>
                           {requirementOptions.map((requirement) => {
-                            const isScheduled = requirement.scheduledStatus !== null
+                            const isInProgress = requirement.scheduledStatus === "in_progress"
 
                             return (
-                            <CommandItem
-                              key={requirement.id}
-                              value={requirement.id}
-                              disabled={isScheduled}
-                              onSelect={() => {
-                                if (isScheduled) return
-                                const currentValues = field.value || []
-                                const isSelected = currentValues.includes(requirement.id)
-                                const newValues = isSelected
-                                  ? currentValues.filter((id: string) => id !== requirement.id)
-                                  : [...currentValues, requirement.id]
-                                form.setValue("issueIds", newValues)
-                                if (newValues.length > 0) {
-                                  form.clearErrors("issueIds")
-                                }
-                              }}
-                              className={`flex justify-between items-center gap-2 ${isScheduled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                              <div className="flex items-center gap-2 min-w-0 flex-1">
-                                <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
-                                  {requirement.iconUrl && (
-                                    <Image src={requirement.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
+                              <CommandItem
+                                key={requirement.id}
+                                value={requirement.id}
+                                disabled={isInProgress}
+                                onSelect={() => {
+                                  if (isInProgress) return
+                                  const currentValues = field.value || []
+                                  const isSelected = currentValues.includes(requirement.id)
+                                  const newValues = isSelected
+                                    ? currentValues.filter((id: string) => id !== requirement.id)
+                                    : [...currentValues, requirement.id]
+                                  form.setValue("issueIds", newValues)
+                                  if (newValues.length > 0) {
+                                    form.clearErrors("issueIds")
+                                  }
+                                }}
+                                className={`flex justify-between items-center gap-2 ${isInProgress ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              >
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
+                                    {requirement.iconUrl && (
+                                      <Image src={requirement.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
+                                    )}
+                                    {requirement.id}
+                                  </Badge>
+                                  <span className="truncate">{requirement.name}</span>
+                                </div>
+                                <CheckIcon
+                                  className={cn(
+                                    "h-4 w-4",
+                                    field.value?.includes(requirement.id)
+                                      ? "opacity-100"
+                                      : "opacity-0"
                                   )}
-                                  {requirement.id}
-                                </Badge>
-                                <span className="truncate">{requirement.name}</span>
-                              </div>
-                              <CheckIcon
-                                className={cn(
-                                  "h-4 w-4",
-                                  field.value?.includes(requirement.id)
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                            </CommandItem>
+                                />
+                              </CommandItem>
                             )
                           })}
                         </CommandGroup>
@@ -395,83 +403,91 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
           />
           {selectedRequirements && selectedRequirements.length > 0 && (
             <div className="mt-2 space-y-1">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-muted-foreground">Requirements added so far</h4>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    Remove all
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Remove all requirements?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will remove all selected requirements. You can add them back by selecting from the dropdown.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => form.setValue("issueIds", [])}>
-                      Remove all
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-            {selectedRequirements.map((requirementId: string) => {
-              const requirement = selectedRequirementDetails.find((req: Requirement) => req?.id === requirementId) || requirementOptions.find(req => req.id === requirementId)
-              return requirement ? (
-                <Badge key={requirementId} variant="outline" className="block w-full text-left justify-start p-2 h-auto">
-                  <div className="flex items-center justify-between gap-2 min-w-0">
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
-                        {requirement.iconUrl && (
-                          <Image src={requirement.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
-                        )}
-                        {requirement.id}
-                      </Badge>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="truncate">{requirement.name}</span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{requirement.name}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium text-muted-foreground">Requirements added so far</h4>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                      onClick={() => {
-                        const newValues = selectedRequirements.filter((id: string) => id !== requirementId)
-                        form.setValue("issueIds", newValues)
-                      }}
+                      className="h-6 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
-                      <XIcon className="h-3 w-3" />
+                      Remove all
                     </Button>
-                  </div>
-                </Badge>
-              ) : null
-            })}
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Remove all requirements?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will remove all selected requirements. You can add them back by selecting from the dropdown.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => form.setValue("issueIds", [])}>
+                        Remove all
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+              {selectedRequirements.map((requirementId: string) => {
+                const requirement = selectedRequirementDetails.find((req: Requirement) => req?.id === requirementId) || requirementOptions.find(req => req.id === requirementId)
+                return requirement ? (
+                  <Badge key={requirementId} variant="outline" className="block w-full text-left justify-start p-2 h-auto">
+                    <div className="flex items-center justify-between gap-2 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
+                          {requirement.iconUrl && (
+                            <Image src={requirement.iconUrl} alt="" width={12} height={12} className="w-3 h-3" />
+                          )}
+                          {requirement.id}
+                        </Badge>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="truncate">{requirement.name}</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{requirement.name}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                        onClick={() => {
+                          const newValues = selectedRequirements.filter((id: string) => id !== requirementId)
+                          form.setValue("issueIds", newValues)
+                        }}
+                      >
+                        <XIcon className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </Badge>
+                ) : null
+              })}
             </div>
           )}
         </div>
-        <div className="text-sm text-muted-foreground space-y-1">
-          <p className="font-medium">Note:</p>
-          <p>Disabled options indicate issues that are already scheduled:</p>
-          <ul className="list-disc list-inside space-y-1 ml-2">
-            <li>Issues that are pending execution</li>
-            <li>Issues currently in progress</li>
-            <li>Issues completed and requiring review</li>
-          </ul>
+        <div className="text-sm space-y-1 p-3 min-h-24 italic">
+          <p className="font-medium text-white">ℹ️ Note:</p>
+          <p className="text-white">Disabled options indicate issues with testcase generation currently in progress.</p>
+          {(() => {
+            const issuesWithExistingTestcases = selectedRequirements
+              .map((id: string) => selectedRequirementCache.get(id) || requirementOptions.find((req: Requirement) => req.id === id))
+              .filter((req: Requirement) => req && req.scheduledStatus && req.scheduledStatus !== "in_progress")
+
+            return issuesWithExistingTestcases.length > 0 ? (
+              <p className="text-white">
+                <strong>Selected issues that already have testcase generated and pending review will have their previous testcase generation marked as stale if you proceed:</strong> <div className="font-medium text-red-600 break-words">{issuesWithExistingTestcases.map((req: Requirement) => req.id).join(", ")}</div>
+              </p>
+            ) : (
+              <p className="text-white"><strong>Selected issues that already have testcase generated and pending review will have their previous testcase generation marked as stale if you proceed.</strong></p>
+            )
+          })()}
         </div>
       </div>
     </>
