@@ -68,17 +68,17 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
 
 
 def generate_markdown_format(summary: str, description: str, frameworks: list = None) -> str:
-    base_template = """**Summary / Title**
+    base_template = """**Requirement Title**
 - {summary}
  
-**Description / User Story**
+**Requirement Description**
  - {description}"""
 
     # Conditionally add compliance section
     if frameworks and len(frameworks):
         compliance_section = """
  
-**Compliance** 
+**Compliance Requirements** 
 - {frameworks}"""
 
         template = base_template + compliance_section
