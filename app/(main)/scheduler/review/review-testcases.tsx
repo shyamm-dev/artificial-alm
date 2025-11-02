@@ -77,6 +77,8 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
   }
 
   const updateTestCase = (id: string, field: keyof TestCase, value: string) => {
+    if (isStale) return
+    
     setTestCases(prev => prev.map(tc =>
       tc.id === id ? { ...tc, [field]: value, updatedAt: new Date().toISOString() } : tc
     ))
@@ -134,6 +136,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
   }
 
   const hasChanges = JSON.stringify(testCases) !== JSON.stringify(baselineTestCases)
+  const isStale = issue?.status === "stale"
   
   const validateTestCases = () => {
     const errors: Record<string, { summary?: string; description?: string }> = {}
@@ -254,7 +257,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
           </h1>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={handleSaveDraft} disabled={!hasChanges || isSaving}>
+          <Button variant="outline" onClick={handleSaveDraft} disabled={isStale || !hasChanges || isSaving}>
             {isSaving ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
@@ -467,6 +470,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                       value={testCase.summary}
                       onChange={(e) => updateTestCase(testCase.id, "summary", e.target.value)}
                       required
+                      disabled={isStale}
                       className={validationErrors[testCase.id]?.summary ? "border-red-500" : ""}
                     />
                     {validationErrors[testCase.id]?.summary && (
@@ -523,6 +527,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                     onChange={(e) => updateTestCase(testCase.id, "description", e.target.value)}
                     className={`resize-none max-h-32 overflow-y-auto ${validationErrors[testCase.id]?.description ? "border-red-500" : ""}`}
                     required
+                    disabled={isStale}
                   />
                   {validationErrors[testCase.id]?.description && (
                     <p className="text-sm text-red-500 mt-1">{validationErrors[testCase.id].description}</p>

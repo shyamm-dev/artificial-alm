@@ -481,11 +481,11 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
               .filter((req: Requirement) => req && req.scheduledStatus && req.scheduledStatus !== "in_progress")
 
             return issuesWithExistingTestcases.length > 0 ? (
-              <p className="text-white">
+              <div className="text-white">
                 <strong>Selected issues that already have testcase generated and pending review will have their previous testcase generation marked as stale if you proceed:</strong> <div className="font-medium text-red-600 break-words">{issuesWithExistingTestcases.map((req: Requirement) => req.id).join(", ")}</div>
-              </p>
+              </div>
             ) : (
-              <p className="text-white"><strong>Selected issues that already have testcase generated and pending review will have their previous testcase generation marked as stale if you proceed.</strong></p>
+              <div className="text-white"><strong>Selected issues that already have testcase generated and pending review will have their previous testcase generation marked as stale if you proceed.</strong></div>
             )
           })()}
         </div>
