@@ -175,8 +175,6 @@ class JiraClient {
       options: { method: "POST", body: { issueUpdates } }
     };
 
-    console.log("Bulk create issues request:", JSON.stringify(payload, null, 2));
-
     return this.makeRequest(payload);
   }
 

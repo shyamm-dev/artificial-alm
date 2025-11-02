@@ -4,7 +4,6 @@ import { getServerSession } from "@/lib/get-server-session"
 import { getTestCasesByIssueId } from "@/db/queries/testcase-queries"
 import { updateIssueStatus } from "@/db/queries/scheduled-job-queries"
 import { jiraClient } from "@/data-access-layer/atlassian-cloud-api/jira-cloud-api"
-import { SCHEDULED_JOB_ISSUE_STATUS } from "@/constants/shared-constants"
 import { z } from "zod"
 import { revalidatePath } from "next/cache"
 
@@ -54,7 +53,7 @@ export async function deployTestCasesToJira(data: z.infer<typeof deployTestCases
     }
 
     // Update issue status to deployed
-    await updateIssueStatus(validatedData.issueId, SCHEDULED_JOB_ISSUE_STATUS[4])
+    await updateIssueStatus(validatedData.issueId, "deployed_to_jira")
     
     revalidatePath("/scheduler")
 

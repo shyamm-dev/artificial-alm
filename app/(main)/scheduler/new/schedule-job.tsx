@@ -89,28 +89,22 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
 
   const scheduleStandaloneJobMutation = useMutation({
     mutationFn: async (formData: FormData) => {
-      console.log('[mutation] Sending request')
       const response = await fetch('/api/scheduler/scheduleStandaloneJob', {
         method: 'POST',
         body: formData
       })
-      console.log('[mutation] Response status:', response.status)
       if (!response.ok) {
         const error = await response.json()
-        console.error('[mutation] Error:', error)
         throw new Error(error.error || 'Failed to schedule standalone job')
       }
       const result = await response.json()
-      console.log('[mutation] Success:', result)
       return result
     },
-    onSuccess: (data) => {
-      console.log('[mutation] onSuccess:', data)
+    onSuccess: () => {
       setSuccessSource("standalone")
       setSuccessDialogOpen(true)
     },
     onError: (error) => {
-      console.error('[mutation] onError:', error)
       setErrorMessage(error.message)
       setErrorDialogOpen(true)
     }
@@ -132,17 +126,12 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
   }, [selectedSource, form])
 
   const onSubmit = (data: JobFormData) => {
-    console.log('[onSubmit] Called with data:', data)
     if (data.source === "standalone") {
-      console.log('[onSubmit] Standalone source detected')
       const isValid = standaloneValidateRef.current.validate()
-      console.log('[onSubmit] Validation result:', isValid)
       if (!isValid) {
-        console.log('[onSubmit] Validation failed, stopping')
         return
       }
       const requirements = standaloneValidateRef.current.getRequirements()
-      console.log('[onSubmit] Requirements:', requirements)
       
       const formData = new FormData()
       formData.append('jobName', data.jobName)
@@ -156,7 +145,6 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
         }
       })
       
-      console.log('[onSubmit] Calling mutation')
       scheduleStandaloneJobMutation.mutate(formData)
       return
     }
@@ -173,27 +161,22 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
       <div className="border rounded-lg p-6">
         <Form {...form}>
         <form onSubmit={(e) => {
-          console.log('[form] Submit event triggered')
           e.preventDefault()
           const values = form.getValues()
-          console.log('[form] Form values:', values)
           
           // For standalone, bypass form validation and use custom validation
           if (values.source === "standalone") {
-            console.log('[form] Standalone - bypassing form validation')
             onSubmit(values as JobFormData)
             return
           }
           
           // For jira, use normal form validation
-          console.log('[form] Jira - using form validation')
           form.handleSubmit(
             (data) => {
-              console.log('[form] Validation passed, calling onSubmit')
               onSubmit(data)
             },
-            (errors) => {
-              console.log('[form] Validation failed:', errors)
+            () => {
+              // Validation failed
             }
           )()
         }} className="space-y-4">

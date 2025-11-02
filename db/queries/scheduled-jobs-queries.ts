@@ -24,7 +24,8 @@ export function createScheduledJobWithIssues(jobData: typeof scheduledJob.$infer
             or(
               eq(scheduledJobIssue.status, "pending" as ScheduledJobIssueStatus),
               eq(scheduledJobIssue.status, "completed" as ScheduledJobIssueStatus),
-              eq(scheduledJobIssue.status, "failed" as ScheduledJobIssueStatus)
+              eq(scheduledJobIssue.status, "failed" as ScheduledJobIssueStatus),
+              eq(scheduledJobIssue.status, "deployed_to_jira" as ScheduledJobIssueStatus)
             )
           )
         )

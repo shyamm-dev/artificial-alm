@@ -222,7 +222,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
       setDeployDialogOpen(false)
       setSelectedIssueTypeId("")
       toast.success("Test cases deployed to Jira successfully!")
-      router.push("/scheduler")
+      router.push("/scheduler?tab=jira")
     } catch (error) {
       console.error("Failed to deploy to Jira:", error)
       toast.error("Failed to deploy test cases to Jira. Please try again.")
@@ -351,6 +351,14 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
               <p className="bg-gray-300 p-3 rounded border border-gray-400">
                 This testcase generation has been marked as stale because updated testcases for this issue are available. These testcases cannot be deployed to Jira but can still be exported for reference.
               </p>
+              {issue.reason && (
+                <>
+                  <p className="font-medium mb-2 mt-4">Original Failure Reason:</p>
+                  <p className="bg-gray-300 p-3 rounded border border-gray-400">
+                    {issue.reason}
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
