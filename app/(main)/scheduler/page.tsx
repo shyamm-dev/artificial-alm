@@ -15,6 +15,7 @@ import { getPaginationParams } from "@/lib/search-params"
 import { hasAtlassianAccount } from "@/lib/check-atlassian-account"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getStandaloneProjects } from "@/db/queries/standalone-project-queries"
+import { RefreshButton } from "./refresh-button"
 
 
 interface SchedulerPageProps {
@@ -33,14 +34,14 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
   const tab = params.tab || "standalone";
   const hasStandaloneProjects = standaloneProjects.length > 0;
   const { page, pageSize, search, sortBy, sortOrder, status, projectId, jobName } = getPaginationParams(params);
-  
+
   const jiraDataPromise = Promise.all([
     getScheduledJobIssues(session.user.id, { page, pageSize }, { search, sortBy, sortOrder, status, projectId, jobName }),
     getUserProjects(session.user.id),
     getJobNames(session.user.id),
     getIssueKeysAndSummaries(session.user.id)
   ]);
-  
+
   const standaloneDataPromise = hasStandaloneProjects ? Promise.all([
     getStandaloneScheduledJobRequirements(session.user.id, { page, pageSize }, { search, sortBy, sortOrder, status, projectId, jobName }),
     getStandaloneUserProjects(session.user.id),
@@ -55,12 +56,15 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
       <Tabs value={tab}>
         <div className="flex items-center justify-between">
           <ProgressTabNavigation />
-          <Link href="/scheduler/new">
-            <Button size="sm" disabled={tab === "standalone" && !hasStandaloneProjects}>
-              <Plus className="h-4 w-4 mr-2" />
-              Schedule Job
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <RefreshButton />
+            <Link href="/scheduler/new">
+              <Button size="sm" disabled={tab === "standalone" && !hasStandaloneProjects}>
+                <Plus className="h-4 w-4 mr-2" />
+                Schedule Job
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <TabsContent value="standalone" className="mt-6">
