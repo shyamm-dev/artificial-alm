@@ -87,6 +87,19 @@ export function StandaloneSourceFields({ form, projects, validateRef }: Standalo
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+        <FormField
+          control={form.control}
+          name="jobName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base">Job Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter job name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="space-y-2">
           <FormField
             control={form.control}

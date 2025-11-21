@@ -5,7 +5,7 @@ import { nextCookies } from "better-auth/next-js";
 import { authSchema } from "@/db/schema/auth-schema";
 
 export const auth = betterAuth({
-  appName: "Artificial AML",
+  appName: "Artificial ALM",
 
   database: drizzleAdapter(db, {
     provider: "sqlite",
@@ -44,6 +44,10 @@ export const auth = betterAuth({
       enabled: true,
       trustedProviders: ["atlassian", "google"],
     }
+  },
+
+  accessToken: {
+    autoRefresh: true,
   },
 
   plugins: [nextCookies()]

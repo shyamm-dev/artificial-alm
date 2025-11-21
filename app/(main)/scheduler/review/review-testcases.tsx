@@ -56,7 +56,7 @@ interface ReviewTestCasesProps {
   tab: string
 }
 
-export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases, tab }: ReviewTestCasesProps) {
+export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases }: ReviewTestCasesProps) {
   const router = useRouter()
   const [testCases, setTestCases] = useState(initialTestCases)
   const [baselineTestCases, setBaselineTestCases] = useState(initialTestCases)
@@ -222,7 +222,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
       setDeployDialogOpen(false)
       setSelectedIssueTypeId("")
       toast.success("Test cases deployed to Jira successfully!")
-      router.push("/scheduler?tab=jira")
+      router.push('/scheduler')
     } catch (error) {
       console.error("Failed to deploy to Jira:", error)
       toast.error("Failed to deploy test cases to Jira. Please try again.")
@@ -235,13 +235,13 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
     if (hasChanges) {
       setBackDialogOpen(true)
     } else {
-      router.push(`/scheduler?tab=${tab}`)
+      router.push('/scheduler')
     }
   }
 
   const confirmBack = () => {
     setBackDialogOpen(false)
-    router.push(`/scheduler?tab=${tab}`)
+    router.push('/scheduler')
   }
 
   return (

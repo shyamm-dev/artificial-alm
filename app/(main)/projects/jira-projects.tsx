@@ -1,4 +1,5 @@
 import { getUserResourcesAndProjects } from "@/db/queries/user-project-queries";
+import { getJiraProjectTestCaseStats } from "@/db/queries/jira-project-stats-queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -10,7 +11,25 @@ interface JiraProjectsProps {
 }
 
 export async function JiraProjects({ hasAtlassian, userId }: JiraProjectsProps) {
-  const sitesWithProjectsPromise = hasAtlassian ? getUserResourcesAndProjects(userId) : Promise.resolve([]);
+  const projectsWithStatsPromise = hasAtlassian
+    ? getUserResourcesAndProjects(userId).then(async (userAccessData) => {
+        const projectsWithStats = await Promise.all(
+          userAccessData
+            .filter((access) => access.project)
+            .map(async (access) => ({
+              project: {
+                ...access.project!,
+                complianceStandards: access.project!.compliance?.frameworks || [],
+                compliance: access.project!.compliance,
+              },
+              stats: await getJiraProjectTestCaseStats(access.project!.id, userId),
+              siteName: access.resource.name,
+              siteUrl: access.resource.url,
+            }))
+        );
+        return projectsWithStats;
+      })
+    : Promise.resolve([]);
 
   if (!hasAtlassian) {
     return (
@@ -30,5 +49,5 @@ export async function JiraProjects({ hasAtlassian, userId }: JiraProjectsProps) 
     );
   }
 
-  return <JiraProjectsWrapper sitesWithProjectsPromise={sitesWithProjectsPromise} />;
+  return <JiraProjectsWrapper projectsWithStatsPromise={projectsWithStatsPromise} />;
 }

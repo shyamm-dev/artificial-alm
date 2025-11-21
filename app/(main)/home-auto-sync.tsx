@@ -2,16 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { syncAtlassianResource } from "@/app/(main)/projects/actions/sync-actions";
+import { syncAtlassianResource } from "./projects/actions/sync-actions";
 import { toast } from "sonner";
 
-export function SyncHandler() {
+export function HomeAutoSync() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const hasRun = useRef(false);
 
   useEffect(() => {
-    const shouldSync = searchParams.get("sync") === "true";
+    const shouldSync = searchParams.get("sync") === "atlassian";
     if (shouldSync && !hasRun.current) {
       hasRun.current = true;
       syncAtlassianResource().then((result) => {
@@ -20,7 +20,7 @@ export function SyncHandler() {
         } else {
           toast.error(result.message || "Failed to sync Atlassian resources.");
         }
-        router.replace("/integrations/atlassian");
+        router.replace("/");
       });
     }
   }, [searchParams, router]);

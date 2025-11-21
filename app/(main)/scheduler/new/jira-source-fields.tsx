@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react"
+import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import type { UseFormReturn, FieldValues } from "react-hook-form"
@@ -119,6 +120,19 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+        <FormField
+          control={form.control}
+          name="jobName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base">Job Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter job name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="space-y-2">
           <FormField
             control={form.control}
@@ -197,24 +211,25 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
               </FormItem>
             )}
           />
-          {currentProject && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Compliance:</span>
-              {currentProject.compliance?.frameworks?.length ? (
-                <div className="flex flex-wrap gap-1">
-                  {currentProject.compliance.frameworks.map((framework, index) => (
-                    <Badge key={index} variant="secondary">
-                      {framework}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <span className="text-sm text-muted-foreground">NA</span>
-              )}
-            </div>
-          )}
+                {currentProject && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Compliance:</span>
+                {currentProject.compliance?.frameworks?.length ? (
+                  <div className="flex flex-wrap gap-1">
+                    {currentProject.compliance.frameworks.map((framework, index) => (
+                      <Badge key={index} variant="secondary">
+                        {framework}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-sm text-muted-foreground">NA</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="space-y-2">
+      <div className="space-y-2 md:w-1/2">
           <FormField
             control={form.control}
             name="issueTypeIds"
@@ -235,7 +250,7 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
                       >
                         {field.value?.length
                           ? `${field.value.length} selected`
-                          : "All options selected by default"}
+                          : "Select issue types..."}
                         <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -307,7 +322,6 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
               })}
             </div>
           )}
-        </div>
       </div>
       <Separator />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -472,9 +486,9 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
             </div>
           )}
         </div>
-        <div className="text-sm space-y-1 p-3 min-h-24 italic">
+        <div className="text-sm space-y-1 p-3 min-h-24">
           <p className="font-medium text-white">ℹ️ Note:</p>
-          <p className="text-white">Disabled options indicate issues with testcase generation currently in progress.</p>
+          <p className="text-white">Can&apos;t select grayed out items? They&apos;re still being worked on.</p>
           {(() => {
             const issuesWithExistingTestcases = selectedRequirements
               .map((id: string) => selectedRequirementCache.get(id) || requirementOptions.find((req: Requirement) => req.id === id))
@@ -482,10 +496,10 @@ export function JiraSourceFields({ form, projects }: JiraSourceFieldsProps) {
 
             return issuesWithExistingTestcases.length > 0 ? (
               <div className="text-white">
-                <strong>Selected issues that already have testcase generated and pending review will have their previous testcase generation marked as stale if you proceed:</strong> <div className="font-medium text-red-600 break-words">{issuesWithExistingTestcases.map((req: Requirement) => req.id).join(", ")}</div>
+                <strong>Already have test cases for some items? Selecting them again will create fresh test cases and mark the old ones as stale. You can still review them:</strong> <div className="font-medium text-red-600 break-words">{issuesWithExistingTestcases.map((req: Requirement) => req.id).join(", ")}</div>
               </div>
             ) : (
-              <div className="text-white"><strong>Selected issues that already have testcase generated and pending review will have their previous testcase generation marked as stale if you proceed.</strong></div>
+              <div className="text-white"><strong>Already have test cases for some items? Selecting them again will create fresh test cases and mark the old ones as stale. You can still review them.</strong></div>
             )
           })()}
         </div>

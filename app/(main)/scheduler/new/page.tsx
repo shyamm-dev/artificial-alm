@@ -13,10 +13,6 @@ export default async function NewSchedulerJobPage() {
 
   return (
     <div className="px-4 lg:px-6">
-      <div className="mb-4">
-        <h1 className="text-xl font-bold">Schedule New Job</h1>
-        <p className="text-muted-foreground">Create a new scheduled job for testcase generation</p>
-      </div>
       <ScheduleJob 
         userProjectsPromise={userProjectsPromise}
         standaloneProjectsPromise={standaloneProjectsPromise}

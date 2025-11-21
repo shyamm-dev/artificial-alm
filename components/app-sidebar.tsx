@@ -1,5 +1,5 @@
 import {
-  IconInnerShadowTop,
+  IconRobot,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -29,7 +29,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a>
-                <IconInnerShadowTop className="!size-5" />
+                <IconRobot className="!size-5" />
                 <span className="text-base font-semibold">Artificial ALM.</span>
               </a>
             </SidebarMenuButton>

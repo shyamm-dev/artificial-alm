@@ -17,14 +17,14 @@ export default async function AtlassianIntegrationPage() {
   return (
     <div className="px-4 lg:px-6">
       <SyncHandler />
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Atlassian Integration</h1>
-        <p className="text-muted-foreground">Connect your Atlassian account to access Jira projects</p>
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">Atlassian Integration</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Connect your Atlassian account to access Jira projects</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
             {hasAtlassian ? (
               <>
                 <CheckCircle2 className="h-5 w-5 text-green-600" />

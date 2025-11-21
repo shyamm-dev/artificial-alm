@@ -5,7 +5,7 @@ const TermsOfServicePage = () => {
   return (
     <div className="container mx-auto p-8 relative">
       <div className="absolute top-4 right-4">
-        <Link href="/projects" passHref>
+        <Link href="/" passHref>
           <Button>Go to App</Button>
         </Link>
       </div>

@@ -23,13 +23,13 @@ export function LoginForm({
 
   const atlassianLogin = async () => {
     setIsAtlassianLoading(true);
-    await authClient.signIn.social({ provider: "atlassian", callbackURL: "/projects" });
+    await authClient.signIn.social({ provider: "atlassian", callbackURL: "/?sync=atlassian" });
     setIsAtlassianLoading(false);
   }
 
   const googleLogin = async () => {
     setIsGoogleLoading(true);
-    await authClient.signIn.social({ provider: "google", callbackURL: "/projects" });
+    await authClient.signIn.social({ provider: "google", callbackURL: "/" });
     setIsGoogleLoading(false);
   }
 
@@ -39,7 +39,7 @@ export function LoginForm({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
-            Login with your Atlassian Account or Google
+            Sign in with Atlassian or Google to continue
           </CardDescription>
         </CardHeader>
         <CardContent>

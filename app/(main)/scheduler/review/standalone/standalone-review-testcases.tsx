@@ -41,7 +41,7 @@ interface StandaloneReviewTestCasesProps {
   tab: string
 }
 
-export function StandaloneReviewTestCases({ requirement, testCases: initialTestCases, tab }: StandaloneReviewTestCasesProps) {
+export function StandaloneReviewTestCases({ requirement, testCases: initialTestCases }: StandaloneReviewTestCasesProps) {
   const router = useRouter()
   const [testCases, setTestCases] = useState(initialTestCases)
   const [baselineTestCases, setBaselineTestCases] = useState(initialTestCases)
@@ -184,13 +184,13 @@ export function StandaloneReviewTestCases({ requirement, testCases: initialTestC
     if (hasChanges) {
       setBackDialogOpen(true)
     } else {
-      router.push(`/scheduler?tab=${tab}`)
+      router.push('/scheduler')
     }
   }
 
   const confirmBack = () => {
     setBackDialogOpen(false)
-    router.push(`/scheduler?tab=${tab}`)
+    router.push('/scheduler')
   }
 
   return (

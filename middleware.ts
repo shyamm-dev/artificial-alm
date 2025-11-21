@@ -9,8 +9,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (session && ["/", "/login"].includes(pathname)) {
-    return NextResponse.redirect(new URL("/projects", request.url));
+  if (session && pathname === "/login") {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

@@ -119,7 +119,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
                 <TooltipTrigger asChild>
                   <button
                     className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 cursor-pointer h-6 px-2"
-                    onClick={() => window.location.href = `/scheduler/review?issueId=${row.original.id}&tab=jira`}
+                    onClick={() => window.location.href = `/scheduler/review?issueId=${row.original.id}`}
                   >
                     Review
                   </button>

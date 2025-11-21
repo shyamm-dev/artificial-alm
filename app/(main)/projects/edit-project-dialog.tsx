@@ -8,27 +8,44 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
+
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Plus } from "lucide-react"
-import { useState } from "react"
-import { createStandaloneProject } from "./actions/standalone-project-actions"
+import { useState, useEffect } from "react"
+import { saveStandaloneProjectSettings } from "./actions/standalone-project-actions"
 import { toast } from "sonner"
 import { COMPLIANCE_FRAMEWORKS, ComplianceFramework } from "@/constants/shared-constants"
 
-export function CreateProjectDialog({ triggerButton }: { triggerButton?: React.ReactNode } = {}) {
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [frameworks, setFrameworks] = useState<ComplianceFramework[]>([])
-  const [isCreating, setIsCreating] = useState(false)
+interface EditProjectDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  project: {
+    id: string
+    name: string
+    description: string | null
+    complianceStandards: string[]
+  }
+}
 
-  const handleCreate = async () => {
-    const trimmedName = name.trim();
+export function EditProjectDialog({ open, onOpenChange, project }: EditProjectDialogProps) {
+  const [name, setName] = useState(project.name)
+  const [description, setDescription] = useState(project.description || "")
+  const [frameworks, setFrameworks] = useState<ComplianceFramework[]>(project.complianceStandards as ComplianceFramework[])
+  const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    if (open) {
+      setName(project.name)
+      setDescription(project.description || "")
+      setFrameworks(project.complianceStandards as ComplianceFramework[])
+    }
+  }, [open, project])
+
+  const handleSave = async () => {
+    const trimmedName = name.trim()
     if (!trimmedName) {
       toast.error("Project name is required")
       return
@@ -38,18 +55,15 @@ export function CreateProjectDialog({ triggerButton }: { triggerButton?: React.R
       return
     }
 
-    setIsCreating(true)
-    const result = await createStandaloneProject(name, description || null, frameworks)
+    setIsSaving(true)
+    const result = await saveStandaloneProjectSettings(project.id, name, description || null, frameworks)
     if (result?.success) {
       toast.success(result.message)
-      setOpen(false)
-      setName("")
-      setDescription("")
-      setFrameworks([])
+      onOpenChange(false)
     } else {
       toast.error(result?.message)
     }
-    setIsCreating(false)
+    setIsSaving(false)
   }
 
   const toggleFramework = (framework: ComplianceFramework) => {
@@ -61,20 +75,12 @@ export function CreateProjectDialog({ triggerButton }: { triggerButton?: React.R
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {triggerButton || (
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            New Project
-          </Button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="bg-card">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-card" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
+          <DialogTitle>Edit Project</DialogTitle>
           <DialogDescription>
-            Create a standalone project to organize your test cases
+            Update project details and compliance standards
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -85,6 +91,7 @@ export function CreateProjectDialog({ triggerButton }: { triggerButton?: React.R
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter project name"
+              autoFocus={false}
             />
           </div>
           <div className="space-y-2">
@@ -119,11 +126,11 @@ export function CreateProjectDialog({ triggerButton }: { triggerButton?: React.R
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={handleCreate} disabled={isCreating}>
-            {isCreating ? "Creating..." : "Create Project"}
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

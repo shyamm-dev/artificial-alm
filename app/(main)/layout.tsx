@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
+import { SiteHeaderWrapper } from "@/components/site-header-wrapper"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { getServerSessionPromise } from "@/lib/get-server-session";
 import { ServerSessionProvider } from "@/components/providers/server-session-provider";
@@ -19,7 +19,7 @@ export default async function MainGroupLayout({ children }: { children: React.Re
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader />
+        <SiteHeaderWrapper />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

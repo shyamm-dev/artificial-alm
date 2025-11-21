@@ -29,7 +29,7 @@ export function NavMain({ hasAtlassian }: { hasAtlassian: boolean }) {
           {items.map((item) => {
             if (item.isGroup && item.items) {
               return (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.title} suppressHydrationWarning>
                   <Collapsible defaultOpen={false} className="group/collapsible">
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton tooltip={item.title}>
@@ -75,12 +75,12 @@ export function NavMain({ hasAtlassian }: { hasAtlassian: boolean }) {
             }
 
             return (
-              <SidebarMenuItem key={item.title}>
+              <SidebarMenuItem key={item.title} suppressHydrationWarning>
                 <Link href={item.url}>
                   <SidebarMenuButton
                     tooltip={item.title}
                     className={cn(
-                      pathname.includes(item.url) &&
+                      (item.url === "/" ? pathname === "/" : pathname.includes(item.url)) &&
                       "bg-accent text-accent-foreground",
                     )}
                   >

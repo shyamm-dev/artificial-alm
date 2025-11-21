@@ -6,13 +6,20 @@ import { CreateProjectDialog } from "./create-project-dialog";
 import { useState } from "react";
 import { standaloneProject, standaloneProjectCompliance } from "@/db/schema";
 
-type ProjectData = {
+type StandaloneProjectWithCompliance = {
   project: typeof standaloneProject.$inferSelect;
   compliance: typeof standaloneProjectCompliance.$inferSelect | null;
+  stats: {
+    success: number;
+    failed: number;
+    inProgress: number;
+    pending: number;
+    total: number;
+  };
 };
 
 interface StandaloneProjectsProps {
-  projectsData: ProjectData[];
+  projectsData: StandaloneProjectWithCompliance[];
 }
 
 export function StandaloneProjectsWrapper({ projectsData }: StandaloneProjectsProps) {

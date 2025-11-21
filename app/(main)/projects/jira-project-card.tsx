@@ -2,16 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { EditJiraProjectDialog } from "./edit-jira-project-dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
-
-import { Pencil, FolderIcon, RefreshCw, CheckCircle, XCircle, BarChart3, FileText, Info, ArrowUpRight, Zap } from "lucide-react"
-import { EditProjectDialog } from "./edit-project-dialog"
-import { standaloneProject, standaloneProjectCompliance } from "@/db/schema"
-import { refreshProjectStats } from "./actions/refresh-project-stats"
+import { Pencil, RefreshCw, CheckCircle, XCircle, BarChart3, FileText, Info, ArrowUpRight, Zap } from "lucide-react"
+import { jiraProject, jiraProjectCompliance } from "@/db/schema/jira-project-schema"
+import { refreshJiraProjectStats } from "./actions/refresh-jira-project-stats"
 import { toast } from "sonner"
 import {
   Tooltip,
@@ -20,32 +19,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-type StandaloneProjectWithCompliance = typeof standaloneProject.$inferSelect & {
+type JiraProjectWithCompliance = typeof jiraProject.$inferSelect & {
   complianceStandards: string[]
-  compliance?: typeof standaloneProjectCompliance.$inferSelect | null
+  compliance?: typeof jiraProjectCompliance.$inferSelect | null
 }
 
-const colors = [
-  'bg-blue-500',
-  'bg-green-500',
-  'bg-purple-500',
-  'bg-orange-500',
-  'bg-pink-500',
-  'bg-teal-500',
-  'bg-indigo-500',
-  'bg-red-500',
-];
-
-const getColorForProject = (projectId: string) => {
-  const hash = projectId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return colors[hash % colors.length];
-};
-
-export default function StandaloneProjectCard({
+export default function JiraProjectCard({
   project,
   stats,
 }: {
-  project: StandaloneProjectWithCompliance
+  project: JiraProjectWithCompliance
   stats: {
     success: number
     failed: number
@@ -55,7 +38,6 @@ export default function StandaloneProjectCard({
   }
 }) {
   const router = useRouter();
-  const iconColor = getColorForProject(project.id);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [currentStats, setCurrentStats] = useState(stats);
@@ -84,7 +66,7 @@ export default function StandaloneProjectCard({
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    const result = await refreshProjectStats(project.id);
+    const result = await refreshJiraProjectStats(project.id);
     if (result.success && result.stats) {
       setCurrentStats(result.stats);
       setLastUpdated(new Date());
@@ -98,7 +80,6 @@ export default function StandaloneProjectCard({
   const handleEditClose = (open: boolean) => {
     setIsEditOpen(open);
     if (!open) {
-      // Refresh project data when dialog closes
       router.refresh();
     }
   };
@@ -109,9 +90,8 @@ export default function StandaloneProjectCard({
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <Avatar className="h-8 w-8 shrink-0">
-              <AvatarFallback className={`text-sm ${iconColor}`}>
-                <FolderIcon className="h-4 w-4 text-white" />
-              </AvatarFallback>
+              <AvatarImage src={project.avatar48 || undefined} alt={project.name} />
+              <AvatarFallback className="text-sm">{project.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <h3 className="font-semibold text-foreground text-sm truncate">{project.name}</h3>
           </div>
@@ -154,7 +134,7 @@ export default function StandaloneProjectCard({
                     <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-xs">Shows the number of requirements and their status</p>
+                    <p className="text-xs">Shows the number of issues and their status</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -220,7 +200,7 @@ export default function StandaloneProjectCard({
                 <div className="flex items-center justify-between text-sm font-semibold">
                   <div className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4 text-blue-600" />
-                    <span>Total Requirements</span>
+                    <span>Total Issues</span>
                   </div>
                   <span>{currentStats.total}</span>
                 </div>
@@ -251,12 +231,9 @@ export default function StandaloneProjectCard({
           )}
         </div>
 
-        {/* Metadata */}
-        <div className="text-xs text-muted-foreground">
-          <span>Created : {new Date(project.createdAt).toLocaleDateString()}</span>
-        </div>
+
       </CardContent>
-      <EditProjectDialog
+      <EditJiraProjectDialog
         open={isEditOpen}
         onOpenChange={handleEditClose}
         project={project}

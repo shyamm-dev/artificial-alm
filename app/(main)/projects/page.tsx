@@ -1,51 +1,54 @@
 import { getServerSession } from "@/lib/get-server-session";
 import { redirect } from "next/navigation";
 import { hasAtlassianAccount } from "@/lib/check-atlassian-account";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { TabNavigation } from "./tab-navigation";
-import { JiraProjects } from "./jira-projects";
-import { StandaloneProjectsServer } from "./standalone-projects-server";
-import { createDefaultStandaloneProject } from "@/db/queries/standalone-project-queries";
-import { AutoSync } from "./auto-sync";
-import { db } from "@/db/drizzle";
-import { user } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { getStandaloneProjects } from "@/db/queries/standalone-project-queries";
+import { getUserResourcesAndProjects } from "@/db/queries/user-project-queries";
+import { getProjectTestCaseStats } from "@/db/queries/standalone-project-stats-queries";
+import { getJiraProjectTestCaseStats } from "@/db/queries/jira-project-stats-queries";
+import { ProjectsClient } from "./projects-client";
 
-interface ProjectsPageProps {
-  searchParams: Promise<{ tab?: string }>;
-}
-
-export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
+export default async function ProjectsPage() {
   const session = await getServerSession();
   if (!session)
     redirect("/login");
 
-  const [userRecord] = await db.select({ onboarded: user.onboarded }).from(user).where(eq(user.id, session.user.id)).limit(1);
-  const wasOnboarded = userRecord?.onboarded || false;
-
-  await createDefaultStandaloneProject(session.user.id);
-
   const hasAtlassian = await hasAtlassianAccount();
-  const shouldAutoSync = !wasOnboarded && hasAtlassian;
-  const params = await searchParams;
-  const tab = params.tab || "standalone";
+  const standaloneProjects = await getStandaloneProjects(session.user.id);
+
+  const projectsWithStats = await Promise.all(
+    standaloneProjects.map(async (projectData) => ({
+      ...projectData,
+      stats: await getProjectTestCaseStats(projectData.project.id, session.user.id)
+    }))
+  );
+
+  const jiraProjectsPromise = hasAtlassian
+    ? getUserResourcesAndProjects(session.user.id).then(async (userAccessData) => {
+        const projectsWithStats = await Promise.all(
+          userAccessData
+            .filter((access) => access.project)
+            .map(async (access) => ({
+              project: {
+                ...access.project!,
+                complianceStandards: access.project!.compliance?.frameworks || [],
+                compliance: access.project!.compliance,
+              },
+              stats: await getJiraProjectTestCaseStats(access.project!.id, session.user.id),
+              siteName: access.resource.name,
+              siteUrl: access.resource.url,
+            }))
+        );
+        return projectsWithStats;
+      })
+    : Promise.resolve([]);
 
   return (
     <div className="px-4 lg:px-6">
-      <AutoSync shouldSync={shouldAutoSync} />
-      <h1 className="text-2xl font-bold mb-6">Projects</h1>
-      
-      <Tabs value={tab}>
-        <TabNavigation />
-        
-        <TabsContent value="standalone" className="mt-6">
-          <StandaloneProjectsServer userId={session.user.id} />
-        </TabsContent>
-        
-        <TabsContent value="jira" className="mt-6">
-          <JiraProjects hasAtlassian={hasAtlassian} userId={session.user.id} />
-        </TabsContent>
-      </Tabs>
+      <ProjectsClient
+        standaloneProjects={projectsWithStats}
+        jiraProjectsPromise={jiraProjectsPromise}
+        hasAtlassian={hasAtlassian}
+      />
     </div>
   );
 }

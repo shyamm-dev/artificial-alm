@@ -6,7 +6,7 @@ import { getTestCasesByRequirementId } from "@/db/queries/standalone-testcase-qu
 import { AccessDenied } from "./access-denied"
 
 interface StandaloneReviewPageProps {
-  searchParams: Promise<{ requirementId?: string; tab?: string }>
+  searchParams: Promise<{ requirementId?: string }>
 }
 
 export default async function StandaloneReviewPage({ searchParams }: StandaloneReviewPageProps) {
@@ -17,25 +17,24 @@ export default async function StandaloneReviewPage({ searchParams }: StandaloneR
 
   const params = await searchParams
   const requirementId = params.requirementId
-  const tab = params.tab || "standalone"
 
   if (!requirementId) {
-    redirect(`/scheduler?tab=${tab}`)
+    redirect('/scheduler')
   }
 
   const [requirement, testCases] = await getTestCasesByRequirementId(requirementId, session.user.id)
 
   if (requirement.length === 0) {
-    return <AccessDenied tab={tab} />
+    return <AccessDenied />
   }
 
   if (testCases.length === 0 && requirement[0].status !== "failed") {
-    redirect(`/scheduler?tab=${tab}`)
+    redirect('/scheduler')
   }
 
   return (
     <div className="px-4 lg:px-6">
-      <StandaloneReviewTestCases requirement={requirement[0]} testCases={testCases} tab={tab} />
+      <StandaloneReviewTestCases requirement={requirement[0]} testCases={testCases} tab="standalone" />
     </div>
   )
 }

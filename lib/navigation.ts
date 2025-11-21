@@ -1,7 +1,8 @@
 import {
-  IconCalendar,
+  IconFileText,
   IconFolder,
   IconPlug,
+  IconHome,
   type Icon,
 } from "@tabler/icons-react";
 
@@ -16,8 +17,9 @@ export type NavItem = {
 };
 
 export const navOptions: NavItem[] = [
+  { title: "Home", url: "/", pageTitle: "Explore Features & Capabilities", icon: IconHome },
   { title: "Projects", url: "/projects", pageTitle: "Manage Projects And Compliance", icon: IconFolder },
-  { title: "Scheduler", url: "/scheduler", pageTitle: "Schedule And Track Testcase Generation", icon: IconCalendar },
+  { title: "Generate Testcase", url: "/scheduler", pageTitle: "Schedule And Track Testcase Generation Progress", icon: IconFileText },
   {
     title: "Integrations",
     url: "/integrations",

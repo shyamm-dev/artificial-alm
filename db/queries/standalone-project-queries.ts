@@ -1,6 +1,6 @@
-import { db } from "@/db/drizzle";
-import { standaloneProject, standaloneProjectCompliance, user } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { db } from "../drizzle";
+import { standaloneProject, standaloneProjectCompliance, user } from "../schema";
 
 export async function updateStandaloneProject(projectId: string, name: string, description: string | null) {
   await db
@@ -43,7 +43,7 @@ export async function createDefaultStandaloneProject(userId: string) {
       db.insert(standaloneProject).values({
         id: crypto.randomUUID(),
         name: "Default Project",
-        description: "Configure compliance for this project and all test cases generated under this project will have the compliance applied to them",
+        description: "This is a comprehensive default project created to help you get started with test case management and compliance tracking. Configure compliance standards for this project and all test cases generated under this project will automatically have the compliance requirements applied to them. You can customize the project name, description, and compliance standards at any time through the settings panel. This project serves as a template to demonstrate how you can organize your testing efforts across different compliance frameworks including GDPR, SOC2, ISO 27001, and HIPAA.",
         userId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

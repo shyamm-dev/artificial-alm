@@ -8,20 +8,11 @@ import { useMutation } from "@tanstack/react-query"
 import { getUserAccessibleProjects } from "@/db/queries/user-project-queries"
 import { getStandaloneProjects } from "@/db/queries/standalone-project-queries"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
-import { CheckIcon, ChevronsUpDownIcon, FolderIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { FolderIcon } from "lucide-react"
 import {
   Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form"
 import { JiraSourceFields } from "./jira-source-fields"
 import { StandaloneSourceFields } from "./standalone-source-fields"
@@ -45,26 +36,43 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
     compliance: item.compliance
   }))
   const router = useRouter()
-  const [sourceOpen, setSourceOpen] = useState(false)
+  const [workspace, setWorkspace] = useState<"standalone" | "jira" | null>(null)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [successDialogOpen, setSuccessDialogOpen] = useState(false)
   const [errorDialogOpen, setErrorDialogOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
-  const [successSource, setSuccessSource] = useState<"jira" | "standalone">("jira")
+  const [, setSuccessSource] = useState<"jira" | "standalone">("jira")
   const standaloneValidateRef = useRef<{ validate: () => boolean; getRequirements: () => Array<{ id: string; name: string; content: string; file: File | null }> }>({
     validate: () => true,
     getRequirements: () => []
   })
 
 
+  useEffect(() => {
+    const savedSource = localStorage.getItem('selectedSource') as "standalone" | "jira" | null
+    setWorkspace(savedSource)
+
+    const handleStorageChange = () => {
+      const newSource = localStorage.getItem('selectedSource') as "standalone" | "jira" | null
+      setWorkspace(newSource)
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('workspace-changed', handleStorageChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('workspace-changed', handleStorageChange)
+    }
+  }, [])
+
   const form = useForm<JobFormData>({
     resolver: async (values, context, options) => {
-      const schema = values.source === "standalone" ? standaloneScheduleJobSchema : scheduleJobFormSchema
+      const schema = workspace === "standalone" ? standaloneScheduleJobSchema : scheduleJobFormSchema
       return zodResolver(schema)(values, context, options)
     },
     defaultValues: {
       jobName: "",
-      source: "",
+      source: workspace || "",
       projectId: "",
       issueTypeIds: [],
       issueIds: [],
@@ -110,20 +118,17 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
     }
   })
 
-  const selectedSource = form.watch("source")
-
   useEffect(() => {
-    if (selectedSource) {
-      const currentJobName = form.getValues("jobName")
+    if (workspace) {
       form.reset({
-        jobName: currentJobName,
-        source: selectedSource,
+        jobName: "",
+        source: workspace,
         projectId: "",
         issueTypeIds: [],
         issueIds: [],
       })
     }
-  }, [selectedSource, form])
+  }, [workspace, form])
 
   const onSubmit = (data: JobFormData) => {
     if (data.source === "standalone") {
@@ -156,8 +161,36 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
     }
   }
 
+  const getDescription = () => {
+    if (workspace === "standalone") {
+      return "Add requirements manually or upload files to generate test cases"
+    }
+    if (workspace === "jira") {
+      return "Select Jira issues from your project to generate test cases automatically"
+    }
+    return "Pick requirements from your project to create test cases automatically"
+  }
+
+  if (!workspace) {
+    return (
+      <div className="flex items-center justify-center h-[400px]">
+        <div className="text-center space-y-4">
+          <FolderIcon className="h-16 w-16 mx-auto text-muted-foreground" />
+          <div>
+            <h3 className="text-lg font-semibold mb-2">No Workspace Selected</h3>
+            <p className="text-sm text-muted-foreground">Select a workspace from the header to create a job</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <TooltipProvider>
+      <div className="mb-4">
+        <h1 className="text-xl font-bold">New Test Case Generation</h1>
+        <p className="text-muted-foreground">{getDescription()}</p>
+      </div>
       <div className="border rounded-lg p-6">
         <Form {...form}>
         <form onSubmit={(e) => {
@@ -181,107 +214,8 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
           )()
         }} className="space-y-4">
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Job Name Field - Start */}
-              <FormField
-                control={form.control}
-                name="jobName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-base">Job Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter job name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* Job Name Field - End */}
-              {/* Source Field - Start */}
-              <FormField
-                control={form.control}
-                name="source"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormLabel className="text-base">Source</FormLabel>
-                    <Popover open={sourceOpen} onOpenChange={setSourceOpen}>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              "w-full justify-between",
-                              !field.value && "text-muted-foreground",
-                              fieldState.error && "!border-destructive"
-                            )}
-                          >
-                            <div className="flex items-center gap-2">
-                              {field.value === "jira" && (
-                                <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-                                  <path d="M108.023 16H61.805c0 11.52 9.324 20.848 20.847 20.848h8.5v8.226c0 11.52 9.328 20.848 20.848 20.848V19.977A3.98 3.98 0 00108.023 16zm0 0" fill="currentColor" />
-                                  <path d="M85.121 39.04H38.902c0 11.519 9.325 20.847 20.844 20.847h8.504v8.226c0 11.52 9.328 20.848 20.848 20.848V43.016a3.983 3.983 0 00-3.977-3.977zm0 0" fill="currentColor" />
-                                  <path d="M62.219 62.078H16c0 11.524 9.324 20.848 20.848 20.848h8.5v8.23c0 11.52 9.328 20.844 20.847 20.844V66.059a3.984 3.984 0 00-3.976-3.98zm0 0" fill="currentColor" />
-                                </svg>
-                              )}
-                              {field.value === "standalone" && <FolderIcon className="h-4 w-4" />}
-                              <span>{field.value === "jira" ? "Jira Project" : field.value === "standalone" ? "Standalone Project" : "Select source..."}</span>
-                            </div>
-                            <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full p-0">
-                        <Command>
-                          <CommandList>
-                            <CommandGroup>
-                              <CommandItem
-                                value="standalone"
-                                onSelect={() => {
-                                  form.setValue("source", "standalone")
-                                  form.clearErrors("source")
-                                  setSourceOpen(false)
-                                }}
-                                className="flex justify-between"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <FolderIcon className="h-4 w-4" />
-                                  Standalone Project
-                                </div>
-                                <CheckIcon className={cn("h-4 w-4", field.value === "standalone" ? "opacity-100" : "opacity-0")} />
-                              </CommandItem>
-                              <CommandItem
-                                value="jira"
-                                onSelect={() => {
-                                  form.setValue("source", "jira")
-                                  form.clearErrors("source")
-                                  setSourceOpen(false)
-                                }}
-                                className="flex justify-between"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-                                    <path d="M108.023 16H61.805c0 11.52 9.324 20.848 20.847 20.848h8.5v8.226c0 11.52 9.328 20.848 20.848 20.848V19.977A3.98 3.98 0 00108.023 16zm0 0" fill="currentColor" />
-                                    <path d="M85.121 39.04H38.902c0 11.519 9.325 20.847 20.844 20.847h8.504v8.226c0 11.52 9.328 20.848 20.848 20.848V43.016a3.983 3.983 0 00-3.977-3.977zm0 0" fill="currentColor" />
-                                    <path d="M62.219 62.078H16c0 11.524 9.324 20.848 20.848 20.848h8.5v8.23c0 11.52 9.328 20.844 20.847 20.844V66.059a3.984 3.984 0 00-3.976-3.98zm0 0" fill="currentColor" />
-                                  </svg>
-                                  Jira Project
-                                </div>
-                                <CheckIcon className={cn("h-4 w-4", field.value === "jira" ? "opacity-100" : "opacity-0")} />
-                              </CommandItem>
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* Source Field - End */}
-            </div>
-            {selectedSource === "jira" && <JiraSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={jiraProjects} />}
-            {selectedSource === "standalone" && <StandaloneSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={standaloneProjects} validateRef={standaloneValidateRef} />}
+            {workspace === "jira" && <JiraSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={jiraProjects} />}
+            {workspace === "standalone" && <StandaloneSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={standaloneProjects} validateRef={standaloneValidateRef} />}
           </div>
           <div className="flex justify-end gap-2">
             <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
@@ -324,7 +258,7 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
             <AlertDialogFooter>
               <AlertDialogAction onClick={() => {
                 setSuccessDialogOpen(false)
-                router.push(`/scheduler?tab=${successSource}`)
+                router.push('/scheduler')
               }}>
                 OK
               </AlertDialogAction>
