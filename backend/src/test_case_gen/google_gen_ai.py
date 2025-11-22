@@ -23,18 +23,10 @@ class GoogleGenAI:
                     type=types.Type.ARRAY,
                     description="Array of test case objects if success is true; empty array if success is false.",
                     items=types.Schema(
-                        type=types.Type.OBJECT,
-                        properties={
-                            "summary": types.Schema(
-                                type=types.Type.STRING,
-                                description="Short title for the test case"
-                            ),
-                            "description": types.Schema(
-                                type=types.Type.STRING,
-                                description="Detailed description including purpose, steps, and expected result"
-                            )
-                        },
-                        required=["summary", "description"]
+                        any_of=[
+                            self._get_functional_schema(),
+                            self._get_compliance_schema()
+                        ]
                     )
                 )
             },
@@ -90,3 +82,45 @@ class GoogleGenAI:
             config=generate_content_config
         )
         return response.text
+
+    def _get_functional_schema(self) -> types.Schema:
+        return types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "summary": types.Schema(type=types.Type.STRING, description="Short title (5-10 words) describing the test case"),
+                "description": types.Schema(
+                    type=types.Type.OBJECT,
+                    properties={
+                        "type": types.Schema(type=types.Type.STRING, enum=["functional"]),
+                        "purpose": types.Schema(type=types.Type.STRING, description="Purpose of the test"),
+                        "preconditions": types.Schema(type=types.Type.STRING, description="Preconditions (if any)"),
+                        "testing_procedure": types.Schema(type=types.Type.ARRAY, items=types.Schema(type=types.Type.STRING), description="Steps for testing"),
+                        "expected_result": types.Schema(type=types.Type.STRING, description="Expected result (Clear observable outcome)"),
+                        "requirement_coverage": types.Schema(type=types.Type.STRING, description="Requirement Coverage (Which part of the requirement this test validates)")
+                    },
+                    required=["type", "purpose", "preconditions", "testing_procedure", "expected_result", "requirement_coverage"]
+                )
+            },
+            required=["summary", "description"]
+        )
+
+    def _get_compliance_schema(self) -> types.Schema:
+        return types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "summary": types.Schema(type=types.Type.STRING, description="COMPLIANCE - [Short title (5-10 words) describing the test case.]"),
+                "description": types.Schema(
+                    type=types.Type.OBJECT,
+                    properties={
+                        "type": types.Schema(type=types.Type.STRING, enum=["compliance"]),
+                        "compliance_rule": types.Schema(type=types.Type.STRING, description="Compliance Rule Involved (Exact rule text or clause from Compliance Requirements)"),
+                        "preconditions": types.Schema(type=types.Type.STRING, description="Preconditions (if any)"),
+                        "testing_procedure": types.Schema(type=types.Type.ARRAY, items=types.Schema(type=types.Type.STRING), description="Steps for testing"),
+                        "expected_result": types.Schema(type=types.Type.STRING, description="Expected result (System behavior must remain compliant with the rule.)"),
+                        "compliance_impact": types.Schema(type=types.Type.STRING, description="Compliance Impact Explanation (Brief explanation of significance and why verification is required)")
+                    },
+                    required=["type", "compliance_rule", "preconditions", "testing_procedure", "expected_result", "compliance_impact"]
+                )
+            },
+            required=["summary", "description"]
+        )

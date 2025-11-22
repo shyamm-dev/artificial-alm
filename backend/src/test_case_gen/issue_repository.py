@@ -1,3 +1,5 @@
+import json
+
 from abc import ABC, abstractmethod
 from uuid import uuid4
 
@@ -47,7 +49,7 @@ class JIRAIssueRepository(IssueRepository):
         self._conn.commit()
 
     def insert_issue_test_cases(self, issue_id: str, testcases: list):
-        _testcases = [(str(uuid4()), issue_id, tc['summary'], tc['description']) for tc in testcases]
+        _testcases = [(str(uuid4()), issue_id, tc['summary'], json.dumps(tc['description'])) for tc in testcases]
         with self._conn:
             self._conn.executemany(
                 JiraQueries.INSERT_ISSUE_TEST_CASES,
@@ -80,7 +82,7 @@ class ManualUploadIssueRepository(IssueRepository):
         self._conn.commit()
 
     def insert_issue_test_cases(self, issue_id: str, testcases: list):
-        _testcases = [(str(uuid4()), issue_id, tc['summary'], tc['description']) for tc in testcases]
+        _testcases = [(str(uuid4()), issue_id, tc['summary'], json.dumps(tc['description'])) for tc in testcases]
         with self._conn:
             self._conn.executemany(
                 ManualUploadQueries.INSERT_ISSUE_TEST_CASES,
