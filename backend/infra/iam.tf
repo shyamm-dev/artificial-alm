@@ -32,21 +32,9 @@ resource "google_service_account" "test_case_gen_cloud_function_sa" {
   account_id   = "test-case-gen-cf-sa"
 }
 
-# Grant Cloud Function SA necessary permissions
-# resource "google_project_iam_member" "function_permissions" {
-#   for_each = toset([
-#     "roles/logging.logWriter",
-#     "roles/monitoring.metricWriter"
-#   ])
-  
-#   project = var.project_id
-#   role    = each.value
-#   member  = "serviceAccount:${google_service_account.cloud_function_sa.email}"
-# }
-
 #########################################################################################
 
-# Service account for Eventarc trigger
+# Service account for Eventarc trigger/ Subscription
 
 resource "google_service_account" "testcase_gen_eventarc_sa" {
   account_id   = "testcase-gen-eventarc-ps-sa"
@@ -59,6 +47,14 @@ resource "google_cloud_run_service_iam_member" "testcase_gen_eventarc_invoker" {
   role     = "roles/run.invoker"
   member   = "serviceAccount:${google_service_account.testcase_gen_eventarc_sa.email}"
 }
+
+resource "google_cloud_run_service_iam_member" "compliance_invoker" {
+  service  = google_cloudfunctions2_function.compliance_test_case_gen.name
+  location = google_cloudfunctions2_function.compliance_test_case_gen.location
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.testcase_gen_eventarc_sa.email}"
+}
+
 
 # Grant Eventarc SA permission to receive Pub/Sub messages
 resource "google_pubsub_topic_iam_member" "testcase_gen_eventarc_subscriber" {

@@ -5,7 +5,7 @@ data "archive_file" "event_dispatcher_function_zip" {
 }
 
 locals {
-  event_dispatcher_zip_md5 = md5(filebase64(data.archive_file.event_dispatcher_function_zip.output_path))
+  event_dispatcher_zip_md5 = data.archive_file.event_dispatcher_function_zip.output_md5
 }
 
 resource "google_storage_bucket_object" "event_dispatcher_function_zip" {
@@ -57,7 +57,7 @@ data "archive_file" "test_case_gen_function_zip" {
 }
 
 locals {
-  testcase_gen_zip_md5 = md5(filebase64(data.archive_file.test_case_gen_function_zip.output_path))
+  testcase_gen_zip_md5 = data.archive_file.test_case_gen_function_zip.output_md5
 }
 
 resource "google_storage_bucket_object" "test_case_gen_function_zip" {
@@ -96,4 +96,54 @@ resource "google_cloudfunctions2_function" "test_case_gen" {
     }
   }
   depends_on = [google_storage_bucket_object.test_case_gen_function_zip]
+}
+
+#########################################################################################
+
+data "archive_file" "compliance_test_case_gen_function_zip" {
+  type        = "zip"
+  output_path = "build/compliance-test-case-gen-function.zip"
+  source_dir  = "${path.module}/../src/compliance_test_case_gen/"
+}
+
+locals {
+  compliance_testcase_gen_zip_md5 = data.archive_file.compliance_test_case_gen_function_zip.output_md5
+}
+
+resource "google_storage_bucket_object" "compliance_test_case_gen_function_zip" {
+  name   = "test-case-gen-${local.compliance_testcase_gen_zip_md5}.zip"
+  bucket = var.bucket_name
+  source = data.archive_file.compliance_test_case_gen_function_zip.output_path
+
+}
+
+resource "google_cloudfunctions2_function" "compliance_test_case_gen" {
+  name        = "compliance-test-case-gen"
+  location    = var.region
+  description = "Calls generative AI model to create compliance test cases"
+
+  build_config {
+    runtime     = "python313"
+    entry_point = "handler"
+    source {
+      storage_source {
+        bucket = var.bucket_name
+        object = google_storage_bucket_object.compliance_test_case_gen_function_zip.name
+      }
+    }
+  }
+
+  service_config {
+    service_account_email = google_service_account.test_case_gen_cloud_function_sa.email
+    available_memory   = "256M"
+    max_instance_count = 20
+    timeout_seconds    = 120
+    ingress_settings = "ALLOW_ALL"
+    environment_variables = {
+      TURSO_DATABASE_URL   = var.TURSO_DATABASE_URL
+      GOOGLE_CLOUD_API_KEY = var.GOOGLE_CLOUD_API_KEY
+      TURSO_AUTH_TOKEN     = var.TURSO_AUTH_TOKEN
+    }
+  }
+  depends_on = [google_storage_bucket_object.compliance_test_case_gen_function_zip]
 }
