@@ -18,9 +18,10 @@ interface ProjectSelectorProps {
   projects: Project[];
   currentProjectId?: string;
   hasAtlassian?: boolean;
+  disabled?: boolean;
 }
 
-export function ProjectSelector({ projects, hasAtlassian = false }: ProjectSelectorProps) {
+export function ProjectSelector({ projects, hasAtlassian = false, disabled = false }: ProjectSelectorProps) {
   const router = useRouter();
   const standaloneProjects = projects.filter(p => p.source === "standalone");
   const jiraProjects = projects.filter(p => p.source === "jira");
@@ -86,7 +87,7 @@ export function ProjectSelector({ projects, hasAtlassian = false }: ProjectSelec
       <span className="text-sm font-medium">Workspace :</span>
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="h-9 px-3 gap-2">
+          <Button variant="outline" className="h-9 px-3 gap-2" disabled={disabled}>
             {displaySource === "standalone" ? (
               <FolderIcon className="h-4 w-4 shrink-0" />
             ) : displaySource === "jira" ? (

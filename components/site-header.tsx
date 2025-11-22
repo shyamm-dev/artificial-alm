@@ -17,6 +17,7 @@ interface SiteHeaderProps {
 export function SiteHeader({ projects = [], currentProjectId, hasAtlassian = false }: SiteHeaderProps) {
   const pathname = usePathname();
   const [title, setTitle] = useState("");
+  const isReviewPage = pathname.includes("/scheduler/review");
 
   useEffect(() => {
     const item = navOptions.find(item => {
@@ -37,7 +38,7 @@ export function SiteHeader({ projects = [], currentProjectId, hasAtlassian = fal
         <h1 className="hidden sm:block text-base font-medium">{title}</h1>
         <div className="ml-auto flex items-center gap-2">
           {projects.length > 0 && (
-            <ProjectSelector projects={projects} currentProjectId={currentProjectId} hasAtlassian={hasAtlassian} />
+            <ProjectSelector projects={projects} currentProjectId={currentProjectId} hasAtlassian={hasAtlassian} disabled={isReviewPage} />
           )}
           <ModeToggle />
         </div>

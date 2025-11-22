@@ -88,43 +88,24 @@ export const standaloneColumns: ColumnDef<StandaloneScheduledJobRequirement>[] =
   {
     accessorKey: "status",
     header: "Status",
-    size: 130,
+    size: 100,
     cell: ({ row }) => {
       const status: StandaloneScheduledJobIssueStatus = row.getValue("status");
       const { text, icon } = getStatusIndicator(status);
       return (
-        <div className="flex items-center gap-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-2 border-dashed bg-transparent text-foreground">
-                  {icon && <span className="mr-1">{icon}</span>}
-                  {text}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{text}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          {(status === "completed" || status === "failed") && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 cursor-pointer h-6 px-2"
-                    onClick={() => window.location.href = `/scheduler/review/standalone?requirementId=${row.original.id}`}
-                  >
-                    Review
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{status === "completed" ? "Testcase generation completed. Review the testcase" : "Testcase generation failed. Review the details"}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border-2 border-dashed bg-transparent text-foreground">
+                {icon && <span className="mr-1">{icon}</span>}
+                {text}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{text}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       );
     },
   },
@@ -208,6 +189,34 @@ export const standaloneColumns: ColumnDef<StandaloneScheduledJobRequirement>[] =
       };
       
       return <DateCell />;
+    },
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    size: 80,
+    cell: ({ row }) => {
+      const status: StandaloneScheduledJobIssueStatus = row.getValue("status");
+      if (status !== "completed" && status !== "failed") {
+        return <span className="text-xs text-muted-foreground">N/A</span>;
+      }
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 cursor-pointer h-6 px-2"
+                onClick={() => window.location.href = `/scheduler/review/standalone?requirementId=${row.original.id}`}
+              >
+                Review
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{status === "completed" ? "Testcase generation completed. Review the testcase" : "Testcase generation failed. Review the details"}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
     },
   },
 ]
