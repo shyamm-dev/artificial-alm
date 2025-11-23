@@ -1,13 +1,15 @@
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { timestamps } from "../helper/timestamp-helper";
+import { standaloneProject } from "./standalone-project-schema";
+import { jiraProject } from "./jira-project-schema";
 import { user } from "@/auth-schema";
 
 export const customRuleTag = sqliteTable("custom_rule_tag", {
   id: text("id").primaryKey(),
   name: text("name").notNull().unique(),
   description: text("description").notNull(),
-  
+
   ...timestamps
 },
   (table) => [
@@ -42,3 +44,13 @@ export const projectCustomRuleRelations = relations(projectCustomRule, ({ one })
     references: [user.id],
   }),
 }));
+
+export const standaloneProjectRelationsExtended = relations(standaloneProject, ({ many }) => ({
+  customRules: many(projectCustomRule),
+}));
+
+export const jiraProjectRelationsExtended = relations(jiraProject, ({ many }) => ({
+  customRules: many(projectCustomRule),
+}));
+
+
