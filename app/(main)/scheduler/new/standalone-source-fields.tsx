@@ -189,7 +189,8 @@ export function StandaloneSourceFields({ form, projects, validateRef }: Standalo
       </div>
       <Separator />
       <div className="space-y-4">
-        <div className="flex justify-center">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold">Requirements | Total: ({requirements.length})</h3>
           <Button
             type="button"
             variant="outline"

@@ -17,6 +17,61 @@ const deployTestCasesSchema = z.object({
   }))
 })
 
+function parseDescriptionForJira(description: string): string {
+  try {
+    const parsed = JSON.parse(description)
+    
+    if (parsed.type === 'functional') {
+      return `Type: Functional
+
+Purpose: ${parsed.purpose || 'NA'}
+
+Preconditions: ${parsed.preconditions || 'NA'}
+
+Testing Procedure:
+${(parsed.testing_procedure || []).map((step: string, i: number) => `${i + 1}. ${step}`).join('\n') || 'NA'}
+
+Expected Result: ${parsed.expected_result || 'NA'}
+
+Requirement Coverage: ${parsed.requirement_coverage || 'NA'}`
+    }
+    
+    if (parsed.type === 'non-functional' || parsed.type === 'non_functional') {
+      return `Type: Non-Functional
+
+Test Category: ${parsed.test_category || 'NA'}
+
+Preconditions: ${parsed.preconditions || 'NA'}
+
+Testing Procedure:
+${(parsed.testing_procedure || []).map((step: string, i: number) => `${i + 1}. ${step}`).join('\n') || 'NA'}
+
+Expected Result: ${parsed.expected_result || 'NA'}
+
+Acceptance Criteria: ${parsed.acceptance_criteria || 'NA'}`
+    }
+    
+    if (parsed.type === 'compliance') {
+      return `Type: Compliance
+
+Compliance Rule: ${parsed.compliance_rule || 'NA'}
+
+Preconditions: ${parsed.preconditions || 'NA'}
+
+Testing Procedure:
+${(parsed.testing_procedure || []).map((step: string, i: number) => `${i + 1}. ${step}`).join('\n') || 'NA'}
+
+Expected Result: ${parsed.expected_result || 'NA'}
+
+Compliance Impact: ${parsed.compliance_impact || 'NA'}`
+    }
+    
+    return description
+  } catch {
+    return description
+  }
+}
+
 export async function deployTestCasesToJira(data: z.infer<typeof deployTestCasesSchema>) {
   const session = await getServerSession()
   if (!session) {
@@ -37,7 +92,7 @@ export async function deployTestCasesToJira(data: z.infer<typeof deployTestCases
     // Prepare issues for bulk creation
     const issuesToCreate = validatedData.testCases.map(testCase => ({
       summary: testCase.summary,
-      description: testCase.description,
+      description: parseDescriptionForJira(testCase.description),
       projectId: issue.projectId,
       issueTypeId: validatedData.issueTypeId,
       parentId: issue.issueId

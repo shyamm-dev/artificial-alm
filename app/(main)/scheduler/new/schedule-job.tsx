@@ -191,7 +191,7 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
         <h1 className="text-xl font-bold">New Test Case Generation</h1>
         <p className="text-muted-foreground">{getDescription()}</p>
       </div>
-      <div className="border rounded-lg p-6">
+      <div className="border rounded-lg p-6 bg-card">
         <Form {...form}>
         <form onSubmit={(e) => {
           e.preventDefault()

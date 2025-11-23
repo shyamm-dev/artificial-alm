@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -18,6 +19,7 @@ import { COMPLIANCE_FRAMEWORKS } from "@/constants/shared-constants"
 import { jiraProject, jiraProjectCompliance } from "@/db/schema/jira-project-schema"
 import { updateJiraProjectCompliance } from "./actions/update-jira-project-compliance"
 import { toast } from "sonner"
+import { CustomRulesTab } from "./custom-rules-tab"
 
 type JiraProjectWithCompliance = typeof jiraProject.$inferSelect & {
   complianceStandards: string[]
@@ -56,43 +58,55 @@ export function EditJiraProjectDialog({ open, onOpenChange, project }: EditJiraP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-card">
+      <DialogContent className="sm:max-w-[600px] bg-card">
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
           <DialogDescription>
             Update compliance standards for {project.name}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label>Project Name <span className="text-muted-foreground">(readonly)</span></Label>
-            <Input value={project.name} disabled />
-          </div>
-          <div className="space-y-2">
-            <Label>Description <span className="text-muted-foreground">(readonly)</span></Label>
-            <Textarea value={project.description || "No description"} disabled className="resize-none" rows={3} />
-          </div>
-          <div>
-            <Label>Compliance Standards</Label>
-            <div className="grid grid-cols-2 gap-3 mt-2">
-              {COMPLIANCE_FRAMEWORKS.map((standard) => (
-                <div key={standard} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`jira-${standard}`}
-                    checked={selectedStandards.includes(standard)}
-                    onCheckedChange={() => handleToggleStandard(standard)}
-                  />
-                  <label
-                    htmlFor={`jira-${standard}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                  >
-                    {standard}
-                  </label>
-                </div>
-              ))}
+        <Tabs defaultValue="general" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="compliance">Compliance</TabsTrigger>
+            <TabsTrigger value="rules">Custom Rules</TabsTrigger>
+          </TabsList>
+          <TabsContent value="general" className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Project Name <span className="text-muted-foreground">(readonly)</span></Label>
+              <Input value={project.name} disabled />
             </div>
-          </div>
-        </div>
+            <div className="space-y-2">
+              <Label>Description <span className="text-muted-foreground">(readonly)</span></Label>
+              <Textarea value={project.description || "No description"} disabled className="resize-none" rows={3} />
+            </div>
+          </TabsContent>
+          <TabsContent value="compliance" className="space-y-4 py-4">
+            <div>
+              <Label>Compliance Standards</Label>
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                {COMPLIANCE_FRAMEWORKS.map((standard) => (
+                  <div key={standard} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`jira-${standard}`}
+                      checked={selectedStandards.includes(standard)}
+                      onCheckedChange={() => handleToggleStandard(standard)}
+                    />
+                    <label
+                      htmlFor={`jira-${standard}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {standard}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+          <TabsContent value="rules" className="py-4">
+            <CustomRulesTab />
+          </TabsContent>
+        </Tabs>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
             Cancel

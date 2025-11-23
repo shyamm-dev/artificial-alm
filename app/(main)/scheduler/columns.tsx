@@ -203,7 +203,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
     size: 80,
     cell: ({ row }) => {
       const status: ScheduledJobIssueStatus = row.getValue("status");
-      if (status !== "completed" && status !== "failed" && status !== "stale") {
+      if (status !== "completed" && status !== "failed" && status !== "stale" && status !== "deployed_to_jira") {
         return <span className="text-xs text-muted-foreground">N/A</span>;
       }
       return (
@@ -218,7 +218,7 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{status === "completed" ? "Testcase generation completed. Review the testcase" : status === "failed" ? "Testcase generation failed. Review the details" : "Previous testcase generation marked as stale. Review the testcase"}</p>
+              <p>{status === "completed" ? "Testcase generation completed. Review the testcase" : status === "failed" ? "Testcase generation failed. Review the details" : status === "stale" ? "Previous testcase generation marked as stale. Review the testcase" : "Testcases deployed to Jira. Review the testcase"}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

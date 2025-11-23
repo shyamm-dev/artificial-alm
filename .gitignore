@@ -56,3 +56,6 @@ build
 venv/
 __pycache__/
 test.py
+
+# amazonq
+.amazonq/
