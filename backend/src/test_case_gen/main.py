@@ -10,6 +10,8 @@ from flask import Request
 from .database import Database
 from .issue_repository import IssueRepository, JIRAIssueRepository, ManualUploadIssueRepository
 from .google_gen_ai import GoogleGenAI
+from .compliance_gen_ai import ComplianceTestCaseGeneration
+from .schema import FNFTestCaseGenResponseSchema
 
 TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
@@ -41,22 +43,18 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
 
             repo.update_issue_status("in_progress", issue_id)
 
-            vertex_ai = GoogleGenAI(GOOGLE_CLOUD_API_KEY)
-
             prompt = generate_markdown_format(summary, description, compliance_list)
 
-            with open("./system_instruction.md", "r", encoding='utf-8') as f:
-                system_instruction = f.read()
+            fnf_response = generate_functional_non_functional_test_cases(prompt)
 
-            response_text = vertex_ai.generate(prompt, system_instruction)
-            response_json = json.loads(response_text)
+            compliance_response = ComplianceTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt)
 
-            if not response_json.get("success"):
-                reason = response_json.get("issue", "Unknown error")
+            if not fnf_response.get("success"):
+                reason = fnf_response.get("issue", "Unknown error")
                 repo.update_issue_status_with_reason("failed", reason, issue_id)
                 return {"success": True}, 200
 
-            test_cases = response_json.get("data", [])
+            test_cases = fnf_response.get("data", []) + compliance_response.get("data", [])
 
             repo.insert_issue_test_cases(issue_id, test_cases)
             repo.update_issue_status("completed", issue_id)
@@ -90,3 +88,14 @@ def generate_markdown_format(summary: str, description: str, frameworks: list = 
         description=description,
         frameworks=", ".join(frameworks)
     )
+
+def generate_functional_non_functional_test_cases(prompt):
+    vertex_ai = GoogleGenAI(GOOGLE_CLOUD_API_KEY)
+    with open("./system_instruction.md", "r", encoding='utf-8') as f:
+        system_instruction = f.read()
+
+    response_text = vertex_ai.generate([("user", prompt)],
+                                       system_instruction,
+                                       schema=FNFTestCaseGenResponseSchema.get_schema())
+    response_json = json.loads(response_text)
+    return response_json

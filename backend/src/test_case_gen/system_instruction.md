@@ -66,20 +66,4 @@ Include:
 
 ---
 
-### **C. Compliance Test Cases (Only If Applicable)**
-
-Compliance Test Cases are generated **only when:**
-
-Compliance Requirements are provided  
-**AND**  
-The Requirement Description has **potential to break or conflict** with the compliance rules
-
-If so:
-- Generate **separate** compliance-focused test cases
-- Name must **start with**: `COMPLIANCE`
-
-If no compliance risk → *do not create compliance test cases.*
-
-If no compliance requirements are given → *skip compliance evaluation.*
-
 ---
