@@ -7,9 +7,9 @@ from typing import Any, Dict, Tuple
 from functions_framework import http
 from flask import Request
 
-from database import Database
-from issue_repository import IssueRepository, JIRAIssueRepository, ManualUploadIssueRepository
-from google_gen_ai import GoogleGenAI
+from libs.database import Database
+from libs.issue_repository import IssueRepository, JIRAIssueRepository, ManualUploadIssueRepository
+from libs.google_gen_ai import GoogleGenAI
 
 TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")

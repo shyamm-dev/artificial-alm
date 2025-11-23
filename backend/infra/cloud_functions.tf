@@ -53,7 +53,46 @@ resource "google_cloudfunctions2_function" "event_dispatcher" {
 data "archive_file" "test_case_gen_function_zip" {
   type        = "zip"
   output_path = "build/test-case-gen-function.zip"
-  source_dir  = "${path.module}/../src/test_case_gen/"
+  
+  source {
+    content  = file("${path.module}/../src/test_case_gen/main.py")
+    filename = "main.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/test_case_gen/requirements.txt")
+    filename = "requirements.txt"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/test_case_gen/system_instruction.md")
+    filename = "system_instruction.md"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/__init__.py")
+    filename = "libs/__init__.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/database.py")
+    filename = "libs/database.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/google_gen_ai.py")
+    filename = "libs/google_gen_ai.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/database_queries.py")
+    filename = "libs/database_queries.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/issue_repository.py")
+    filename = "libs/issue_repository.py"
+  }
 }
 
 locals {
@@ -103,7 +142,46 @@ resource "google_cloudfunctions2_function" "test_case_gen" {
 data "archive_file" "compliance_test_case_gen_function_zip" {
   type        = "zip"
   output_path = "build/compliance-test-case-gen-function.zip"
-  source_dir  = "${path.module}/../src/compliance_test_case_gen/"
+  
+  source {
+    content  = file("${path.module}/../src/compliance_test_case_gen/main.py")
+    filename = "main.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/compliance_test_case_gen/requirements.txt")
+    filename = "requirements.txt"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/compliance_test_case_gen/system_instruction.md")
+    filename = "system_instruction.md"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/__init__.py")
+    filename = "libs/__init__.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/database.py")
+    filename = "libs/database.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/google_gen_ai.py")
+    filename = "libs/google_gen_ai.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/database_queries.py")
+    filename = "libs/database_queries.py"
+  }
+  
+  source {
+    content  = file("${path.module}/../src/libs/issue_repository.py")
+    filename = "libs/issue_repository.py"
+  }
 }
 
 locals {

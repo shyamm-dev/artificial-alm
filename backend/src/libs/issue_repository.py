@@ -3,7 +3,7 @@ import json
 from abc import ABC, abstractmethod
 from uuid import uuid4
 
-from database_queries import JiraQueries, ManualUploadQueries
+from .database_queries import JiraQueries, ManualUploadQueries
 
 class IssueRepository(ABC):
 
