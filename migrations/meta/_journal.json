@@ -113,6 +113,20 @@
       "when": 1761853364816,
       "tag": "0015_tiresome_master_chief",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1763910718798,
+      "tag": "0016_famous_blazing_skull",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1763911143680,
+      "tag": "0017_natural_iceman",
+      "breakpoints": true
     }
   ]
 }
