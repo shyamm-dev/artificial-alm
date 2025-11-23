@@ -1,17 +1,38 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../drizzle";
 import { projectCustomRule } from "../schema";
+import type { InferSelectModel } from "drizzle-orm";
 
-export async function getProjectCustomRules(projectId: string, projectType: "standalone" | "jira") {
-  return await db
-    .select()
-    .from(projectCustomRule)
-    .where(
-      and(
-        eq(projectCustomRule.projectId, projectId),
-        eq(projectCustomRule.projectType, projectType)
-      )
-    );
+export type ProjectCustomRule = InferSelectModel<typeof projectCustomRule>;
+
+export async function getProjectCustomRules(projectId: string, projectType: "standalone" | "jira"): Promise<ProjectCustomRule[]> {
+  try {
+    const result = await db
+      .select({
+        id: projectCustomRule.id,
+        projectId: projectCustomRule.projectId,
+        projectType: projectCustomRule.projectType,
+        title: projectCustomRule.title,
+        description: projectCustomRule.description,
+        severity: projectCustomRule.severity,
+        isActive: projectCustomRule.isActive,
+        tags: projectCustomRule.tags,
+        createdBy: projectCustomRule.createdBy,
+        createdAt: projectCustomRule.createdAt,
+        updatedAt: projectCustomRule.updatedAt
+      })
+      .from(projectCustomRule)
+      .where(
+        and(
+          eq(projectCustomRule.projectId, projectId),
+          eq(projectCustomRule.projectType, projectType)
+        )
+      );
+    return result ?? [];
+  } catch (error) {
+    console.error("Error fetching custom rules:", error);
+    return [];
+  }
 }
 
 export async function createProjectCustomRule(data: {

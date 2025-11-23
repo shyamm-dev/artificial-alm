@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
 import { db } from "../drizzle";
-import { standaloneProject, standaloneProjectCompliance, user } from "../schema";
+import { standaloneProject, standaloneProjectCompliance, user, projectCustomRule } from "../schema";
 
 export async function updateStandaloneProject(projectId: string, name: string, description: string | null) {
   await db
@@ -14,7 +14,7 @@ export async function updateStandaloneProject(projectId: string, name: string, d
 }
 
 export async function getStandaloneProjects(userId: string) {
-  return await db
+  const projects = await db
     .select({
       project: standaloneProject,
       compliance: standaloneProjectCompliance,
@@ -25,6 +25,18 @@ export async function getStandaloneProjects(userId: string) {
       eq(standaloneProject.id, standaloneProjectCompliance.projectId)
     )
     .where(eq(standaloneProject.userId, userId));
+
+  const projectsWithRuleCount = await Promise.all(
+    projects.map(async (p) => {
+      const [ruleCount] = await db
+        .select({ count: count() })
+        .from(projectCustomRule)
+        .where(eq(projectCustomRule.projectId, p.project.id));
+      return { ...p, customRuleCount: ruleCount?.count || 0 };
+    })
+  );
+
+  return projectsWithRuleCount;
 }
 
 export async function createDefaultStandaloneProject(userId: string) {

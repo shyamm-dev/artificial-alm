@@ -17,6 +17,7 @@ type ProjectWithStats = {
     pending: number
     total: number
   }
+  customRuleCount: number
   siteName: string
   siteUrl: string
 }
@@ -105,11 +106,12 @@ export default function ProjectAccordian({ projectsWithStatsPromise, searchQuery
               <AccordionContent className="px-4 md:px-6 pb-6">
                 <Separator className="mb-4" />
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {siteProjects.map(({ project, stats }) => (
+                  {siteProjects.map(({ project, stats, customRuleCount }) => (
                     <JiraProjectCard
                       key={project.id}
                       project={project}
                       stats={stats}
+                      customRuleCount={customRuleCount}
                     />
                   ))}
                 </div>

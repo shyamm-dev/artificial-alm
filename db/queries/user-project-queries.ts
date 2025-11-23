@@ -1,7 +1,9 @@
 import { db } from "@/db/drizzle";
 import { jiraProjectCompliance } from "@/db/schema/jira-project-schema";
+import { projectCustomRule } from "@/db/schema";
 import { stripUndefined } from "@/db/helper/sync-helpers";
 import { createInsertSchema } from "drizzle-zod";
+import { eq, count } from "drizzle-orm";
 
 const jiraProjectComplianceInsertSchema = createInsertSchema(jiraProjectCompliance);
 
@@ -13,8 +15,8 @@ export function upsertProjectCompliance(complianceData: typeof jiraProjectCompli
 }
 
 
-export function getUserResourcesAndProjects(userId: string) {
-  return db.query.userAtlassianProjectAccess.findMany({
+export async function getUserResourcesAndProjects(userId: string) {
+  const userAccess = await db.query.userAtlassianProjectAccess.findMany({
     where: (u, { eq }) => eq(u.userId, userId),
     with: {
       resource: true,
@@ -26,6 +28,19 @@ export function getUserResourcesAndProjects(userId: string) {
       }
     }
   });
+
+  const accessWithRuleCount = await Promise.all(
+    userAccess.map(async (access) => {
+      if (!access.project) return { ...access, customRuleCount: 0 };
+      const [ruleCount] = await db
+        .select({ count: count() })
+        .from(projectCustomRule)
+        .where(eq(projectCustomRule.projectId, access.project.id));
+      return { ...access, customRuleCount: ruleCount?.count || 0 };
+    })
+  );
+
+  return accessWithRuleCount;
 }
 
 export function hasAccessToResource(userId: string, cloudId: string, projectId: string) {

@@ -7,6 +7,7 @@ import { standaloneProject, standaloneProjectCompliance } from "@/db/schema";
 type ProjectData = {
   project: typeof standaloneProject.$inferSelect;
   compliance: typeof standaloneProjectCompliance.$inferSelect | null;
+  customRuleCount: number;
   stats: {
     success: number;
     failed: number;
@@ -54,7 +55,7 @@ export function StandaloneProjectsClient({ projectsData, searchQuery = "" }: { p
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {filteredProjects.map(({ project, compliance, stats }) => {
+      {filteredProjects.map(({ project, compliance, customRuleCount, stats }) => {
         const projectWithCompliance = {
           ...project,
           complianceStandards: projectCompliance.get(project.id) || compliance?.frameworks || [],
@@ -66,6 +67,7 @@ export function StandaloneProjectsClient({ projectsData, searchQuery = "" }: { p
             key={`${project.id}-${project.updatedAt}-${projectWithCompliance.complianceStandards.join(',')}`}
             project={projectWithCompliance}
             stats={stats}
+            customRuleCount={customRuleCount}
           />
         );
       })}

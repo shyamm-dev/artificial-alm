@@ -9,6 +9,7 @@ import { standaloneProject, standaloneProjectCompliance } from "@/db/schema";
 type StandaloneProjectWithCompliance = {
   project: typeof standaloneProject.$inferSelect;
   compliance: typeof standaloneProjectCompliance.$inferSelect | null;
+  customRuleCount: number;
   stats: {
     success: number;
     failed: number;

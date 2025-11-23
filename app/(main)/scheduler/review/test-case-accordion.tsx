@@ -562,7 +562,7 @@ export function TestCaseAccordion({
               <AlertDialogTitle>Delete Test Case?</AlertDialogTitle>
               <AlertDialogDescription className="space-y-2">
                 <p>Are you sure you want to delete this test case?</p>
-                <p className="text-sm font-medium">Note: To apply the deletion, click the "Save Changes" button at the top. You can use the "Reset" button to recover this test case before saving.</p>
+                <p className="text-sm font-medium">Note: To apply the deletion, click the &quot;Save Changes&quot; button at the top. You can use the &quot;Reset&quot; button to recover this test case before saving.</p>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -35,6 +35,9 @@ interface EditJiraProjectDialogProps {
 export function EditJiraProjectDialog({ open, onOpenChange, project }: EditJiraProjectDialogProps) {
   const [selectedStandards, setSelectedStandards] = useState<string[]>(project.complianceStandards)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [activeTab, setActiveTab] = useState("general")
+  
+  const hasChanges = JSON.stringify(selectedStandards.sort()) !== JSON.stringify([...project.complianceStandards].sort())
 
   const handleToggleStandard = (standard: string) => {
     setSelectedStandards(prev =>
@@ -58,20 +61,21 @@ export function EditJiraProjectDialog({ open, onOpenChange, project }: EditJiraP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-card">
+      <DialogContent className="sm:max-w-[800px] max-h-[85vh] flex flex-col bg-card">
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
           <DialogDescription>
             Update compliance standards for {project.name}
           </DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="general" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="compliance">Compliance</TabsTrigger>
             <TabsTrigger value="rules">Custom Rules</TabsTrigger>
           </TabsList>
-          <TabsContent value="general" className="space-y-4 py-4">
+          <div className="flex-1 overflow-y-auto mt-4">
+          <TabsContent value="general" className="space-y-4 mt-0">
             <div className="space-y-2">
               <Label>Project Name <span className="text-muted-foreground">(readonly)</span></Label>
               <Input value={project.name} disabled />
@@ -80,11 +84,23 @@ export function EditJiraProjectDialog({ open, onOpenChange, project }: EditJiraP
               <Label>Description <span className="text-muted-foreground">(readonly)</span></Label>
               <Textarea value={project.description || "No description"} disabled className="resize-none" rows={3} />
             </div>
+            <div className="border rounded-lg p-4 bg-muted/30 space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <span>💡</span>
+                <span>Quick Tips</span>
+              </div>
+              <ul className="text-sm text-muted-foreground space-y-1.5 ml-6">
+                <li>• Project details are synced from Jira</li>
+                <li>• Add compliance standards in the Compliance tab</li>
+                <li>• Define custom rules for AI enforcement in Custom Rules tab</li>
+                <li>• Active rules are automatically applied during test case generation</li>
+              </ul>
+            </div>
           </TabsContent>
-          <TabsContent value="compliance" className="space-y-4 py-4">
-            <div>
+          <TabsContent value="compliance" className="space-y-4 mt-0">
+            <div className="space-y-3">
               <Label>Compliance Standards</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-2 gap-3">
                 {COMPLIANCE_FRAMEWORKS.map((standard) => (
                   <div key={standard} className="flex items-center space-x-2">
                     <Checkbox
@@ -101,20 +117,41 @@ export function EditJiraProjectDialog({ open, onOpenChange, project }: EditJiraP
                   </div>
                 ))}
               </div>
+              {selectedStandards.length > 0 && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Selected: {selectedStandards.length} {selectedStandards.length === 1 ? 'standard' : 'standards'}
+                </p>
+              )}
+            </div>
+            <div className="border rounded-lg p-4 bg-muted/30 space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <span>ℹ️</span>
+                <span>About Compliance Standards</span>
+              </div>
+              <div className="text-sm text-muted-foreground space-y-1.5">
+                <p><strong>FDA:</strong> Medical device regulations and quality system requirements</p>
+                <p><strong>IEC 62304:</strong> Medical device software lifecycle processes</p>
+                <p><strong>ISO 9001:</strong> Quality management system standards</p>
+                <p><strong>ISO 13485:</strong> Medical devices quality management systems</p>
+                <p><strong>ISO 27001:</strong> Information security management standards</p>
+              </div>
             </div>
           </TabsContent>
-          <TabsContent value="rules" className="py-4">
-            <CustomRulesTab />
+          <TabsContent value="rules" className="mt-0">
+            <CustomRulesTab projectId={project.id} projectType="jira" open={open} />
           </TabsContent>
+          </div>
         </Tabs>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </Button>
-        </DialogFooter>
+        {activeTab === "compliance" && (
+          <DialogFooter>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Close
+            </Button>
+            <Button onClick={handleSubmit} disabled={isSubmitting || !hasChanges}>
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   )

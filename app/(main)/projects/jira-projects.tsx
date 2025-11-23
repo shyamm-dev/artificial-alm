@@ -23,6 +23,7 @@ export async function JiraProjects({ hasAtlassian, userId }: JiraProjectsProps) 
                 compliance: access.project!.compliance,
               },
               stats: await getJiraProjectTestCaseStats(access.project!.id, userId),
+              customRuleCount: access.customRuleCount,
               siteName: access.resource.name,
               siteUrl: access.resource.url,
             }))

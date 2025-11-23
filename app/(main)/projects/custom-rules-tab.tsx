@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,8 +9,11 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Pencil, Trash2, Loader2, Lock, Shield, Database } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Plus, Pencil, Trash2, Loader2, Lock, Shield, Database, Download } from "lucide-react"
 import { toast } from "sonner"
+import { getProjectCustomRulesAction, createProjectCustomRuleAction, updateProjectCustomRuleAction, deleteProjectCustomRuleAction, toggleProjectCustomRuleStatusAction } from "./actions/custom-rules-actions"
+import { tryCatch } from "@/lib/try-catch"
 
 type CustomRule = {
   id: string
@@ -21,11 +24,10 @@ type CustomRule = {
   tags: string[]
 }
 
-const SEVERITY_ICONS = {
-  low: "○",
-  medium: "◐",
-  high: "●",
-  critical: "⬤"
+interface CustomRulesTabProps {
+  projectId: string
+  projectType: "standalone" | "jira"
+  open?: boolean
 }
 
 const SEVERITY_COLORS = {
@@ -37,30 +39,40 @@ const SEVERITY_COLORS = {
 
 const RULE_ICONS = [Lock, Shield, Database]
 
-export function CustomRulesTab() {
-  const [rules, setRules] = useState<CustomRule[]>([
-    {
-      id: "1",
-      title: "All API endpoints must validate JWT tokens",
-      description: "Every API endpoint must include JWT token validation before processing requests. Unauthorized requests should return 401 status code.",
-      severity: "high",
-      isActive: true,
-      tags: ["Security", "Authentication", "API"]
-    },
-    {
-      id: "2",
-      title: "PII data must be encrypted at rest",
-      description: "All personally identifiable information (PII) must be encrypted using AES-256 encryption when stored in the database.",
-      severity: "critical",
-      isActive: true,
-      tags: ["Data Protection", "Encryption", "Privacy"]
-    }
-  ])
+export function CustomRulesTab({ projectId, projectType, open = true }: CustomRulesTabProps) {
+  const [rules, setRules] = useState<CustomRule[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [editingRule, setEditingRule] = useState<CustomRule | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [tagSearchQuery, setTagSearchQuery] = useState("")
+
+  const loadRules = useCallback(async () => {
+    setIsLoading(true)
+    const { data, error } = await tryCatch(getProjectCustomRulesAction(projectId, projectType))
+    if (error) {
+      toast.error("Failed to load rules")
+    } else if (!data?.success) {
+      toast.error(data?.message || "Access denied")
+    } else {
+      setRules((data.data || []).map(r => ({
+        id: r.id,
+        title: r.title,
+        description: r.description,
+        severity: r.severity,
+        isActive: r.isActive,
+        tags: r.tags || []
+      })))
+    }
+    setIsLoading(false)
+  }, [projectId, projectType])
+
+  useEffect(() => {
+    if (open) {
+      loadRules()
+    }
+  }, [open, loadRules])
 
   const handleAddRule = () => {
     setEditingRule(null)
@@ -72,38 +84,113 @@ export function CustomRulesTab() {
     setIsAddDialogOpen(true)
   }
 
-  const handleDeleteRule = (id: string) => {
-    setRules(rules.filter(r => r.id !== id))
-    toast.success("Rule deleted")
+  const handleDeleteRule = async (id: string) => {
+    const result = await deleteProjectCustomRuleAction(id)
+    if (result.success) {
+      setRules(rules.filter(r => r.id !== id))
+      toast.success("Rule deleted")
+    } else {
+      toast.error(result.message)
+    }
   }
 
-  const handleToggleActive = (id: string) => {
-    setRules(rules.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r))
+  const handleToggleActive = async (id: string) => {
+    const rule = rules.find(r => r.id === id)
+    if (!rule) return
+    const result = await toggleProjectCustomRuleStatusAction(id, !rule.isActive)
+    if (result.success) {
+      setRules(rules.map(r => r.id === id ? { ...r, isActive: !r.isActive } : r))
+    } else {
+      toast.error(result.message)
+    }
   }
 
   // Get all unique tags
   const allTags = Array.from(new Set(rules.flatMap(r => r.tags)))
 
   // Filter tags based on search
-  const filteredTags = allTags.filter(tag => 
+  const filteredTags = allTags.filter(tag =>
     tag.toLowerCase().includes(tagSearchQuery.toLowerCase())
   )
 
   // Filter rules based on search and selected tags
   const filteredRules = rules.filter(rule => {
-    const matchesSearch = 
+    const matchesSearch =
       rule.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       rule.description.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesTags = selectedTags.length === 0 || 
+
+    const matchesTags = selectedTags.length === 0 ||
       selectedTags.some(tag => rule.tags.includes(tag))
-    
+
     return matchesSearch && matchesTags
   })
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
+    setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    )
+  }
+
+  const handleExport = () => {
+    const exportData = rules.map(rule => ({
+      title: rule.title,
+      description: rule.description,
+      severity: rule.severity,
+      tags: rule.tags,
+      isActive: rule.isActive
+    }))
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `custom-rules-${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success(`Exported ${rules.length} rule(s)`)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Skeleton className="h-9 w-24" />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <div className="space-y-3">
+          {[1, 2].map((i) => (
+            <Card key={i}>
+              <CardContent className="px-5 py-3">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Skeleton className="h-10 w-10 rounded-lg" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-5 w-3/4" />
+                      <Skeleton className="h-4 w-full" />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-5 w-16" />
+                  </div>
+                  <div className="flex items-center justify-between pt-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-5 w-20" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     )
   }
 
@@ -111,32 +198,41 @@ export function CustomRulesTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-medium">Custom Compliance Rules</h3>
-          <p className="text-xs text-muted-foreground mt-1">
+          <h3 className="text-base font-semibold">Custom Compliance Rules</h3>
+          <p className="text-sm text-muted-foreground mt-1">
             Define project-specific rules that AI will enforce during test case generation
           </p>
         </div>
-        <Button size="sm" onClick={handleAddRule}>
-          <Plus className="h-4 w-4 mr-1" />
-          Add Rule
-        </Button>
+        <div className="flex items-center gap-2">
+          {rules.length > 0 && (
+            <Button size="sm" variant="outline" onClick={handleExport}>
+              <Download className="h-4 w-4 mr-1" />
+              Export
+            </Button>
+          )}
+          <Button size="sm" onClick={handleAddRule}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add Rule
+          </Button>
+        </div>
       </div>
 
-      <div className="flex gap-2">
-        <Input
-          placeholder="Search rules..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1"
-        />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="shrink-0">
-              <Badge variant="secondary" className="mr-1.5">{selectedTags.length}</Badge>
-              Filter by Tags
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[400px]">
+      <div className="space-y-2">
+        <div className="flex gap-2">
+          <Input
+            placeholder="Search rules..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1"
+          />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="shrink-0">
+                <Badge variant="secondary" className="mr-1.5">{selectedTags.length}</Badge>
+                Filter by Tags
+              </Button>
+            </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Filter by Tags</DialogTitle>
               <DialogDescription>
@@ -185,6 +281,14 @@ export function CustomRulesTab() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {(searchQuery || selectedTags.length > 0) ? (
+            <>Showing {filteredRules.length} of {rules.length} {rules.length === 1 ? 'rule' : 'rules'}</>
+          ) : (
+            <>{rules.length} {rules.length === 1 ? 'rule' : 'rules'} total</>
+          )}
+        </p>
       </div>
 
       {filteredRules.length === 0 && rules.length === 0 ? (
@@ -211,49 +315,55 @@ export function CustomRulesTab() {
           </Button>
         </div>
       ) : (
-        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+        <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
           {filteredRules.map((rule, index) => {
             const Icon = RULE_ICONS[index % RULE_ICONS.length]
             return (
-              <Card key={rule.id} className={!rule.isActive ? "opacity-60" : ""}>
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-3">
-                    <Icon className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-medium text-sm leading-tight">{rule.title}</h4>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleEditRule(rule)}>
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleDeleteRule(rule.id)}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+              <Card key={rule.id} className={`transition-all hover:shadow-md ${!rule.isActive ? "opacity-60" : ""}`}>
+                <CardContent className="px-5 py-3">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <div className={`p-2 rounded-lg ${rule.severity === 'critical' ? 'bg-red-100 dark:bg-red-950' : rule.severity === 'high' ? 'bg-orange-100 dark:bg-orange-950' : rule.severity === 'medium' ? 'bg-yellow-100 dark:bg-yellow-950' : 'bg-blue-100 dark:bg-blue-950'}`}>
+                          <Icon className="h-4 w-4 shrink-0" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-base leading-tight mb-1">{rule.title}</h4>
+                          <p className="text-sm text-muted-foreground line-clamp-2">{rule.description}</p>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2">{rule.description}</p>
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {rule.tags.map(tag => (
-                            <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className={`text-xs font-medium flex items-center gap-1 ${SEVERITY_COLORS[rule.severity]}`}>
-                            <span>{SEVERITY_ICONS[rule.severity]}</span>
-                            {rule.severity.charAt(0).toUpperCase() + rule.severity.slice(1)}
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <Checkbox 
-                              checked={rule.isActive} 
-                              onCheckedChange={() => handleToggleActive(rule.id)}
-                              className="h-3 w-3" 
-                            />
-                            <span className="text-xs text-muted-foreground">Active</span>
-                          </div>
-                        </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleEditRule(rule)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:text-destructive" onClick={() => handleDeleteRule(rule.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {rule.tags.map(tag => (
+                        <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          checked={rule.isActive}
+                          onCheckedChange={() => handleToggleActive(rule.id)}
+                          className="h-4 w-4"
+                        />
+                        <span className="text-sm text-muted-foreground">Active</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Severity:</span>
+                        <Badge variant="outline" className={`text-xs font-semibold ${SEVERITY_COLORS[rule.severity]}`}>
+                          {rule.severity.charAt(0).toUpperCase() + rule.severity.slice(1)}
+                        </Badge>
                       </div>
                     </div>
                   </div>
@@ -268,15 +378,40 @@ export function CustomRulesTab() {
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         rule={editingRule}
-        onSave={(rule) => {
+        onSave={async (rule) => {
           if (editingRule) {
-            setRules(rules.map(r => r.id === rule.id ? rule : r))
-            toast.success("Rule updated")
+            const result = await updateProjectCustomRuleAction(rule.id, {
+              title: rule.title,
+              description: rule.description,
+              severity: rule.severity,
+              isActive: rule.isActive,
+              tags: rule.tags
+            })
+            if (result.success) {
+              setRules(rules.map(r => r.id === rule.id ? rule : r))
+              toast.success("Rule updated")
+              setIsAddDialogOpen(false)
+            } else {
+              toast.error(result.message)
+            }
           } else {
-            setRules([...rules, { ...rule, id: Date.now().toString() }])
-            toast.success("Rule added")
+            const result = await createProjectCustomRuleAction({
+              projectId,
+              projectType,
+              title: rule.title,
+              description: rule.description,
+              severity: rule.severity,
+              isActive: rule.isActive,
+              tags: rule.tags
+            })
+            if (result.success && result.data) {
+              setRules([...rules, { ...rule, id: result.data.id }])
+              toast.success("Rule added")
+              setIsAddDialogOpen(false)
+            } else {
+              toast.error(result.message)
+            }
           }
-          setIsAddDialogOpen(false)
         }}
       />
     </div>
@@ -294,11 +429,11 @@ function AddEditRuleDialog({
   rule: CustomRule | null
   onSave: (rule: CustomRule) => void
 }) {
-  const [title, setTitle] = useState(rule?.title || "")
-  const [description, setDescription] = useState(rule?.description || "")
-  const [severity, setSeverity] = useState<CustomRule["severity"]>(rule?.severity || "medium")
-  const [isActive, setIsActive] = useState(rule?.isActive ?? true)
-  const [tags, setTags] = useState<string[]>(rule?.tags || [])
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [severity, setSeverity] = useState<CustomRule["severity"]>("medium")
+  const [isActive, setIsActive] = useState(true)
+  const [tags, setTags] = useState<string[]>([])
   const [isGeneratingTags, setIsGeneratingTags] = useState(false)
   const [tagInput, setTagInput] = useState("")
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false)
@@ -309,6 +444,22 @@ function AddEditRuleDialog({
     "Documentation", "Code Quality", "GDPR", "HIPAA", "SOC2", "PCI-DSS",
     "Audit Trail", "Business Logic", "Workflow", "User Experience"
   ])
+
+  useEffect(() => {
+    if (open && rule) {
+      setTitle(rule.title)
+      setDescription(rule.description)
+      setSeverity(rule.severity)
+      setIsActive(rule.isActive)
+      setTags(rule.tags)
+    } else if (open && !rule) {
+      setTitle("")
+      setDescription("")
+      setSeverity("medium")
+      setIsActive(true)
+      setTags([])
+    }
+  }, [open, rule])
 
   const handleGenerateTags = async () => {
     if (!description.trim()) {
@@ -353,17 +504,11 @@ function AddEditRuleDialog({
       isActive,
       tags
     })
-    // Reset form
-    setTitle("")
-    setDescription("")
-    setSeverity("medium")
-    setIsActive(true)
-    setTags([])
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{rule ? "Edit" : "Add"} Custom Rule</DialogTitle>
           <DialogDescription>
@@ -415,7 +560,7 @@ function AddEditRuleDialog({
               onCheckedChange={(checked) => setIsActive(checked as boolean)}
             />
             <label htmlFor="rule-active" className="text-sm cursor-pointer">
-              Active (Inactive rules won't be enforced by AI)
+              Active (Inactive rules won&apos;t be enforced by AI)
             </label>
           </div>
           <div className="space-y-2">
@@ -476,7 +621,7 @@ function AddEditRuleDialog({
           </div>
 
           <Dialog open={isTagDialogOpen} onOpenChange={setIsTagDialogOpen}>
-            <DialogContent className="sm:max-w-[400px]">
+            <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>Add Tags</DialogTitle>
                 <DialogDescription>

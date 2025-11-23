@@ -44,6 +44,7 @@ const getColorForProject = (projectId: string) => {
 export default function StandaloneProjectCard({
   project,
   stats,
+  customRuleCount = 0,
 }: {
   project: StandaloneProjectWithCompliance
   stats: {
@@ -53,6 +54,7 @@ export default function StandaloneProjectCard({
     pending: number
     total: number
   }
+  customRuleCount?: number
 }) {
   const router = useRouter();
   const iconColor = getColorForProject(project.id);
@@ -249,6 +251,12 @@ export default function StandaloneProjectCard({
           ) : (
             <span className="text-xs text-muted-foreground">No standards configured</span>
           )}
+        </div>
+
+        {/* Custom Rules */}
+        <div className="text-sm">
+          <span className="font-medium text-foreground">Custom Rules :</span>{' '}
+          <span className="text-muted-foreground">{customRuleCount}</span>
         </div>
 
         {/* Metadata */}

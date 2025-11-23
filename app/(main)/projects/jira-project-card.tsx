@@ -27,6 +27,7 @@ type JiraProjectWithCompliance = typeof jiraProject.$inferSelect & {
 export default function JiraProjectCard({
   project,
   stats,
+  customRuleCount = 0,
 }: {
   project: JiraProjectWithCompliance
   stats: {
@@ -36,6 +37,7 @@ export default function JiraProjectCard({
     pending: number
     total: number
   }
+  customRuleCount?: number
 }) {
   const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -231,6 +233,11 @@ export default function JiraProjectCard({
           )}
         </div>
 
+        {/* Custom Rules */}
+        <div className="text-sm">
+          <span className="font-medium text-foreground">Custom Rules :</span>{' '}
+          <span className="text-muted-foreground">{customRuleCount}</span>
+        </div>
 
       </CardContent>
       <EditJiraProjectDialog

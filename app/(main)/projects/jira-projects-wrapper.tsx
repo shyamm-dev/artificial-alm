@@ -15,6 +15,7 @@ type ProjectWithStats = {
     pending: number
     total: number
   }
+  customRuleCount: number
   siteName: string
   siteUrl: string
 }
