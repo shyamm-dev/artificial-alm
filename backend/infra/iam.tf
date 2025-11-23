@@ -48,12 +48,12 @@ resource "google_cloud_run_service_iam_member" "testcase_gen_eventarc_invoker" {
   member   = "serviceAccount:${google_service_account.testcase_gen_eventarc_sa.email}"
 }
 
-resource "google_cloud_run_service_iam_member" "compliance_invoker" {
-  service  = google_cloudfunctions2_function.compliance_test_case_gen.name
-  location = google_cloudfunctions2_function.compliance_test_case_gen.location
-  role     = "roles/run.invoker"
-  member   = "serviceAccount:${google_service_account.testcase_gen_eventarc_sa.email}"
-}
+# resource "google_cloud_run_service_iam_member" "compliance_invoker" {
+#   service  = google_cloudfunctions2_function.compliance_test_case_gen.name
+#   location = google_cloudfunctions2_function.compliance_test_case_gen.location
+#   role     = "roles/run.invoker"
+#   member   = "serviceAccount:${google_service_account.testcase_gen_eventarc_sa.email}"
+# }
 
 
 # Grant Eventarc SA permission to receive Pub/Sub messages

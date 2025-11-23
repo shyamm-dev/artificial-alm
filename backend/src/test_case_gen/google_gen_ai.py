@@ -25,6 +25,7 @@ class GoogleGenAI:
                     items=types.Schema(
                         any_of=[
                             self._get_functional_schema(),
+                            self._get_non_functional_schema(),
                             self._get_compliance_schema()
                         ]
                     )
@@ -33,7 +34,7 @@ class GoogleGenAI:
             required=["success", "issue", "data"]
         )
 
-    def generate(self, prompt: str, system_instruction: str):
+    def generate(self, prompt: str, system_instruction: str, tools=None):
         client = genai.Client(
             vertexai=True,
             api_key=self.api_key,
@@ -51,11 +52,11 @@ class GoogleGenAI:
             ),
         ]
 
-        generate_content_config = types.GenerateContentConfig(
-            temperature=1,
-            top_p=1,
-            max_output_tokens=65535,
-            safety_settings=[types.SafetySetting(
+        config_params = {
+            "temperature": 1,
+            "top_p": 1,
+            "max_output_tokens": 65535,
+            "safety_settings": [types.SafetySetting(
                 category="HARM_CATEGORY_HATE_SPEECH",
                 threshold="OFF"
             ), types.SafetySetting(
@@ -68,13 +69,18 @@ class GoogleGenAI:
                 category="HARM_CATEGORY_HARASSMENT",
                 threshold="OFF"
             )],
-            response_mime_type="application/json",
-            response_schema=self._get_response_schema(),
-            system_instruction=[types.Part.from_text(text=system_instruction)],
-            thinking_config=types.ThinkingConfig(
+            "response_mime_type": "application/json",
+            "response_schema": self._get_response_schema(),
+            "system_instruction": [types.Part.from_text(text=system_instruction)],
+            "thinking_config": types.ThinkingConfig(
                 thinking_budget=-1,
             )
-        )
+        }
+        
+        if tools:
+            config_params["tools"] = tools
+            
+        generate_content_config = types.GenerateContentConfig(**config_params)
 
         response = client.models.generate_content(
             model=model,
@@ -99,6 +105,27 @@ class GoogleGenAI:
                         "requirement_coverage": types.Schema(type=types.Type.STRING, description="Requirement Coverage (Which part of the requirement this test validates)")
                     },
                     required=["type", "purpose", "preconditions", "testing_procedure", "expected_result", "requirement_coverage"]
+                )
+            },
+            required=["summary", "description"]
+        )
+
+    def _get_non_functional_schema(self) -> types.Schema:
+        return types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "summary": types.Schema(type=types.Type.STRING, description="Short title (5-10 words) describing the test case."),
+                "description": types.Schema(
+                    type=types.Type.OBJECT,
+                    properties={
+                        "type": types.Schema(type=types.Type.STRING, enum=["non_functional"]),
+                        "test_category": types.Schema(type=types.Type.STRING, description="Non-functional category (Performance, Security, Usability, Reliability, Scalability, Compatibility)"),
+                        "preconditions": types.Schema(type=types.Type.STRING, description="Preconditions (if any)"),
+                        "testing_procedure": types.Schema(type=types.Type.ARRAY, items=types.Schema(type=types.Type.STRING), description="Steps for testing"),
+                        "expected_result": types.Schema(type=types.Type.STRING, description="Expected result (Clear measurable outcome)"),
+                        "acceptance_criteria": types.Schema(type=types.Type.STRING, description="Specific acceptance criteria or thresholds")
+                    },
+                    required=["type", "test_category", "preconditions", "testing_procedure", "expected_result", "acceptance_criteria"]
                 )
             },
             required=["summary", "description"]

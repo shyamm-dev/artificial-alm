@@ -18,16 +18,6 @@ Your task is to generate **detailed, reproducible test cases** based strictly on
 
 If the **Requirement Title and Description lack clarity or not detailed enough**, test cases **must not** be generated.
 
-Return instead:
-
-```json
-{
-  "success": false,
-  "issue": "<Add reasons for not generating test cases>",
-  "data": []
-}
-```
-
 ---
 
 ## **2. Test Case Categories**
@@ -56,7 +46,27 @@ These **do not reference compliance**.
 
 ---
 
-### **B. Compliance Test Cases (Only If Applicable)**
+### **B. Non-Functional Test Cases (Only If Applicable)**
+
+Generate Non-Functional Test Cases **only when** the requirement involves:
+- Performance requirements (response time, throughput)
+- Security aspects (authentication, authorization, data protection)
+- Usability concerns (user experience, accessibility)
+- Reliability requirements (uptime, error rates)
+- Scalability needs (concurrent users, data volume)
+- Compatibility requirements (browsers, devices, systems)
+
+Include:
+- Performance testing scenarios
+- Security validation tests
+- Usability and accessibility checks
+- Load and stress testing
+- Compatibility verification
+- Reliability and availability tests
+
+---
+
+### **C. Compliance Test Cases (Only If Applicable)**
 
 Compliance Test Cases are generated **only when:**
 
