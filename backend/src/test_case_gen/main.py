@@ -2,6 +2,7 @@
 import os
 import base64
 import json
+import traceback
 from typing import Any, Dict, Tuple
 
 from functions_framework import http
@@ -9,9 +10,8 @@ from flask import Request
 
 from .database import Database
 from .issue_repository import IssueRepository, JIRAIssueRepository, ManualUploadIssueRepository
-from .google_gen_ai import GoogleGenAI
 from .compliance_gen_ai import ComplianceTestCaseGeneration
-from .schema import FNFTestCaseGenResponseSchema
+from .functional_gen_ai import FNFTestCaseGeneration
 
 TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
@@ -43,11 +43,11 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
 
             repo.update_issue_status("in_progress", issue_id)
 
-            prompt = generate_markdown_format(summary, description, compliance_list)
+            prompt = generate_markdown_format(summary, description)
 
-            fnf_response = generate_functional_non_functional_test_cases(prompt)
+            fnf_response = FNFTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt)
 
-            compliance_response = ComplianceTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt)
+            compliance_response = ComplianceTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt, project_compliance=compliance_list)
 
             if not fnf_response.get("success"):
                 reason = fnf_response.get("issue", "Unknown error")
@@ -60,42 +60,20 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
             repo.update_issue_status("completed", issue_id)
 
         except Exception as e:
+            traceback.print_exc()
             repo.update_issue_status_with_reason("failed", str(e), issue_id)
 
     return {"success": True}, 200
 
 
-def generate_markdown_format(summary: str, description: str, frameworks: list = None) -> str:
-    base_template = """**Requirement Title**
+def generate_markdown_format(summary: str, description: str) -> str:
+    template = """**Requirement Title**
 - {summary}
  
 **Requirement Description**
  - {description}"""
 
-    # Conditionally add compliance section
-    if frameworks and len(frameworks):
-        compliance_section = """
- 
-**Compliance Requirements** 
-- {frameworks}"""
-
-        template = base_template + compliance_section
-    else:
-        template = base_template
-
     return template.format(
         summary=summary,
         description=description,
-        frameworks=", ".join(frameworks)
     )
-
-def generate_functional_non_functional_test_cases(prompt):
-    vertex_ai = GoogleGenAI(GOOGLE_CLOUD_API_KEY)
-    with open("./system_instruction.md", "r", encoding='utf-8') as f:
-        system_instruction = f.read()
-
-    response_text = vertex_ai.generate([("user", prompt)],
-                                       system_instruction,
-                                       schema=FNFTestCaseGenResponseSchema.get_schema())
-    response_json = json.loads(response_text)
-    return response_json

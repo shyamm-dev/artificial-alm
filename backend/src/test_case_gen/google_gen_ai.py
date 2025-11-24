@@ -10,11 +10,11 @@ class GoogleGenAI:
     def _client(self):
         return genai.Client(vertexai=True, api_key=self.api_key)
 
-    def _build_contents(self, texts: list[tuple[str, str]]) -> list[types.Content]:
+    def _build_contents(self, texts: list[tuple[str, str|types.Part]]) -> list[types.Content]:
         return [
             types.Content(
                 role=role,
-                parts=[types.Part.from_text(text=text)]
+                parts=[types.Part.from_text(text=text) if isinstance(text, str) else text]
             ) for role, text in texts
         ]
 
@@ -58,4 +58,4 @@ class GoogleGenAI:
             contents=contents,
             config=content_config
         )
-        return response.text
+        return response

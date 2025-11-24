@@ -4,63 +4,25 @@ import json
 from google.genai import types
 from .schema import ComplianceTestCaseResponseSchema
 
-tool_call_schema = types.Schema(
-    type="object",
-    properties={
-        "tool_calls": types.Schema(
-            type="array",
-            items=types.Schema(
-                type="object",
-                properties={
-                    "function": types.Schema(
-                        type="object",
-                        properties={
-                            "name": types.Schema(
-                                type="string",
-                                enum=["get_compliance_info"]
-                            ),
-                            "arguments": types.Schema(
-                                type="object",
-                                properties={
-                                    "tags": types.Schema(
-                                        type="array",
-                                        items=types.Schema(type="string")
-                                    )
-                                },
-                                required=["tags"]
-                            ),
-                        },
-                        required=["name", "arguments"]
-                    )
-                },
-                required=["function"]
-            )
-        )
-    },
-    required=["tool_calls"]
-)
-
-
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_compliance_info",
-            "description": "Gets software compliance information based on provided parameters.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "tags": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "List of compliance-related tags."
-                    }
-                },
-                "required": ["tags"]
+get_compliance_function = {
+    "name": "get_compliance_info",
+    "description": "Gets software compliance information based on provided parameters.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "tags": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "List of compliance-related tags.",
             }
-        }
-    }
-]
+        },
+        "required": ["tags"],
+    },
+}
+
+get_compliance_tool = types.Tool(function_declarations=[get_compliance_function])
+
+tools = [get_compliance_tool]
 
 
 class ComplianceTestCaseGeneration:
@@ -88,26 +50,24 @@ class ComplianceTestCaseGeneration:
             instruction = f.read()
         return instruction
 
-    def generate(self, prompt: str) -> list:
+    def generate(self, prompt: str, project_compliance: list=None) -> list:
 
         messages = [("user", prompt)]
 
         response = self.gen_ai.generate(
             messages=messages,
             system_instruction=self.__get_compliance_tags_instruction(),
-            schema=tool_call_schema,
             tools=tools
         )
 
-        data = json.loads(response)
+        if response.candidates[0].content.parts[0].function_call:
+            function_call = response.candidates[0].content.parts[0].function_call
+            function_response_part = types.Part.from_function_response(
+                name=function_call.name,
+                response={"result": f"Project compliance requirements: {project_compliance} and compliance tags: {function_call.args}"},
+            )
 
-        tags = data["function"]["arguments"]["tags"]
-
-        tool_result = self.get_compliance_info(tags)
-
-        messages.append(("model", response))
-
-        messages.append(("tool", json.dumps(tool_result)))
+            messages.append(("user", function_response_part))
 
         final_msg = self.gen_ai.generate(
             messages=messages,
@@ -115,4 +75,4 @@ class ComplianceTestCaseGeneration:
             schema=ComplianceTestCaseResponseSchema.get_compliance_schema()
         )
 
-        return json.loads(final_msg)
+        return json.loads(final_msg.text)
