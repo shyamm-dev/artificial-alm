@@ -51,7 +51,7 @@ export function StandaloneSourceFields({ form, projects, validateRef }: Standalo
         if (requirements.length === 0) return false
         const updatedRequirements = requirements.map(req => {
           const trimmedName = req.name.trim()
-          const nameError = !trimmedName ? "Name is required" : trimmedName.length < 3 ? "Name must be at least 3 characters" : /^\d+$/.test(trimmedName) ? "Name cannot contain only numbers" : undefined
+          const nameError = !trimmedName ? "Name is required" : trimmedName.length < 3 ? "Name must be at least 3 characters" : trimmedName.length > 200 ? "Name cannot exceed 200 characters" : /^\d+$/.test(trimmedName) ? "Name cannot contain only numbers" : undefined
           const contentError = !req.content && !req.file ? "Either content or file is required" : undefined
           return { ...req, nameError, contentError }
         })
@@ -72,6 +72,9 @@ export function StandaloneSourceFields({ form, projects, validateRef }: Standalo
   const updateRequirement = (id: string, field: keyof Requirement, value: string | File | null) => {
     setRequirements(requirements.map(req => {
       if (req.id === id) {
+        if (field === 'name' && typeof value === 'string' && value.length > 200) {
+          return req
+        }
         const updated = { ...req, [field]: value }
         if (showErrors) {
           const trimmedName = updated.name.trim()

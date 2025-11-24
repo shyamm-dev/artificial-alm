@@ -94,6 +94,11 @@ export function StandaloneReviewTestCases({ requirement, testCases: initialTestC
   }
 
   const updateTestCase = (id: string, field: keyof StandaloneTestCase, value: string) => {
+    if (field === 'summary' && value.length > 200) {
+      toast.error('Summary cannot exceed 200 characters')
+      return
+    }
+
     setTestCases(prev => prev.map(tc =>
       tc.id === id ? { ...tc, [field]: value, updatedAt: new Date().toISOString() } : tc
     ))
