@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Bot, User, RotateCcw, Trash2, Edit2, Save, X, FileText, Scale, CheckSquare, Square } from "lucide-react"
+import { Bot, User, RotateCcw, Trash2, Edit2, Save, X, FileText, Scale, CheckSquare, Square, FolderKanban } from "lucide-react"
 import { TestCaseGeneratedBy } from "@/constants/shared-constants"
 import { toast } from "sonner"
 
@@ -407,7 +407,7 @@ export function StandaloneTestCaseAccordion({
             {isCompliance ? (
               <Scale className="h-4 w-4 text-amber-600 shrink-0" />
             ) : isNonFunctional ? (
-              <FileText className="h-4 w-4 text-purple-600 shrink-0" />
+              <FolderKanban className="h-4 w-4 text-purple-600 shrink-0" />
             ) : (
               <FileText className="h-4 w-4 text-blue-600 shrink-0" />
             )}

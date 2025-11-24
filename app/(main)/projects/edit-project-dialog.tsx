@@ -151,16 +151,7 @@ export function EditProjectDialog({ open, onOpenChange, project }: EditProjectDi
           </TabsContent>
           <TabsContent value="compliance" className="space-y-4 mt-0">
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label>Compliance Standards</Label>
-                <Button
-                  size="sm"
-                  onClick={handleSaveCompliance}
-                  disabled={!hasComplianceChanges || isSavingCompliance}
-                >
-                  {isSavingCompliance ? "Saving..." : "Save Changes"}
-                </Button>
-              </div>
+              <Label>Compliance Standards</Label>
               <div className="grid grid-cols-2 gap-2">
                 {COMPLIANCE_FRAMEWORKS.map((framework) => (
                   <div key={framework} className="flex items-center space-x-2">
@@ -209,10 +200,10 @@ export function EditProjectDialog({ open, onOpenChange, project }: EditProjectDi
               Close
             </Button>
             <Button
-              onClick={handleSaveGeneral}
-              disabled={!hasGeneralChanges || isSavingGeneral}
+              onClick={activeTab === "compliance" ? handleSaveCompliance : handleSaveGeneral}
+              disabled={activeTab === "compliance" ? (!hasComplianceChanges || isSavingCompliance) : (!hasGeneralChanges || isSavingGeneral)}
             >
-              {isSavingGeneral ? "Saving..." : "Save Changes"}
+              {(activeTab === "compliance" ? isSavingCompliance : isSavingGeneral) ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         )}

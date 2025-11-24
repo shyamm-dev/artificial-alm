@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { Save, Download, Upload, RotateCcw, ChevronDown, Loader2, ArrowLeft, XCircle, Archive, Search, Briefcase, FileText, Scale, Filter, CheckSquare, Square, X, FileCode, FileType } from "lucide-react"
+import { Save, Download, Upload, RotateCcw, ChevronDown, Loader2, ArrowLeft, XCircle, Archive, Search, Briefcase, FileText, Scale, Filter, CheckSquare, Square, X, FileCode, FileType, FolderKanban } from "lucide-react"
 import { exportTestCasesToMarkdown, exportTestCasesToPlainText } from "@/lib/export-utils"
 import { saveTestCasesDraft } from "./actions"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -75,17 +75,14 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
   const [selectedTestCases, setSelectedTestCases] = useState<Set<string>>(new Set(initialTestCases.map(tc => tc.id)))
 
   const testCaseStats = useMemo(() => {
-    const stats = { functional: 0, "non-functional": 0, compliance: 0, unknown: 0 }
+    const stats = { functional: 0, "non-functional": 0, compliance: 0 }
     testCases.forEach(tc => {
       try {
         const parsed = JSON.parse(tc.description)
         if (parsed.type === "functional") stats.functional++
-        else if (parsed.type === "non-functional") stats["non-functional"]++
+        else if (parsed.type === "non_functional") stats["non-functional"]++
         else if (parsed.type === "compliance") stats.compliance++
-        else stats.unknown++
-      } catch {
-        stats.unknown++
-      }
+      } catch {}
     })
     return stats
   }, [testCases])
@@ -93,12 +90,14 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
   const filteredTestCases = useMemo(() => {
     return testCases.filter(tc => {
       const matchesSearch = tc.summary.toLowerCase().includes(searchQuery.toLowerCase())
-      
+
       if (typeFilter === "all") return matchesSearch
-      
+
       try {
         const parsed = JSON.parse(tc.description)
-        const matchesType = parsed.type === typeFilter
+        const matchesType = typeFilter === "non-functional"
+          ? parsed.type === "non_functional"
+          : parsed.type === typeFilter
         return matchesSearch && matchesType
       } catch {
         return matchesSearch
@@ -116,11 +115,11 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
 
   const updateTestCase = (id: string, field: keyof TestCase, value: string) => {
     if (isStale) return
-    
+
     setTestCases(prev => prev.map(tc =>
       tc.id === id ? { ...tc, [field]: value, updatedAt: new Date().toISOString() } : tc
     ))
-    
+
     // Clear validation error for this field if value is not empty
     const trimmedValue = value.trim()
     if (trimmedValue && validationErrors[id]?.[field as 'summary' | 'description']) {
@@ -163,29 +162,29 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
 
   const hasChanges = JSON.stringify(testCases) !== JSON.stringify(baselineTestCases)
   const isStale = issue?.status === "stale"
-  
+
   const validateTestCases = () => {
     const errors: Record<string, { summary?: string; description?: string }> = {}
-    
+
     testCases.forEach(testCase => {
       const testCaseErrors: { summary?: string; description?: string } = {}
-      
+
       const trimmedSummary = testCase.summary.trim()
       if (!trimmedSummary) {
         testCaseErrors.summary = "Summary is required"
       } else if (/^\d+$/.test(trimmedSummary)) {
         testCaseErrors.summary = "Summary cannot contain only numbers"
       }
-      
+
       if (!testCase.description.trim()) {
         testCaseErrors.description = "Description is required"
       }
-      
+
       if (testCaseErrors.summary || testCaseErrors.description) {
         errors[testCase.id] = testCaseErrors
       }
     })
-    
+
     setValidationErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -195,7 +194,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
       toast.error("Please fix validation errors before saving.")
       return
     }
-    
+
     setIsSaving(true)
     try {
       await saveTestCasesDraft(testCases)
@@ -237,6 +236,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
   const getTestCaseType = (tc: TestCase) => {
     try {
       const parsed = JSON.parse(tc.description)
+      if (parsed.type === "non_functional") return "non-functional"
       return parsed.type || "unknown"
     } catch {
       return "unknown"
@@ -300,7 +300,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
           description: tc.description
         }))
       })
-      
+
       setDeployDialogOpen(false)
       setSelectedIssueTypeId("")
       toast.success("Test cases deployed to Jira successfully!")
@@ -509,7 +509,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                   return (
                     <div key={tc.id} className="flex items-center gap-2 p-2 border-b last:border-b-0 text-sm min-w-0">
                       {type === "functional" && <FileText className="h-4 w-4 text-blue-600 shrink-0" />}
-                      {type === "non-functional" && <FileText className="h-4 w-4 text-purple-600 shrink-0" />}
+                      {type === "non-functional" && <FolderKanban className="h-4 w-4 text-purple-600 shrink-0" />}
                       {type === "compliance" && <Scale className="h-4 w-4 text-amber-600 shrink-0" />}
                       <span className="flex-1 truncate min-w-0">{tc.summary}</span>
                     </div>
@@ -562,7 +562,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                 <span>Functional: {selectedTestCasesList.filter(tc => getTestCaseType(tc) === "functional").length}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-purple-600" />
+                <FolderKanban className="h-4 w-4 text-purple-600" />
                 <span>Non-Functional: {selectedTestCasesList.filter(tc => getTestCaseType(tc) === "non-functional").length}</span>
               </div>
               <div className="flex items-center gap-2">
@@ -578,7 +578,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                   return (
                     <div key={tc.id} className="flex items-center gap-2 p-2 border-b last:border-b-0 text-sm min-w-0">
                       {type === "functional" && <FileText className="h-4 w-4 text-blue-600 shrink-0" />}
-                      {type === "non-functional" && <FileText className="h-4 w-4 text-purple-600 shrink-0" />}
+                      {type === "non-functional" && <FolderKanban className="h-4 w-4 text-purple-600 shrink-0" />}
                       {type === "compliance" && <Scale className="h-4 w-4 text-amber-600 shrink-0" />}
                       <span className="flex-1 truncate min-w-0">{tc.summary}</span>
                     </div>
@@ -607,7 +607,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                 <span className="text-lg font-semibold">{testCaseStats.functional}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-purple-600" />
+                <FolderKanban className="h-5 w-5 text-purple-600" />
                 <span className="text-sm text-muted-foreground">Non-Functional:</span>
                 <span className="text-lg font-semibold">{testCaseStats["non-functional"]}</span>
               </div>
@@ -668,7 +668,7 @@ export function ReviewTestCases({ issue, issueTypes, testCases: initialTestCases
                   </SelectItem>
                   <SelectItem value="non-functional">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-purple-600" />
+                      <FolderKanban className="h-4 w-4 text-purple-600" />
                       Non-Functional
                     </div>
                   </SelectItem>

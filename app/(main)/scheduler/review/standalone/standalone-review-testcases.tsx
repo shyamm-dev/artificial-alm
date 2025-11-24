@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { Save, Download, RotateCcw, ChevronDown, Loader2, ArrowLeft, XCircle, Search, Briefcase, FileText, Scale, Filter, CheckSquare, Square, X, FileCode, FileType } from "lucide-react"
+import { Save, Download, RotateCcw, ChevronDown, Loader2, ArrowLeft, XCircle, Search, Briefcase, FileText, Scale, Filter, CheckSquare, Square, X, FileCode, FileType, FolderKanban } from "lucide-react"
 import { exportTestCasesToMarkdown, exportTestCasesToPlainText } from "@/lib/export-utils"
 import { saveStandaloneTestCasesDraft } from "./actions"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -57,17 +57,14 @@ export function StandaloneReviewTestCases({ requirement, testCases: initialTestC
   const [selectedTestCases, setSelectedTestCases] = useState<Set<string>>(new Set(initialTestCases.map(tc => tc.id)))
 
   const testCaseStats = useMemo(() => {
-    const stats = { functional: 0, "non-functional": 0, compliance: 0, unknown: 0 }
+    const stats = { functional: 0, "non-functional": 0, compliance: 0 }
     testCases.forEach(tc => {
       try {
         const parsed = JSON.parse(tc.description)
         if (parsed.type === "functional") stats.functional++
-        else if (parsed.type === "non-functional" || parsed.type === "non_functional") stats["non-functional"]++
+        else if (parsed.type === "non_functional") stats["non-functional"]++
         else if (parsed.type === "compliance") stats.compliance++
-        else stats.unknown++
-      } catch {
-        stats.unknown++
-      }
+      } catch {}
     })
     return stats
   }, [testCases])
@@ -387,7 +384,7 @@ export function StandaloneReviewTestCases({ requirement, testCases: initialTestC
                 <span>Functional: {selectedTestCasesList.filter(tc => getTestCaseType(tc) === "functional").length}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-purple-600" />
+                <FolderKanban className="h-4 w-4 text-purple-600" />
                 <span>Non-Functional: {selectedTestCasesList.filter(tc => getTestCaseType(tc) === "non-functional" || getTestCaseType(tc) === "non_functional").length}</span>
               </div>
               <div className="flex items-center gap-2">
@@ -403,7 +400,7 @@ export function StandaloneReviewTestCases({ requirement, testCases: initialTestC
                   return (
                     <div key={tc.id} className="flex items-center gap-2 p-2 border-b last:border-b-0 text-sm min-w-0">
                       {type === "functional" && <FileText className="h-4 w-4 text-blue-600 shrink-0" />}
-                      {(type === "non-functional" || type === "non_functional") && <FileText className="h-4 w-4 text-purple-600 shrink-0" />}
+                      {(type === "non-functional" || type === "non_functional") && <FolderKanban className="h-4 w-4 text-purple-600 shrink-0" />}
                       {type === "compliance" && <Scale className="h-4 w-4 text-amber-600 shrink-0" />}
                       <span className="flex-1 truncate min-w-0">{tc.summary}</span>
                     </div>
@@ -432,7 +429,7 @@ export function StandaloneReviewTestCases({ requirement, testCases: initialTestC
                 <span className="text-lg font-semibold">{testCaseStats.functional}</span>
               </div>
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-purple-600" />
+                <FolderKanban className="h-5 w-5 text-purple-600" />
                 <span className="text-sm text-muted-foreground">Non-Functional:</span>
                 <span className="text-lg font-semibold">{testCaseStats["non-functional"]}</span>
               </div>
@@ -493,7 +490,7 @@ export function StandaloneReviewTestCases({ requirement, testCases: initialTestC
                   </SelectItem>
                   <SelectItem value="non-functional">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-purple-600" />
+                      <FolderKanban className="h-4 w-4 text-purple-600" />
                       Non-Functional
                     </div>
                   </SelectItem>
