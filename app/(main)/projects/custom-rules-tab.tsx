@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Plus, Pencil, Trash2, Loader2, Lock, Shield, Database, Download } from "lucide-react"
 import { toast } from "sonner"
-import { getProjectCustomRulesAction, createProjectCustomRuleAction, updateProjectCustomRuleAction, deleteProjectCustomRuleAction, toggleProjectCustomRuleStatusAction, getAllCustomRuleTagsAction } from "./actions/custom-rules-actions"
+import { getProjectCustomRulesAction, createProjectCustomRuleAction, updateProjectCustomRuleAction, deleteProjectCustomRuleAction, toggleProjectCustomRuleStatusAction, getAllCustomRuleTagsAction, generateRuleTagsAction } from "./actions/custom-rules-actions"
 import { tryCatch } from "@/lib/try-catch"
 
 type CustomRule = {
@@ -152,7 +152,10 @@ export function CustomRulesTab({ projectId, projectType, open = true }: CustomRu
       title: rule.title,
       description: rule.description,
       severity: rule.severity,
-      tags: rule.tags,
+      tags: rule.tags.map(tagId => {
+        const tag = allTags.find(t => t.id === tagId)
+        return tag ? `${tag.name}: ${tag.description || 'No description'}` : tagId
+      }),
       isActive: rule.isActive
     }))
 
@@ -456,6 +459,7 @@ function AddEditRuleDialog({
   const [isGeneratingTags, setIsGeneratingTags] = useState(false)
   const [tagInput, setTagInput] = useState("")
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false)
+  const [aiReasoning, setAiReasoning] = useState<string | null>(null)
 
   useEffect(() => {
     if (open && rule) {
@@ -474,17 +478,40 @@ function AddEditRuleDialog({
   }, [open, rule])
 
   const handleGenerateTags = async () => {
-    if (!description.trim()) {
-      toast.error("Please enter a description first")
+    if (!title.trim() || !description.trim()) {
+      toast.error("Please enter title and description first")
       return
     }
     setIsGeneratingTags(true)
-    // Simulate AI tag generation
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    const mockTags = ["Security", "Authentication", "API", "Authorization"]
-    setTags(mockTags)
+    setAiReasoning(null)
+    
+    const result = await generateRuleTagsAction({
+      ruleTitle: title,
+      ruleDescription: description
+    })
+    
     setIsGeneratingTags(false)
-    toast.success("Tags generated successfully")
+    
+    if (!result.success || !result.data) {
+      toast.error(result.message || "Failed to generate tags")
+      return
+    }
+    
+    const { selectedTags, reasoning } = result.data
+    setAiReasoning(reasoning)
+    
+    if (selectedTags.length === 0) {
+      toast.info("No tags suggested")
+      return
+    }
+    
+    // Map tag names to IDs
+    const tagIds = selectedTags
+      .map(tagName => allTags.find(t => t.name === tagName)?.id)
+      .filter(Boolean) as string[]
+    
+    setTags(tagIds)
+    toast.success(`${tagIds.length} tag(s) suggested`)
   }
 
   const handleRemoveTag = (tagToRemove: string) => {
@@ -582,29 +609,49 @@ function AddEditRuleDialog({
           <div className="space-y-2">
             <Label>Tags</Label>
             <div className="border rounded-lg p-3 space-y-3">
-              <div className="flex flex-wrap gap-1.5 min-h-[32px]">
-                {tags.length > 0 ? (
-                  tags.map(tagId => {
-                    const tagName = getTagName(tagId)
-                    return (
-                      <Badge key={tagId} variant="secondary" className="text-xs px-2 py-1">
-                        {tagName}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTag(tagId)}
-                          className="ml-1.5 hover:text-destructive text-muted-foreground hover:text-foreground"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    )
-                  })
-                ) : (
-                  <p className="text-xs text-muted-foreground py-1">
-                    Add tags manually or generate with AI
-                  </p>
-                )}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap gap-1.5 min-h-[32px] flex-1">
+                    {tags.length > 0 ? (
+                      tags.map(tagId => {
+                        const tagName = getTagName(tagId)
+                        return (
+                          <Badge key={tagId} variant="secondary" className="text-xs px-2 py-1">
+                            {tagName}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveTag(tagId)}
+                              className="ml-1.5 hover:text-destructive text-muted-foreground hover:text-foreground"
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        )
+                      })
+                    ) : (
+                      <p className="text-xs text-muted-foreground py-1">
+                        Add tags manually or generate with AI
+                      </p>
+                    )}
+                  </div>
+                  {tags.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setTags([])}
+                      className="h-7 text-xs shrink-0"
+                    >
+                      Remove All
+                    </Button>
+                  )}
+                </div>
               </div>
+              {aiReasoning && (
+                <div className="text-sm text-muted-foreground bg-muted/50 rounded p-2">
+                  <span className="font-semibold">AI Reasoning:</span> {aiReasoning}
+                </div>
+              )}
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -621,7 +668,7 @@ function AddEditRuleDialog({
                   variant="outline"
                   size="sm"
                   onClick={handleGenerateTags}
-                  disabled={isGeneratingTags || !description.trim()}
+                  disabled={isGeneratingTags || !title.trim() || !description.trim()}
                   className="h-8 px-3 shrink-0"
                 >
                   {isGeneratingTags ? (

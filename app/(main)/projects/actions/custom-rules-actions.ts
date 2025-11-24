@@ -5,6 +5,7 @@ import { getProjectCustomRules, createProjectCustomRule, updateProjectCustomRule
 import { db } from "@/db/drizzle"
 import { standaloneProject, userAtlassianProjectAccess } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
+import { generateRuleTags } from "@/data-access-layer/ai/rule-tag-generator"
 
 async function verifyProjectAccess(projectId: string, projectType: "standalone" | "jira", userId: string) {
   if (projectType === "standalone") {
@@ -120,4 +121,29 @@ export async function getAllCustomRuleTagsAction(): Promise<{ success: boolean; 
 
   const tags = await getAllCustomRuleTags()
   return { success: true, data: tags }
+}
+
+export async function generateRuleTagsAction(data: {
+  ruleTitle: string
+  ruleDescription: string
+}): Promise<{ success: boolean; message?: string; data?: { selectedTags: string[]; reasoning: string } }> {
+  const session = await getServerSession()
+  if (!session?.user?.id) {
+    return { success: false, message: "Unauthorized" }
+  }
+
+  try {
+    const allTags = await getAllCustomRuleTags()
+    
+    const result = await generateRuleTags({
+      ruleTitle: data.ruleTitle,
+      ruleDescription: data.ruleDescription,
+      availableTags: allTags.map(t => ({ name: t.name, description: t.description }))
+    })
+
+    return { success: true, data: result }
+  } catch (error) {
+    console.error("Failed to generate tags:", error)
+    return { success: false, message: "AI cannot generate tags right now" }
+  }
 }
