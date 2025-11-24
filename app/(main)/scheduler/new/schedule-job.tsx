@@ -214,7 +214,8 @@ export function ScheduleJob({ userProjectsPromise, standaloneProjectsPromise }: 
           )()
         }} className="space-y-4">
           <div className="space-y-4">
-            {workspace === "jira" && <JiraSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={jiraProjects} />}
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {workspace === "jira" && <JiraSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={jiraProjects as any} />}
             {workspace === "standalone" && <StandaloneSourceFields form={form as unknown as UseFormReturn<FieldValues>} projects={standaloneProjects} validateRef={standaloneValidateRef} />}
           </div>
           <div className="flex justify-end gap-2">

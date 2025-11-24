@@ -31,9 +31,9 @@ export default async function ProjectsPage() {
               project: {
                 ...access.project!,
                 complianceStandards: access.project!.compliance?.frameworks || [],
-                compliance: access.project!.compliance,
               },
               stats: await getJiraProjectTestCaseStats(access.project!.id, session.user.id),
+              customRuleCount: access.customRuleCount,
               siteName: access.resource.name,
               siteUrl: access.resource.url,
             }))

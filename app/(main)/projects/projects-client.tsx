@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 type StandaloneProjectData = {
   project: typeof standaloneProject.$inferSelect;
   compliance: typeof standaloneProjectCompliance.$inferSelect | null;
+  customRuleCount: number;
   stats: {
     success: number;
     failed: number;
@@ -36,6 +37,7 @@ type JiraProjectWithStats = {
     pending: number
     total: number
   }
+  customRuleCount: number
   siteName: string
   siteUrl: string
 }
