@@ -28,7 +28,7 @@ class FNFTestCaseGenResponseSchema:
             },
             required=["success", "issue", "data"]
         )
-        
+    
 
     @staticmethod
     def __get_functional_test_case_schema() -> types.Schema:
@@ -47,7 +47,7 @@ class FNFTestCaseGenResponseSchema:
                         "requirement_coverage": types.Schema(type=types.Type.STRING, description="Requirement Coverage (Which part of the requirement this test validates)")
                     },
                     required=["type", "purpose", "preconditions", "testing_procedure", "expected_result", "requirement_coverage"]
-                )
+                ),
             },
             required=["summary", "description"]
         )
@@ -69,7 +69,7 @@ class FNFTestCaseGenResponseSchema:
                         "acceptance_criteria": types.Schema(type=types.Type.STRING, description="Specific acceptance criteria or thresholds")
                     },
                     required=["type", "test_category", "preconditions", "testing_procedure", "expected_result", "acceptance_criteria"]
-                )
+                ),
             },
             required=["summary", "description"]
         )
@@ -109,7 +109,7 @@ class ComplianceTestCaseResponseSchema:
                                     "compliance_impact": types.Schema(type=types.Type.STRING, description="Compliance Impact Explanation (Brief explanation of significance and why verification is required)")
                                 },
                                 required=["type", "compliance_rule", "preconditions", "testing_procedure", "expected_result", "compliance_impact"]
-                            )
+                            ),
                         },
                         required=["summary", "description"]
                     )

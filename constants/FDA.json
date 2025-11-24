@@ -1,0 +1,266 @@
+[
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(a)",
+    "title": "Controls for closed systems",
+    "text": "Validation of systems to ensure accuracy, reliability, consistent intended performance, and the ability to discern invalid or altered records.",
+    "summary": "Requires software validation processes to guarantee system accuracy, reliability, and the capability to detect invalid or tampered data.",
+    "tags": [
+      "validation",
+      "data-integrity",
+      "system-reliability",
+      "error-handling"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(b)",
+    "title": "Controls for closed systems",
+    "text": "The ability to generate accurate and complete copies of records in both human readable and electronic form suitable for inspection, review, and copying by the agency.",
+    "summary": "The system must be able to export records in both human-readable formats (e.g., PDF, UI display) and electronic formats for inspection.",
+    "tags": [
+      "data-export",
+      "reporting",
+      "audit-compliance"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(c)",
+    "title": "Controls for closed systems",
+    "text": "Protection of records to enable their accurate and ready retrieval throughout the records retention period.",
+    "summary": "Requires technical controls for data storage and backup to ensure records can be retrieved accurately for the duration of the retention period.",
+    "tags": [
+      "backup-and-recovery",
+      "data-retention",
+      "data-availability"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(d)",
+    "title": "Controls for closed systems",
+    "text": "Limiting system access to authorized individuals.",
+    "summary": "Implementation of strict access control mechanisms to ensure only authorized users can access the system.",
+    "tags": [
+      "access-control",
+      "authentication",
+      "authorization"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(e)",
+    "title": "Controls for closed systems",
+    "text": "Use of secure, computer-generated, time-stamped audit trails to independently record the date and time of operator entries and actions that create, modify, or delete electronic records. Record changes shall not obscure previously recorded information.",
+    "summary": "Requires an immutable, automated audit log that captures the date, time, and user for all creation, modification, or deletion events without overwriting original data.",
+    "tags": [
+      "audit-logging",
+      "data-integrity",
+      "non-repudiation",
+      "traceability"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(f)",
+    "title": "Controls for closed systems",
+    "text": "Use of operational system checks to enforce permitted sequencing of steps and events, as appropriate.",
+    "summary": "The software must enforce workflow logic to ensure steps occur in the correct, required sequence.",
+    "tags": [
+      "workflow-enforcement",
+      "process-control",
+      "operational-integrity"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(g)",
+    "title": "Controls for closed systems",
+    "text": "Use of authority checks to ensure that only authorized individuals can use the system, electronically sign a record, access the operation or computer system input or output device, alter a record, or perform the operation at hand.",
+    "summary": "Requires granular authorization checks (Role-Based Access Control) to ensure users only perform actions or sign records they are specifically permitted to.",
+    "tags": [
+      "authorization",
+      "rbac",
+      "privilege-management"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(h)",
+    "title": "Controls for closed systems",
+    "text": "Use of device (e.g., terminal) checks to determine, as appropriate, the validity of the source of data input or operational instruction.",
+    "summary": "System must verify that data input comes from valid devices or terminals, relevant for IoT or specific hardware integrations.",
+    "tags": [
+      "device-authentication",
+      "input-validation",
+      "hardware-security"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.10(k)",
+    "title": "Controls for closed systems",
+    "text": "Use of appropriate controls over systems documentation including: (1) Adequate controls over the distribution of, access to, and use of documentation for system operation and maintenance. (2) Revision and change control procedures to maintain an audit trail that documents time-sequenced development and modification of systems documentation.",
+    "summary": "Requires version control and access restrictions for system documentation and configuration, including audit trails for changes.",
+    "tags": [
+      "change-management",
+      "version-control",
+      "configuration-management"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.30",
+    "title": "Controls for open systems",
+    "text": "Persons who use open systems to create, modify, maintain, or transmit electronic records shall employ procedures and controls designed to ensure the authenticity, integrity, and, as appropriate, the confidentiality of electronic records from the point of their creation to the point of their receipt. Such procedures and controls shall include those identified in § 11.10, as appropriate, and additional measures such as document encryption and use of appropriate digital signature standards to ensure, as necessary under the circumstances, record authenticity, integrity, and confidentiality.",
+    "summary": "For systems connected to external networks (open systems), encryption and digital signature standards must be used to ensure data integrity and confidentiality during transmission.",
+    "tags": [
+      "encryption",
+      "digital-signatures",
+      "network-security",
+      "data-integrity"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.50(a)",
+    "title": "Signature manifestations",
+    "text": "Signed electronic records shall contain information associated with the signing that clearly indicates all of the following: (1) The printed name of the signer; (2) The date and time when the signature was executed; and (3) The meaning (such as review, approval, responsibility, or authorship) associated with the signature.",
+    "summary": "Electronic signatures must explicitly store and display the signer's name, timestamp, and the specific reason for the signature.",
+    "tags": [
+      "electronic-signature",
+      "data-integrity",
+      "audit-logging"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.50(b)",
+    "title": "Signature manifestations",
+    "text": "The items identified in paragraphs (a)(1), (a)(2), and (a)(3) of this section shall be subject to the same controls as for electronic records and shall be included as part of any human readable form of the electronic record (such as electronic display or printout).",
+    "summary": "Signature details (name, time, meaning) must be visible on all human-readable views (screens, PDFs) and protected with the same security as the record itself.",
+    "tags": [
+      "electronic-signature",
+      "reporting",
+      "ui-ux-security"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.70",
+    "title": "Signature/record linking",
+    "text": "Electronic signatures and handwritten signatures executed to electronic records shall be linked to their respective electronic records to ensure that the signatures cannot be excised, copied, or otherwise transferred to falsify an electronic record by ordinary means.",
+    "summary": "Cryptographic or logical linking must bind the signature to the specific record, preventing the signature from being copied or moved to another document.",
+    "tags": [
+      "data-integrity",
+      "electronic-signature",
+      "anti-tampering"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.100(a)",
+    "title": "General requirements",
+    "text": "Each electronic signature shall be unique to one individual and shall not be reused by, or reassigned to, anyone else.",
+    "summary": "System must ensure unique identifiers for every user; user IDs cannot be recycled or reassigned to different individuals.",
+    "tags": [
+      "identity-management",
+      "access-control"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.200(a)(1)",
+    "title": "Electronic signature components and controls",
+    "text": "Electronic signatures that are not based upon biometrics shall: (1) Employ at least two distinct identification components such as an identification code and password.",
+    "summary": "Non-biometric signatures must use Multi-Factor Authentication (MFA) or at minimum two distinct components (e.g., ID and Password).",
+    "tags": [
+      "authentication",
+      "mfa",
+      "electronic-signature"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.200(a)(1)(i)",
+    "title": "Electronic signature components and controls",
+    "text": "When an individual executes a series of signings during a single, continuous period of controlled system access, the first signing shall be executed using all electronic signature components; subsequent signings shall be executed using at least one electronic signature component that is only executable by, and designed to be used only by, the individual.",
+    "summary": "In a continuous session, the first signature requires full authentication (e.g., ID+Password), while subsequent signatures in that session require at least one component (e.g., Password only).",
+    "tags": [
+      "session-management",
+      "authentication",
+      "electronic-signature"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.200(a)(1)(ii)",
+    "title": "Electronic signature components and controls",
+    "text": "When an individual executes one or more signings not performed during a single, continuous period of controlled system access, each signing shall be executed using all of the electronic signature components.",
+    "summary": "If a session is interrupted or non-continuous, every signature action requires re-entry of all authentication components (e.g., ID+Password).",
+    "tags": [
+      "session-management",
+      "authentication",
+      "electronic-signature"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.200(b)",
+    "title": "Electronic signature components and controls",
+    "text": "Electronic signatures based upon biometrics shall be designed to ensure that they cannot be used by anyone other than their genuine owners.",
+    "summary": "Biometric authentication systems must have high fidelity to prevent false positives or spoofing.",
+    "tags": [
+      "biometric-authentication",
+      "security-design"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.300(a)",
+    "title": "Controls for identification codes/passwords",
+    "text": "Maintaining the uniqueness of each combined identification code and password, such that no two individuals have the same combination of identification code and password.",
+    "summary": "The system must enforce unique ID/password combinations to prevent credential collisions.",
+    "tags": [
+      "identity-management",
+      "authentication"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.300(b)",
+    "title": "Controls for identification codes/passwords",
+    "text": "Ensuring that identification code and password issuances are periodically checked, recalled, or revised (e.g., to cover such events as password aging).",
+    "summary": "The system must support password expiration policies and forced revisions (password aging).",
+    "tags": [
+      "password-policy",
+      "credential-management"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.300(d)",
+    "title": "Controls for identification codes/passwords",
+    "text": "Following loss management procedures to electronically deauthorize lost, stolen, missing, or otherwise potentially compromised tokens, cards, and other devices that bear or generate identification code or password information.",
+    "summary": "System must provide the capability to immediately revoke or deauthorize compromised credentials, tokens, or cards.",
+    "tags": [
+      "access-revocation",
+      "incident-response",
+      "identity-management"
+    ]
+  },
+  {
+    "source": "FDA (21 CFR Part 11)",
+    "clause_id": "11.300(e)",
+    "title": "Controls for identification codes/passwords",
+    "text": "Use of transaction safeguards to prevent unauthorized use of passwords and/or identification codes, and to detect and report in an immediate and urgent manner any attempts at their unauthorized use to the system security unit, and, as appropriate, to organizational management.",
+    "summary": "Implementation of intrusion detection, account lockout policies, and immediate alerting for failed authentication attempts or unauthorized access patterns.",
+    "tags": [
+      "intrusion-detection",
+      "alerting",
+      "account-lockout",
+      "security-monitoring"
+    ]
+  }
+]

@@ -1,0 +1,266 @@
+[
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.308(a)(1)(ii)(D)",
+    "title": "Information system activity review (Required)",
+    "text": "Implement procedures to regularly review records of information system activity, such as audit logs, access reports, and security incident tracking reports.",
+    "summary": "Software must generate and maintain audit logs and access reports to facilitate regular security reviews of system activity.",
+    "tags": [
+      "audit-logging",
+      "security-monitoring",
+      "incident-response"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.308(a)(4)(ii)(A)",
+    "title": "Isolating health care clearinghouse functions (Required)",
+    "text": "If a health care clearinghouse is part of a larger organization, the clearinghouse must implement policies and procedures that protect the electronic protected health information of the clearinghouse from unauthorized access by the larger organization.",
+    "summary": "Requires logical segmentation or isolation of software systems handling ePHI from other organizational systems to prevent unauthorized access.",
+    "tags": [
+      "network-segmentation",
+      "access-control",
+      "data-isolation"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.308(a)(5)(ii)(B)",
+    "title": "Protection from malicious software (Addressable)",
+    "text": "Procedures for guarding against, detecting, and reporting malicious software.",
+    "summary": "Software environments must include mechanisms (such as anti-malware integration) to detect, block, and report malicious software.",
+    "tags": [
+      "malware-protection",
+      "endpoint-security",
+      "vulnerability-management"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.308(a)(5)(ii)(C)",
+    "title": "Log-in monitoring (Addressable)",
+    "text": "Procedures for monitoring log-in attempts and reporting discrepancies.",
+    "summary": "The system must track login attempts, identifying and alerting on discrepancies or suspicious activities (e.g., brute force attacks).",
+    "tags": [
+      "authentication",
+      "security-monitoring",
+      "audit-logging"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.308(a)(5)(ii)(D)",
+    "title": "Password management (Addressable)",
+    "text": "Procedures for creating, changing, and safeguarding passwords.",
+    "summary": "Implement system controls for password complexity, rotation, secure storage (hashing/salting), and safe modification workflows.",
+    "tags": [
+      "authentication",
+      "password-policy",
+      "access-control"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.308(a)(7)(ii)(A)",
+    "title": "Data backup plan (Required)",
+    "text": "Establish and implement procedures to create and maintain retrievable exact copies of electronic protected health information.",
+    "summary": "Software systems must include automated backup capabilities to ensure ePHI is copied and retrievable.",
+    "tags": [
+      "backup-and-recovery",
+      "data-availability"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.310(d)(1)",
+    "title": "Device and media controls - Disposal (Required)",
+    "text": "Implement policies and procedures to address the final disposition of electronic protected health information, and/or the hardware or electronic media on which it is stored.",
+    "summary": "Requires software capabilities to securely delete or sanitize data (sanitization) when ePHI or storage media is decommissioned.",
+    "tags": [
+      "data-sanitization",
+      "secure-deletion"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.310(d)(2)(ii)",
+    "title": "Device and media controls - Media re-use (Required)",
+    "text": "Implement procedures for removal of electronic protected health information from electronic media before the media are made available for re-use.",
+    "summary": "Systems must provide mechanisms to securely wipe or overwrite ePHI from storage media prior to reallocation.",
+    "tags": [
+      "data-sanitization",
+      "secure-deletion"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(a)(1)",
+    "title": "Access control (Required)",
+    "text": "Implement technical policies and procedures for electronic information systems that maintain electronic protected health information to allow access only to those persons or software programs that have been granted access rights as specified in § 164.308(a)(4).",
+    "summary": "Implement robust technical access controls (RBAC/ABAC) to restrict access to ePHI solely to authorized users and services.",
+    "tags": [
+      "access-control",
+      "authorization"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(a)(2)(i)",
+    "title": "Unique user identification (Required)",
+    "text": "Assign a unique name and/or number for identifying and tracking user identity.",
+    "summary": "The system must ensure every user is assigned a unique identifier to track activity and identity.",
+    "tags": [
+      "identity-management",
+      "authentication",
+      "audit-logging"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(a)(2)(ii)",
+    "title": "Emergency access procedure (Required)",
+    "text": "Establish (and implement as needed) procedures for obtaining necessary electronic protected health information during an emergency.",
+    "summary": "Software must support emergency access mechanisms ('break-glass' features) to allow authorized access to critical data during emergencies.",
+    "tags": [
+      "access-control",
+      "emergency-access",
+      "availability"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(a)(2)(iii)",
+    "title": "Automatic logoff (Addressable)",
+    "text": "Implement electronic procedures that terminate an electronic session after a predetermined time of inactivity.",
+    "summary": "The application must enforce automatic session termination or locking after a configurable period of user inactivity.",
+    "tags": [
+      "session-management",
+      "access-control"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(a)(2)(iv)",
+    "title": "Encryption and decryption (Addressable)",
+    "text": "Implement a mechanism to encrypt and decrypt electronic protected health information.",
+    "summary": "Implement encryption for ePHI at rest and mechanisms for decryption by authorized processes.",
+    "tags": [
+      "data-encryption",
+      "cryptography"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(b)",
+    "title": "Audit controls (Required)",
+    "text": "Implement hardware, software, and/or procedural mechanisms that record and examine activity in information systems that contain or use electronic protected health information.",
+    "summary": "Implement comprehensive audit logging to record read, write, and modification activities on ePHI.",
+    "tags": [
+      "audit-logging",
+      "security-monitoring"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(c)(1)",
+    "title": "Integrity (Required)",
+    "text": "Implement policies and procedures to protect electronic protected health information from improper alteration or destruction.",
+    "summary": "Implement technical controls (e.g., checksums, versioning, access restrictions) to prevent unauthorized modification or deletion of data.",
+    "tags": [
+      "data-integrity",
+      "change-management"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(c)(2)",
+    "title": "Mechanism to authenticate electronic protected health information (Addressable)",
+    "text": "Implement electronic mechanisms to corroborate that electronic protected health information has not been altered or destroyed in an unauthorized manner.",
+    "summary": "Use hashing, digital signatures, or checksums to verify that ePHI has not been tampered with.",
+    "tags": [
+      "data-integrity",
+      "cryptography"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(d)",
+    "title": "Person or entity authentication (Required)",
+    "text": "Implement procedures to verify that a person or entity seeking access to electronic protected health information is the one claimed.",
+    "summary": "Implement authentication protocols (MFA, certificates, passwords) to verify the identity of users or systems requesting access.",
+    "tags": [
+      "authentication",
+      "identity-management"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(e)(1)",
+    "title": "Transmission security (Required)",
+    "text": "Implement technical security measures to guard against unauthorized access to electronic protected health information that is being transmitted over an electronic communications network.",
+    "summary": "Ensure technical measures (like TLS/SSL) are in place to secure ePHI during transmission over networks.",
+    "tags": [
+      "network-security",
+      "data-encryption",
+      "transmission-security"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(e)(2)(i)",
+    "title": "Transmission security - Integrity controls (Addressable)",
+    "text": "Implement security measures to ensure that electronically transmitted electronic protected health information is not improperly modified without detection until disposed of.",
+    "summary": "Implement message integrity checks (HMAC, digital signatures) for data in transit to detect unauthorized modification.",
+    "tags": [
+      "data-integrity",
+      "network-security"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.312(e)(2)(ii)",
+    "title": "Transmission security - Encryption (Addressable)",
+    "text": "Implement a mechanism to encrypt electronic protected health information whenever deemed appropriate.",
+    "summary": "Encrypt ePHI during transmission using secure protocols (e.g., HTTPS, SFTP, VPN).",
+    "tags": [
+      "data-encryption",
+      "network-security"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.514(b)(2)(i)",
+    "title": "De-identification of protected health information (Safe Harbor)",
+    "text": "The following identifiers of the individual or of relatives, employers, or household members of the individual, are removed: (A) Names; (B) All geographic subdivisions smaller than a State... (C) All elements of dates (except year)... (G) Social security numbers; (H) Medical record numbers... (Q) Full face photographic images...",
+    "summary": "Software attempting to de-identify data for secondary use must implement algorithms to strip or mask the 18 specific identifiers listed.",
+    "tags": [
+      "data-masking",
+      "privacy-enhancing-technologies",
+      "anonymization"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.524(c)(2)(ii)",
+    "title": "Form of access requested (Electronic)",
+    "text": "If the protected health information that is the subject of a request for access is maintained in one or more designated record sets electronically and if the individual requests an electronic copy of such information, the covered entity must provide the individual with access to the protected health information in the electronic form and format requested by the individual, if it is readily producible in such form and format; or, if not, in a readable electronic form and format as agreed to by the covered entity and the individual.",
+    "summary": "The system must support the export of ePHI in standard electronic formats to fulfill patient access requests.",
+    "tags": [
+      "data-export",
+      "interoperability",
+      "access-control"
+    ]
+  },
+  {
+    "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+    "clause_id": "§ 164.528(a)(1)",
+    "title": "Right to an accounting of disclosures",
+    "text": "An individual has a right to receive an accounting of disclosures of protected health information made by a covered entity in the six years prior to the date on which the accounting is requested...",
+    "summary": "Software must maintain a long-term log (6 years) of specific data disclosures to generate accounting reports for individuals.",
+    "tags": [
+      "audit-logging",
+      "data-retention",
+      "reporting"
+    ]
+  }
+]
