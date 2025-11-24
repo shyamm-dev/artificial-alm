@@ -394,6 +394,7 @@ export function CustomRulesTab({ projectId, projectType, open = true }: CustomRu
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
         rule={editingRule}
+        allTags={allTags}
         onSave={async (rule) => {
           if (editingRule) {
             const result = await updateProjectCustomRuleAction(rule.id, {
@@ -438,11 +439,13 @@ function AddEditRuleDialog({
   open,
   onOpenChange,
   rule,
+  allTags,
   onSave
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   rule: CustomRule | null
+  allTags: Array<{ id: string; name: string; description: string }>
   onSave: (rule: CustomRule) => void
 }) {
   const [title, setTitle] = useState("")
@@ -453,8 +456,6 @@ function AddEditRuleDialog({
   const [isGeneratingTags, setIsGeneratingTags] = useState(false)
   const [tagInput, setTagInput] = useState("")
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false)
-  const [allAvailableTags, setAllAvailableTags] = useState<Array<{ id: string; name: string; description: string }>>([])
-  const [isLoadingTags, setIsLoadingTags] = useState(false)
 
   useEffect(() => {
     if (open && rule) {
@@ -471,20 +472,6 @@ function AddEditRuleDialog({
       setTags([])
     }
   }, [open, rule])
-
-  useEffect(() => {
-    const loadTags = async () => {
-      setIsLoadingTags(true)
-      const result = await getAllCustomRuleTagsAction()
-      if (result.success && result.data) {
-        setAllAvailableTags(result.data)
-      }
-      setIsLoadingTags(false)
-    }
-    if (open) {
-      loadTags()
-    }
-  }, [open])
 
   const handleGenerateTags = async () => {
     if (!description.trim()) {
@@ -512,12 +499,12 @@ function AddEditRuleDialog({
     }
   }
 
-  const filteredAvailableTags = allAvailableTags.filter(tag =>
+  const filteredAvailableTags = allTags.filter(tag =>
     tag.name.toLowerCase().includes(tagInput.toLowerCase())
   )
 
   const getTagName = (tagId: string) => {
-    return allAvailableTags.find(t => t.id === tagId)?.name || tagId
+    return allTags.find(t => t.id === tagId)?.name || tagId
   }
 
   const handleSave = () => {
@@ -597,18 +584,21 @@ function AddEditRuleDialog({
             <div className="border rounded-lg p-3 space-y-3">
               <div className="flex flex-wrap gap-1.5 min-h-[32px]">
                 {tags.length > 0 ? (
-                  tags.map(tagId => (
-                    <Badge key={tagId} variant="secondary" className="text-xs px-2 py-1">
-                      {getTagName(tagId)}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveTag(tagId)}
-                        className="ml-1.5 hover:text-destructive text-muted-foreground hover:text-foreground"
-                      >
-                        ×
-                      </button>
-                    </Badge>
-                  ))
+                  tags.map(tagId => {
+                    const tagName = getTagName(tagId)
+                    return (
+                      <Badge key={tagId} variant="secondary" className="text-xs px-2 py-1">
+                        {tagName}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tagId)}
+                          className="ml-1.5 hover:text-destructive text-muted-foreground hover:text-foreground"
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    )
+                  })
                 ) : (
                   <p className="text-xs text-muted-foreground py-1">
                     Add tags manually or generate with AI
@@ -664,9 +654,7 @@ function AddEditRuleDialog({
                   onChange={(e) => setTagInput(e.target.value)}
                 />
                 <div className="max-h-[300px] overflow-y-auto space-y-2">
-                  {isLoadingTags ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">Loading tags...</p>
-                  ) : filteredAvailableTags.length === 0 ? (
+                  {filteredAvailableTags.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">
                       No tags found
                     </p>
