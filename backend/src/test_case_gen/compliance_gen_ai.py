@@ -50,11 +50,11 @@ class ComplianceTestCaseGeneration:
             instruction = f.read()
         return instruction
 
-    def generate(self, prompt: str, project_compliance: list=None) -> list:
+    async def generate(self, prompt: str, project_compliance: list=None) -> list:
 
         messages = [("user", prompt)]
 
-        response = self.gen_ai.generate(
+        response = await self.gen_ai.generate(
             messages=messages,
             system_instruction=self.__get_compliance_tags_instruction(),
             tools=tools
@@ -68,8 +68,10 @@ class ComplianceTestCaseGeneration:
             )
 
             messages.append(("user", function_response_part))
+        else:
+            messages.append(("user", "No compliance tags found."))
 
-        final_msg = self.gen_ai.generate(
+        final_msg = await self.gen_ai.generate(
             messages=messages,
             system_instruction=self.__get_compliance_test_cases_instruction(),
             schema=ComplianceTestCaseResponseSchema.get_compliance_schema()

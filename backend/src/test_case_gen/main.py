@@ -3,6 +3,7 @@ import os
 import base64
 import json
 import traceback
+import asyncio
 from typing import Any, Dict, Tuple
 
 from functions_framework import http
@@ -17,9 +18,11 @@ TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
 TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
 GOOGLE_CLOUD_API_KEY = os.getenv("GOOGLE_CLOUD_API_KEY")
 
-
 @http
 def handler(request: Request) -> Tuple[Dict[str, Any], int]:
+    return asyncio.run(async_handler(request))
+
+async def async_handler(request: Request) -> Tuple[Dict[str, Any], int]:
     """HTTP Cloud Run Function to generate test cases."""
 
     data: Dict[str, Any] | None = request.get_json(silent=True)
@@ -45,9 +48,11 @@ def handler(request: Request) -> Tuple[Dict[str, Any], int]:
 
             prompt = generate_markdown_format(summary, description)
 
-            fnf_response = FNFTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt)
-
-            compliance_response = ComplianceTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt, project_compliance=compliance_list)
+            # Run both test case generations concurrently
+            fnf_response, compliance_response = await asyncio.gather(
+                FNFTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt),
+                ComplianceTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt, project_compliance=compliance_list)
+            )
 
             if not fnf_response.get("success"):
                 reason = fnf_response.get("issue", "Unknown error")

@@ -8,7 +8,7 @@ class GoogleGenAI:
         self.model = model
 
     def _client(self):
-        return genai.Client(vertexai=True, api_key=self.api_key)
+        return genai.Client(vertexai=True, api_key=self.api_key).aio
 
     def _build_contents(self, texts: list[tuple[str, str|types.Part]]) -> list[types.Content]:
         return [
@@ -18,7 +18,7 @@ class GoogleGenAI:
             ) for role, text in texts
         ]
 
-    def generate(self, messages: list[tuple[str, str]], system_instruction: str, schema: types.Schema=None, tools=None):
+    async def generate(self, messages: list[tuple[str, str]], system_instruction: str, schema: types.Schema=None, tools=None):
         client = self._client()
         contents = self._build_contents(messages)
         safety_settings = [
@@ -53,7 +53,7 @@ class GoogleGenAI:
         content_config.tools = tools if tools else None
         content_config.response_schema = schema if schema else None
 
-        response = client.models.generate_content(
+        response = await client.models.generate_content(
             model=self.model,
             contents=contents,
             config=content_config

@@ -18,11 +18,11 @@ class FNFTestCaseGeneration:
             instruction = f.read()
         return instruction
 
-    def generate(self, prompt: str) -> list:
+    async def generate(self, prompt: str) -> list:
 
         messages = [("user", prompt)]
 
-        response = self.gen_ai.generate(
+        response = await self.gen_ai.generate(
             messages=messages,
             system_instruction=self.__get_functional_test_cases_instruction(),
             schema=FNFTestCaseGenResponseSchema.get_schema()
