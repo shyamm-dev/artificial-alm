@@ -1,7 +1,7 @@
 "use server"
 
 import { getServerSession } from "@/lib/get-server-session"
-import { getProjectCustomRules, createProjectCustomRule, updateProjectCustomRule, deleteProjectCustomRule, toggleProjectCustomRuleStatus, type ProjectCustomRule } from "@/db/queries/project-custom-rules-queries"
+import { getProjectCustomRules, createProjectCustomRule, updateProjectCustomRule, deleteProjectCustomRule, toggleProjectCustomRuleStatus, getAllCustomRuleTags, type ProjectCustomRule, type CustomRuleTag } from "@/db/queries/project-custom-rules-queries"
 import { db } from "@/db/drizzle"
 import { standaloneProject, userAtlassianProjectAccess } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
@@ -110,4 +110,14 @@ export async function toggleProjectCustomRuleStatusAction(ruleId: string, isActi
 
   await toggleProjectCustomRuleStatus(ruleId, isActive)
   return { success: true, message: "Rule status updated" }
+}
+
+export async function getAllCustomRuleTagsAction(): Promise<{ success: boolean; message?: string; data?: CustomRuleTag[] }> {
+  const session = await getServerSession()
+  if (!session?.user?.id) {
+    return { success: false, message: "Unauthorized" }
+  }
+
+  const tags = await getAllCustomRuleTags()
+  return { success: true, data: tags }
 }

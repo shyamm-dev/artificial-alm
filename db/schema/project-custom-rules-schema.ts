@@ -52,5 +52,3 @@ export const standaloneProjectRelationsExtended = relations(standaloneProject, (
 export const jiraProjectRelationsExtended = relations(jiraProject, ({ many }) => ({
   customRules: many(projectCustomRule),
 }));
-
-

@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Plus, Pencil, Trash2, Loader2, Lock, Shield, Database, Download } from "lucide-react"
 import { toast } from "sonner"
-import { getProjectCustomRulesAction, createProjectCustomRuleAction, updateProjectCustomRuleAction, deleteProjectCustomRuleAction, toggleProjectCustomRuleStatusAction } from "./actions/custom-rules-actions"
+import { getProjectCustomRulesAction, createProjectCustomRuleAction, updateProjectCustomRuleAction, deleteProjectCustomRuleAction, toggleProjectCustomRuleStatusAction, getAllCustomRuleTagsAction } from "./actions/custom-rules-actions"
 import { tryCatch } from "@/lib/try-catch"
 
 type CustomRule = {
@@ -47,16 +47,21 @@ export function CustomRulesTab({ projectId, projectType, open = true }: CustomRu
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [tagSearchQuery, setTagSearchQuery] = useState("")
+  const [allTags, setAllTags] = useState<Array<{ id: string; name: string; description: string }>>([])
 
   const loadRules = useCallback(async () => {
     setIsLoading(true)
-    const { data, error } = await tryCatch(getProjectCustomRulesAction(projectId, projectType))
-    if (error) {
+    const [rulesResult, tagsResult] = await Promise.all([
+      tryCatch(getProjectCustomRulesAction(projectId, projectType)),
+      getAllCustomRuleTagsAction()
+    ])
+    
+    if (rulesResult.error) {
       toast.error("Failed to load rules")
-    } else if (!data?.success) {
-      toast.error(data?.message || "Access denied")
+    } else if (!rulesResult.data?.success) {
+      toast.error(rulesResult.data?.message || "Access denied")
     } else {
-      setRules((data.data || []).map(r => ({
+      setRules((rulesResult.data.data || []).map(r => ({
         id: r.id,
         title: r.title,
         description: r.description,
@@ -65,6 +70,11 @@ export function CustomRulesTab({ projectId, projectType, open = true }: CustomRu
         tags: r.tags || []
       })))
     }
+    
+    if (tagsResult.success && tagsResult.data) {
+      setAllTags(tagsResult.data)
+    }
+    
     setIsLoading(false)
   }, [projectId, projectType])
 
@@ -105,12 +115,18 @@ export function CustomRulesTab({ projectId, projectType, open = true }: CustomRu
     }
   }
 
-  // Get all unique tags
-  const allTags = Array.from(new Set(rules.flatMap(r => r.tags)))
+  // Get tag name by ID
+  const getTagName = (tagId: string) => {
+    return allTags.find(t => t.id === tagId)?.name || tagId
+  }
+
+  // Get all unique tag IDs from rules
+  const usedTagIds = Array.from(new Set(rules.flatMap(r => r.tags)))
+  const usedTags = usedTagIds.map(id => allTags.find(t => t.id === id)).filter(Boolean) as Array<{ id: string; name: string; description: string }>
 
   // Filter tags based on search
-  const filteredTags = allTags.filter(tag =>
-    tag.toLowerCase().includes(tagSearchQuery.toLowerCase())
+  const filteredTags = usedTags.filter(tag =>
+    tag.name.toLowerCase().includes(tagSearchQuery.toLowerCase())
   )
 
   // Filter rules based on search and selected tags
@@ -125,9 +141,9 @@ export function CustomRulesTab({ projectId, projectType, open = true }: CustomRu
     return matchesSearch && matchesTags
   })
 
-  const toggleTag = (tag: string) => {
+  const toggleTag = (tagId: string) => {
     setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+      prev.includes(tagId) ? prev.filter(t => t !== tagId) : [...prev, tagId]
     )
   }
 
@@ -252,17 +268,17 @@ export function CustomRulesTab({ projectId, projectType, open = true }: CustomRu
                   </p>
                 ) : (
                   filteredTags.map(tag => (
-                    <div key={tag} className="flex items-center space-x-2">
+                    <div key={tag.id} className="flex items-center space-x-2">
                       <Checkbox
-                        id={`tag-${tag}`}
-                        checked={selectedTags.includes(tag)}
-                        onCheckedChange={() => toggleTag(tag)}
+                        id={`tag-${tag.id}`}
+                        checked={selectedTags.includes(tag.id)}
+                        onCheckedChange={() => toggleTag(tag.id)}
                       />
                       <label
-                        htmlFor={`tag-${tag}`}
+                        htmlFor={`tag-${tag.id}`}
                         className="text-sm cursor-pointer flex-1"
                       >
-                        {tag}
+                        {tag.name}
                       </label>
                     </div>
                   ))
@@ -343,9 +359,9 @@ export function CustomRulesTab({ projectId, projectType, open = true }: CustomRu
                     </div>
 
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {rule.tags.map(tag => (
-                        <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5">
-                          {tag}
+                      {rule.tags.map(tagId => (
+                        <Badge key={tagId} variant="secondary" className="text-xs px-2 py-0.5">
+                          {getTagName(tagId)}
                         </Badge>
                       ))}
                     </div>
@@ -437,13 +453,8 @@ function AddEditRuleDialog({
   const [isGeneratingTags, setIsGeneratingTags] = useState(false)
   const [tagInput, setTagInput] = useState("")
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false)
-  const [allAvailableTags] = useState([
-    "Security", "Authentication", "Authorization", "API", "Database",
-    "Data Protection", "Encryption", "Privacy", "Performance", "Scalability",
-    "Error Handling", "Logging", "Monitoring", "Testing", "Validation",
-    "Documentation", "Code Quality", "GDPR", "HIPAA", "SOC2", "PCI-DSS",
-    "Audit Trail", "Business Logic", "Workflow", "User Experience"
-  ])
+  const [allAvailableTags, setAllAvailableTags] = useState<Array<{ id: string; name: string; description: string }>>([])
+  const [isLoadingTags, setIsLoadingTags] = useState(false)
 
   useEffect(() => {
     if (open && rule) {
@@ -460,6 +471,20 @@ function AddEditRuleDialog({
       setTags([])
     }
   }, [open, rule])
+
+  useEffect(() => {
+    const loadTags = async () => {
+      setIsLoadingTags(true)
+      const result = await getAllCustomRuleTagsAction()
+      if (result.success && result.data) {
+        setAllAvailableTags(result.data)
+      }
+      setIsLoadingTags(false)
+    }
+    if (open) {
+      loadTags()
+    }
+  }, [open])
 
   const handleGenerateTags = async () => {
     if (!description.trim()) {
@@ -479,17 +504,21 @@ function AddEditRuleDialog({
     setTags(tags.filter(t => t !== tagToRemove))
   }
 
-  const handleToggleTag = (tag: string) => {
-    if (tags.includes(tag)) {
-      setTags(tags.filter(t => t !== tag))
+  const handleToggleTag = (tagId: string) => {
+    if (tags.includes(tagId)) {
+      setTags(tags.filter(t => t !== tagId))
     } else {
-      setTags([...tags, tag])
+      setTags([...tags, tagId])
     }
   }
 
   const filteredAvailableTags = allAvailableTags.filter(tag =>
-    tag.toLowerCase().includes(tagInput.toLowerCase())
+    tag.name.toLowerCase().includes(tagInput.toLowerCase())
   )
+
+  const getTagName = (tagId: string) => {
+    return allAvailableTags.find(t => t.id === tagId)?.name || tagId
+  }
 
   const handleSave = () => {
     if (!title.trim() || !description.trim()) {
@@ -568,12 +597,12 @@ function AddEditRuleDialog({
             <div className="border rounded-lg p-3 space-y-3">
               <div className="flex flex-wrap gap-1.5 min-h-[32px]">
                 {tags.length > 0 ? (
-                  tags.map(tag => (
-                    <Badge key={tag} variant="secondary" className="text-xs px-2 py-1">
-                      {tag}
+                  tags.map(tagId => (
+                    <Badge key={tagId} variant="secondary" className="text-xs px-2 py-1">
+                      {getTagName(tagId)}
                       <button
                         type="button"
-                        onClick={() => handleRemoveTag(tag)}
+                        onClick={() => handleRemoveTag(tagId)}
                         className="ml-1.5 hover:text-destructive text-muted-foreground hover:text-foreground"
                       >
                         ×
@@ -635,23 +664,30 @@ function AddEditRuleDialog({
                   onChange={(e) => setTagInput(e.target.value)}
                 />
                 <div className="max-h-[300px] overflow-y-auto space-y-2">
-                  {filteredAvailableTags.length === 0 ? (
+                  {isLoadingTags ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">Loading tags...</p>
+                  ) : filteredAvailableTags.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">
                       No tags found
                     </p>
                   ) : (
                     filteredAvailableTags.map(tag => (
-                      <div key={tag} className="flex items-center space-x-2">
+                      <div key={tag.id} className="flex items-center space-x-2">
                         <Checkbox
-                          id={`add-tag-${tag}`}
-                          checked={tags.includes(tag)}
-                          onCheckedChange={() => handleToggleTag(tag)}
+                          id={`add-tag-${tag.id}`}
+                          checked={tags.includes(tag.id)}
+                          onCheckedChange={() => handleToggleTag(tag.id)}
                         />
                         <label
-                          htmlFor={`add-tag-${tag}`}
+                          htmlFor={`add-tag-${tag.id}`}
                           className="text-sm cursor-pointer flex-1"
                         >
-                          {tag}
+                          <div>
+                            <div className="font-medium">{tag.name}</div>
+                            {tag.description && (
+                              <div className="text-xs text-muted-foreground">{tag.description}</div>
+                            )}
+                          </div>
                         </label>
                       </div>
                     ))

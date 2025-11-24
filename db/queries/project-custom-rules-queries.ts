@@ -1,9 +1,10 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../drizzle";
-import { projectCustomRule } from "../schema";
+import { projectCustomRule, customRuleTag } from "../schema";
 import type { InferSelectModel } from "drizzle-orm";
 
 export type ProjectCustomRule = InferSelectModel<typeof projectCustomRule>;
+export type CustomRuleTag = InferSelectModel<typeof customRuleTag>;
 
 export async function getProjectCustomRules(projectId: string, projectType: "standalone" | "jira"): Promise<ProjectCustomRule[]> {
   try {
@@ -84,4 +85,13 @@ export async function toggleProjectCustomRuleStatus(ruleId: string, isActive: bo
       updatedAt: new Date().toISOString(),
     })
     .where(eq(projectCustomRule.id, ruleId));
+}
+
+export async function getAllCustomRuleTags(): Promise<CustomRuleTag[]> {
+  try {
+    return await db.select().from(customRuleTag);
+  } catch (error) {
+    console.error("Error fetching tags:", error);
+    return [];
+  }
 }
