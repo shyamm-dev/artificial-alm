@@ -1,0 +1,561 @@
+{
+    "validation": [
+        "FDA (21 CFR Part 11) 11.10(a)"
+    ],
+    "data-integrity": [
+        "FDA (21 CFR Part 11) 11.10(a)",
+        "FDA (21 CFR Part 11) 11.10(e)",
+        "FDA (21 CFR Part 11) 11.30",
+        "FDA (21 CFR Part 11) 11.50(a)",
+        "FDA (21 CFR Part 11) 11.70",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(c)(1)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(c)(2)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(2)(i)",
+        "ISO/IEC 27001:2022 A.5.33"
+    ],
+    "system-reliability": [
+        "FDA (21 CFR Part 11) 11.10(a)"
+    ],
+    "error-handling": [
+        "FDA (21 CFR Part 11) 11.10(a)"
+    ],
+    "data-export": [
+        "FDA (21 CFR Part 11) 11.10(b)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.524(c)(2)(ii)"
+    ],
+    "reporting": [
+        "FDA (21 CFR Part 11) 11.10(b)",
+        "FDA (21 CFR Part 11) 11.50(b)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.528(a)(1)"
+    ],
+    "audit-compliance": [
+        "FDA (21 CFR Part 11) 11.10(b)",
+        "ISO/IEC 27001:2022 A.8.34"
+    ],
+    "backup-and-recovery": [
+        "FDA (21 CFR Part 11) 11.10(c)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(7)(ii)(A)",
+        "ISO/IEC 27001:2022 A.8.13"
+    ],
+    "data-retention": [
+        "FDA (21 CFR Part 11) 11.10(c)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.528(a)(1)",
+        "ISO/IEC 27001:2022 A.8.10"
+    ],
+    "data-availability": [
+        "FDA (21 CFR Part 11) 11.10(c)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(7)(ii)(A)",
+        "ISO/IEC 27001:2022 A.8.13"
+    ],
+    "access-control": [
+        "FDA (21 CFR Part 11) 11.10(d)",
+        "FDA (21 CFR Part 11) 11.100(a)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(4)(ii)(A)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(D)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(1)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(ii)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(iii)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.524(c)(2)(ii)",
+        "ISO/IEC 27001:2022 A.5.15",
+        "ISO/IEC 27001:2022 A.5.33",
+        "ISO/IEC 27001:2022 A.8.3",
+        "ISO/IEC 27001:2022 A.8.4"
+    ],
+    "authentication": [
+        "FDA (21 CFR Part 11) 11.10(d)",
+        "FDA (21 CFR Part 11) 11.200(a)(1)",
+        "FDA (21 CFR Part 11) 11.200(a)(1)(i)",
+        "FDA (21 CFR Part 11) 11.200(a)(1)(ii)",
+        "FDA (21 CFR Part 11) 11.300(a)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(C)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(D)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(i)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(d)",
+        "ISO/IEC 27001:2022 A.5.17",
+        "ISO/IEC 27001:2022 A.8.5"
+    ],
+    "authorization": [
+        "FDA (21 CFR Part 11) 11.10(d)",
+        "FDA (21 CFR Part 11) 11.10(g)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(1)",
+        "ISO/IEC 27001:2022 A.5.18"
+    ],
+    "audit-logging": [
+        "FDA (21 CFR Part 11) 11.10(e)",
+        "FDA (21 CFR Part 11) 11.50(a)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(1)(ii)(D)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(C)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(i)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(b)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.528(a)(1)",
+        "ISO/IEC 27001:2022 A.8.15"
+    ],
+    "non-repudiation": [
+        "FDA (21 CFR Part 11) 11.10(e)"
+    ],
+    "traceability": [
+        "FDA (21 CFR Part 11) 11.10(e)"
+    ],
+    "workflow-enforcement": [
+        "FDA (21 CFR Part 11) 11.10(f)"
+    ],
+    "process-control": [
+        "FDA (21 CFR Part 11) 11.10(f)"
+    ],
+    "operational-integrity": [
+        "FDA (21 CFR Part 11) 11.10(f)"
+    ],
+    "rbac": [
+        "FDA (21 CFR Part 11) 11.10(g)",
+        "ISO/IEC 27001:2022 A.5.18"
+    ],
+    "privilege-management": [
+        "FDA (21 CFR Part 11) 11.10(g)"
+    ],
+    "device-authentication": [
+        "FDA (21 CFR Part 11) 11.10(h)"
+    ],
+    "input-validation": [
+        "FDA (21 CFR Part 11) 11.10(h)"
+    ],
+    "hardware-security": [
+        "FDA (21 CFR Part 11) 11.10(h)"
+    ],
+    "change-management": [
+        "FDA (21 CFR Part 11) 11.10(k)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(c)(1)",
+        "ISO/IEC 27001:2022 A.8.19",
+        "ISO/IEC 27001:2022 A.8.32"
+    ],
+    "version-control": [
+        "FDA (21 CFR Part 11) 11.10(k)",
+        "ISO/IEC 27001:2022 A.8.4",
+        "ISO/IEC 27001:2022 A.8.32"
+    ],
+    "configuration-management": [
+        "FDA (21 CFR Part 11) 11.10(k)",
+        "ISO/IEC 27001:2022 A.8.9"
+    ],
+    "encryption": [
+        "FDA (21 CFR Part 11) 11.30",
+        "ISO/IEC 27001:2022 A.8.24"
+    ],
+    "digital-signatures": [
+        "FDA (21 CFR Part 11) 11.30"
+    ],
+    "network-security": [
+        "FDA (21 CFR Part 11) 11.30",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(1)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(2)(i)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(2)(ii)",
+        "ISO/IEC 27001:2022 A.8.20",
+        "ISO/IEC 27001:2022 A.8.21",
+        "ISO/IEC 27001:2022 A.8.23"
+    ],
+    "electronic-signature": [
+        "FDA (21 CFR Part 11) 11.50(a)",
+        "FDA (21 CFR Part 11) 11.50(b)",
+        "FDA (21 CFR Part 11) 11.70",
+        "FDA (21 CFR Part 11) 11.200(a)(1)",
+        "FDA (21 CFR Part 11) 11.200(a)(1)(i)",
+        "FDA (21 CFR Part 11) 11.200(a)(1)(ii)"
+    ],
+    "ui-ux-security": [
+        "FDA (21 CFR Part 11) 11.50(b)"
+    ],
+    "anti-tampering": [
+        "FDA (21 CFR Part 11) 11.70"
+    ],
+    "identity-management": [
+        "FDA (21 CFR Part 11) 11.100(a)",
+        "FDA (21 CFR Part 11) 11.300(a)",
+        "FDA (21 CFR Part 11) 11.300(d)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(i)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(d)",
+        "ISO/IEC 27001:2022 A.5.16"
+    ],
+    "mfa": [
+        "FDA (21 CFR Part 11) 11.200(a)(1)",
+        "ISO/IEC 27001:2022 A.8.5"
+    ],
+    "session-management": [
+        "FDA (21 CFR Part 11) 11.200(a)(1)(i)",
+        "FDA (21 CFR Part 11) 11.200(a)(1)(ii)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(iii)",
+        "ISO/IEC 27001:2022 A.7.7"
+    ],
+    "biometric-authentication": [
+        "FDA (21 CFR Part 11) 11.200(b)"
+    ],
+    "security-design": [
+        "FDA (21 CFR Part 11) 11.200(b)"
+    ],
+    "password-policy": [
+        "FDA (21 CFR Part 11) 11.300(b)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(D)",
+        "ISO/IEC 27001:2022 A.5.17"
+    ],
+    "credential-management": [
+        "FDA (21 CFR Part 11) 11.300(b)",
+        "ISO/IEC 27001:2022 A.5.17"
+    ],
+    "access-revocation": [
+        "FDA (21 CFR Part 11) 11.300(d)"
+    ],
+    "incident-response": [
+        "FDA (21 CFR Part 11) 11.300(d)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(1)(ii)(D)",
+        "ISO/IEC 27001:2022 A.5.28",
+        "ISO/IEC 27001:2022 A.8.16"
+    ],
+    "intrusion-detection": [
+        "FDA (21 CFR Part 11) 11.300(e)"
+    ],
+    "alerting": [
+        "FDA (21 CFR Part 11) 11.300(e)"
+    ],
+    "account-lockout": [
+        "FDA (21 CFR Part 11) 11.300(e)"
+    ],
+    "security-monitoring": [
+        "FDA (21 CFR Part 11) 11.300(e)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(1)(ii)(D)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(C)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(b)"
+    ],
+    "network-segmentation": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(4)(ii)(A)",
+        "ISO/IEC 27001:2022 A.8.3",
+        "ISO/IEC 27001:2022 A.8.20",
+        "ISO/IEC 27001:2022 A.8.22"
+    ],
+    "data-isolation": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(4)(ii)(A)"
+    ],
+    "malware-protection": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(B)",
+        "ISO/IEC 27001:2022 A.8.7"
+    ],
+    "endpoint-security": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(B)",
+        "ISO/IEC 27001:2022 A.6.7",
+        "ISO/IEC 27001:2022 A.7.7",
+        "ISO/IEC 27001:2022 A.8.1",
+        "ISO/IEC 27001:2022 A.8.7"
+    ],
+    "vulnerability-management": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(B)",
+        "ISO/IEC 27001:2022 A.8.8"
+    ],
+    "data-sanitization": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.310(d)(1)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.310(d)(2)(ii)",
+        "ISO/IEC 27001:2022 A.7.14",
+        "ISO/IEC 27001:2022 A.8.33"
+    ],
+    "secure-deletion": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.310(d)(1)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.310(d)(2)(ii)",
+        "ISO/IEC 27001:2022 A.7.14",
+        "ISO/IEC 27001:2022 A.8.10"
+    ],
+    "emergency-access": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(ii)"
+    ],
+    "availability": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(ii)"
+    ],
+    "data-encryption": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(iv)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(1)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(2)(ii)",
+        "ISO/IEC 27001:2022 A.5.34"
+    ],
+    "cryptography": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(iv)",
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(c)(2)",
+        "ISO/IEC 27001:2022 A.8.24"
+    ],
+    "transmission-security": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(1)"
+    ],
+    "data-masking": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.514(b)(2)(i)",
+        "ISO/IEC 27001:2022 A.8.11"
+    ],
+    "privacy-enhancing-technologies": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.514(b)(2)(i)"
+    ],
+    "anonymization": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.514(b)(2)(i)"
+    ],
+    "interoperability": [
+        "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.524(c)(2)(ii)"
+    ],
+    "data-classification": [
+        "ISO/IEC 27001:2022 A.5.12"
+    ],
+    "data-tagging": [
+        "ISO/IEC 27001:2022 A.5.12"
+    ],
+    "information-handling": [
+        "ISO/IEC 27001:2022 A.5.12"
+    ],
+    "data-transfer": [
+        "ISO/IEC 27001:2022 A.5.14"
+    ],
+    "encryption-in-transit": [
+        "ISO/IEC 27001:2022 A.5.14"
+    ],
+    "secure-protocols": [
+        "ISO/IEC 27001:2022 A.5.14"
+    ],
+    "iam": [
+        "ISO/IEC 27001:2022 A.5.15"
+    ],
+    "logical-security": [
+        "ISO/IEC 27001:2022 A.5.15"
+    ],
+    "user-provisioning": [
+        "ISO/IEC 27001:2022 A.5.16"
+    ],
+    "account-lifecycle": [
+        "ISO/IEC 27001:2022 A.5.16"
+    ],
+    "access-rights": [
+        "ISO/IEC 27001:2022 A.5.18"
+    ],
+    "cloud-security": [
+        "ISO/IEC 27001:2022 A.5.23"
+    ],
+    "cloud-configuration": [
+        "ISO/IEC 27001:2022 A.5.23"
+    ],
+    "vendor-management": [
+        "ISO/IEC 27001:2022 A.5.23",
+        "ISO/IEC 27001:2022 A.8.21"
+    ],
+    "forensics": [
+        "ISO/IEC 27001:2022 A.5.28"
+    ],
+    "log-retention": [
+        "ISO/IEC 27001:2022 A.5.28"
+    ],
+    "business-continuity": [
+        "ISO/IEC 27001:2022 A.5.30"
+    ],
+    "high-availability": [
+        "ISO/IEC 27001:2022 A.5.30",
+        "ISO/IEC 27001:2022 A.8.14"
+    ],
+    "disaster-recovery": [
+        "ISO/IEC 27001:2022 A.5.30",
+        "ISO/IEC 27001:2022 A.8.13"
+    ],
+    "redundancy": [
+        "ISO/IEC 27001:2022 A.5.30",
+        "ISO/IEC 27001:2022 A.8.14"
+    ],
+    "record-retention": [
+        "ISO/IEC 27001:2022 A.5.33"
+    ],
+    "privacy": [
+        "ISO/IEC 27001:2022 A.5.34",
+        "ISO/IEC 27001:2022 A.8.11",
+        "ISO/IEC 27001:2022 A.8.33"
+    ],
+    "pii-protection": [
+        "ISO/IEC 27001:2022 A.5.34"
+    ],
+    "remote-access": [
+        "ISO/IEC 27001:2022 A.6.7"
+    ],
+    "vpn": [
+        "ISO/IEC 27001:2022 A.6.7"
+    ],
+    "screen-lock": [
+        "ISO/IEC 27001:2022 A.7.7"
+    ],
+    "asset-management": [
+        "ISO/IEC 27001:2022 A.7.14"
+    ],
+    "disk-encryption": [
+        "ISO/IEC 27001:2022 A.8.1"
+    ],
+    "device-management": [
+        "ISO/IEC 27001:2022 A.8.1"
+    ],
+    "privileged-access": [
+        "ISO/IEC 27001:2022 A.8.2",
+        "ISO/IEC 27001:2022 A.8.18"
+    ],
+    "pam": [
+        "ISO/IEC 27001:2022 A.8.2"
+    ],
+    "least-privilege": [
+        "ISO/IEC 27001:2022 A.8.2"
+    ],
+    "acl": [
+        "ISO/IEC 27001:2022 A.8.3"
+    ],
+    "source-code-protection": [
+        "ISO/IEC 27001:2022 A.8.4"
+    ],
+    "sso": [
+        "ISO/IEC 27001:2022 A.8.5"
+    ],
+    "monitoring": [
+        "ISO/IEC 27001:2022 A.8.6",
+        "ISO/IEC 27001:2022 A.8.15",
+        "ISO/IEC 27001:2022 A.8.16"
+    ],
+    "capacity-planning": [
+        "ISO/IEC 27001:2022 A.8.6"
+    ],
+    "system-availability": [
+        "ISO/IEC 27001:2022 A.8.6"
+    ],
+    "antivirus": [
+        "ISO/IEC 27001:2022 A.8.7"
+    ],
+    "patch-management": [
+        "ISO/IEC 27001:2022 A.8.8"
+    ],
+    "security-scanning": [
+        "ISO/IEC 27001:2022 A.8.8"
+    ],
+    "security-baselines": [
+        "ISO/IEC 27001:2022 A.8.9"
+    ],
+    "drift-detection": [
+        "ISO/IEC 27001:2022 A.8.9"
+    ],
+    "data-lifecycle": [
+        "ISO/IEC 27001:2022 A.8.10"
+    ],
+    "obfuscation": [
+        "ISO/IEC 27001:2022 A.8.11"
+    ],
+    "dlp": [
+        "ISO/IEC 27001:2022 A.8.12"
+    ],
+    "data-loss-prevention": [
+        "ISO/IEC 27001:2022 A.8.12"
+    ],
+    "egress-filtering": [
+        "ISO/IEC 27001:2022 A.8.12"
+    ],
+    "infrastructure": [
+        "ISO/IEC 27001:2022 A.8.14"
+    ],
+    "log-management": [
+        "ISO/IEC 27001:2022 A.8.15"
+    ],
+    "threat-detection": [
+        "ISO/IEC 27001:2022 A.8.16"
+    ],
+    "time-synchronization": [
+        "ISO/IEC 27001:2022 A.8.17"
+    ],
+    "ntp": [
+        "ISO/IEC 27001:2022 A.8.17"
+    ],
+    "logging": [
+        "ISO/IEC 27001:2022 A.8.17"
+    ],
+    "application-control": [
+        "ISO/IEC 27001:2022 A.8.18"
+    ],
+    "system-integrity": [
+        "ISO/IEC 27001:2022 A.8.18",
+        "ISO/IEC 27001:2022 A.8.34"
+    ],
+    "application-allowlisting": [
+        "ISO/IEC 27001:2022 A.8.19"
+    ],
+    "software-integrity": [
+        "ISO/IEC 27001:2022 A.8.19"
+    ],
+    "firewall": [
+        "ISO/IEC 27001:2022 A.8.20"
+    ],
+    "service-monitoring": [
+        "ISO/IEC 27001:2022 A.8.21"
+    ],
+    "vlan": [
+        "ISO/IEC 27001:2022 A.8.22"
+    ],
+    "isolation": [
+        "ISO/IEC 27001:2022 A.8.22",
+        "ISO/IEC 27001:2022 A.8.31"
+    ],
+    "web-filtering": [
+        "ISO/IEC 27001:2022 A.8.23"
+    ],
+    "content-filtering": [
+        "ISO/IEC 27001:2022 A.8.23"
+    ],
+    "key-management": [
+        "ISO/IEC 27001:2022 A.8.24"
+    ],
+    "devsecops": [
+        "ISO/IEC 27001:2022 A.8.25"
+    ],
+    "sdlc": [
+        "ISO/IEC 27001:2022 A.8.25"
+    ],
+    "secure-development": [
+        "ISO/IEC 27001:2022 A.8.25"
+    ],
+    "requirements-analysis": [
+        "ISO/IEC 27001:2022 A.8.26"
+    ],
+    "application-security": [
+        "ISO/IEC 27001:2022 A.8.26"
+    ],
+    "procurement": [
+        "ISO/IEC 27001:2022 A.8.26"
+    ],
+    "security-architecture": [
+        "ISO/IEC 27001:2022 A.8.27"
+    ],
+    "secure-design": [
+        "ISO/IEC 27001:2022 A.8.27"
+    ],
+    "engineering-principles": [
+        "ISO/IEC 27001:2022 A.8.27"
+    ],
+    "secure-coding": [
+        "ISO/IEC 27001:2022 A.8.28"
+    ],
+    "code-quality": [
+        "ISO/IEC 27001:2022 A.8.28"
+    ],
+    "vulnerability-prevention": [
+        "ISO/IEC 27001:2022 A.8.28"
+    ],
+    "security-testing": [
+        "ISO/IEC 27001:2022 A.8.29"
+    ],
+    "penetration-testing": [
+        "ISO/IEC 27001:2022 A.8.29"
+    ],
+    "acceptance-testing": [
+        "ISO/IEC 27001:2022 A.8.29"
+    ],
+    "environment-separation": [
+        "ISO/IEC 27001:2022 A.8.31"
+    ],
+    "release-management": [
+        "ISO/IEC 27001:2022 A.8.31"
+    ],
+    "ci-cd": [
+        "ISO/IEC 27001:2022 A.8.32"
+    ],
+    "test-data-management": [
+        "ISO/IEC 27001:2022 A.8.33"
+    ],
+    "operational-security": [
+        "ISO/IEC 27001:2022 A.8.34"
+    ]
+}
