@@ -62,8 +62,8 @@ class ComplianceTestCaseGeneration:
         if tags:
             compliance_clause_ids = self.__get_compliance_clause_ids(tags)
             compliance_clauses = self.__get_compliance_clauses(compliance_clause_ids)
-            messages.append(("user", f"The relevant compliance clauses are: {json.dumps(compliance_clauses)}"))
-            messages.append(("user", "Project compliance requirements to consider: " + json.dumps(project_compliance) if project_compliance else "No specific project compliance requirements provided."))
+            messages.append(("user", "The relevant compliance clauses are: " + json.dumps(compliance_clauses)))
+            messages.append(("user", "Project compliance standards to consider: " + json.dumps(project_compliance) if project_compliance else "No specific project compliance requirements provided."))
             messages.append(("user", "Project custom rules to ensure: " + json.dumps(project_custom_rules) if project_custom_rules else "No specific project custom rules provided."))
         else:
             return {
