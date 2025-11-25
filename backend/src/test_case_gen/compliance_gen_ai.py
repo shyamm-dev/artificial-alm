@@ -4,39 +4,12 @@ import json
 from google.genai import types
 from .schema import ComplianceTestCaseResponseSchema
 
-get_compliance_function = {
-    "name": "get_compliance_info",
-    "description": "Gets software compliance information based on provided parameters.",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "tags": {
-                "type": "array",
-                "items": {"type": "string"},
-                "description": "List of compliance-related tags.",
-            }
-        },
-        "required": ["tags"],
-    },
-}
-
-get_compliance_tool = types.Tool(function_declarations=[get_compliance_function])
-
-tools = [get_compliance_tool]
-
-
 class ComplianceTestCaseGeneration:
 
     def __init__(self, api_key: str, db_client=None):
         self.api_key = api_key
         self.gen_ai = GoogleGenAI(self.api_key)
         self.db = db_client
-
-    def get_compliance_info(self, tags: list[str]):
-        return {
-            "tags_received": tags,
-            "result": "Mock compliance data generated."
-        }
 
     def __get_compliance_tags_instruction(self) -> str:
 
@@ -49,27 +22,55 @@ class ComplianceTestCaseGeneration:
         with open("./compliance_test_cases_instruction.md", "r", encoding='utf-8') as f:
             instruction = f.read()
         return instruction
+    
+    def __get_compliance_index(self) -> dict:
+        with open("./compliance_index.json", "r", encoding='utf-8') as f:
+            compliance_index = json.load(f)
+        return compliance_index
+    
+    def __get_compliance_reverse_index(self) -> dict:
+        with open("./compliance_reverse_index.json", "r", encoding='utf-8') as f:
+            compliance_reverse_index = json.load(f)
+        return compliance_reverse_index
 
-    async def generate(self, prompt: str, project_compliance: list=None) -> list:
+    def __get_compliance_clause_ids(self, tags: list) -> list:
+        reverse_index = self.__get_compliance_reverse_index()
+        clause_ids = set()
+        for tag in tags:
+            clause_ids.add(reverse_index[tag])
+        return list(clause_ids)
+
+    def __get_compliance_clauses(self, clause_ids: list) -> list:
+        compliance_index = self.__get_compliance_index()
+        clauses = []
+        for clause_id in clause_ids:
+            clauses.append(compliance_index[clause_id])
+        return clauses
+
+    async def generate(self, prompt: str, project_compliance: list=None, project_custom_rules: list=None) -> dict:
 
         messages = [("user", prompt)]
 
         response = await self.gen_ai.generate(
             messages=messages,
             system_instruction=self.__get_compliance_tags_instruction(),
-            tools=tools
+            schema=ComplianceTestCaseResponseSchema.get_compliance_tags_schema()
         )
 
-        if response.candidates[0].content.parts[0].function_call:
-            function_call = response.candidates[0].content.parts[0].function_call
-            function_response_part = types.Part.from_function_response(
-                name=function_call.name,
-                response={"result": f"Project compliance requirements: {project_compliance} and compliance tags: {function_call.args}"},
-            )
+        tags = json.loads(response.text).get("tags", [])
 
-            messages.append(("user", function_response_part))
+        if tags:
+            compliance_clause_ids = self.__get_compliance_clause_ids(tags)
+            compliance_clauses = self.__get_compliance_clauses(compliance_clause_ids)
+            messages.append(("user", f"The relevant compliance clauses are: {json.dumps(compliance_clauses)}"))
+            messages.append(("user", "Project compliance requirements to consider: " + json.dumps(project_compliance) if project_compliance else "No specific project compliance requirements provided."))
+            messages.append(("user", "Project custom rules to ensure: " + json.dumps(project_custom_rules) if project_custom_rules else "No specific project custom rules provided."))
         else:
-            messages.append(("user", "No compliance tags found."))
+            return {
+                "success": False,
+                "issue": "No compliance tags found.",
+                "data": []
+            }
 
         final_msg = await self.gen_ai.generate(
             messages=messages,

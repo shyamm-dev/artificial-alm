@@ -117,3 +117,17 @@ class ComplianceTestCaseResponseSchema:
             },
             required=["success", "issue", "data"]
         )
+
+    @staticmethod
+    def get_compliance_tags_schema() -> types.Schema:
+        return types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "tags": types.Schema(
+                    type=types.Type.ARRAY,
+                    description="Array of compliance tags that matches the requirement.",
+                    items=types.Schema(type=types.Type.STRING)
+                )
+            },
+            required=["tags"]
+        )

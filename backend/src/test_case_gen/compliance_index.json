@@ -1,0 +1,1095 @@
+{
+    "FDA (21 CFR Part 11) 11.10(a)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(a)",
+        "title": "Controls for closed systems",
+        "text": "Validation of systems to ensure accuracy, reliability, consistent intended performance, and the ability to discern invalid or altered records.",
+        "summary": "Requires software validation processes to guarantee system accuracy, reliability, and the capability to detect invalid or tampered data.",
+        "tags": [
+            "validation",
+            "data-integrity",
+            "system-reliability",
+            "error-handling"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.10(b)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(b)",
+        "title": "Controls for closed systems",
+        "text": "The ability to generate accurate and complete copies of records in both human readable and electronic form suitable for inspection, review, and copying by the agency.",
+        "summary": "The system must be able to export records in both human-readable formats (e.g., PDF, UI display) and electronic formats for inspection.",
+        "tags": [
+            "data-export",
+            "reporting",
+            "audit-compliance"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.10(c)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(c)",
+        "title": "Controls for closed systems",
+        "text": "Protection of records to enable their accurate and ready retrieval throughout the records retention period.",
+        "summary": "Requires technical controls for data storage and backup to ensure records can be retrieved accurately for the duration of the retention period.",
+        "tags": [
+            "backup-and-recovery",
+            "data-retention",
+            "data-availability"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.10(d)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(d)",
+        "title": "Controls for closed systems",
+        "text": "Limiting system access to authorized individuals.",
+        "summary": "Implementation of strict access control mechanisms to ensure only authorized users can access the system.",
+        "tags": [
+            "access-control",
+            "authentication",
+            "authorization"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.10(e)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(e)",
+        "title": "Controls for closed systems",
+        "text": "Use of secure, computer-generated, time-stamped audit trails to independently record the date and time of operator entries and actions that create, modify, or delete electronic records. Record changes shall not obscure previously recorded information.",
+        "summary": "Requires an immutable, automated audit log that captures the date, time, and user for all creation, modification, or deletion events without overwriting original data.",
+        "tags": [
+            "audit-logging",
+            "data-integrity",
+            "non-repudiation",
+            "traceability"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.10(f)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(f)",
+        "title": "Controls for closed systems",
+        "text": "Use of operational system checks to enforce permitted sequencing of steps and events, as appropriate.",
+        "summary": "The software must enforce workflow logic to ensure steps occur in the correct, required sequence.",
+        "tags": [
+            "workflow-enforcement",
+            "process-control",
+            "operational-integrity"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.10(g)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(g)",
+        "title": "Controls for closed systems",
+        "text": "Use of authority checks to ensure that only authorized individuals can use the system, electronically sign a record, access the operation or computer system input or output device, alter a record, or perform the operation at hand.",
+        "summary": "Requires granular authorization checks (Role-Based Access Control) to ensure users only perform actions or sign records they are specifically permitted to.",
+        "tags": [
+            "authorization",
+            "rbac",
+            "privilege-management"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.10(h)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(h)",
+        "title": "Controls for closed systems",
+        "text": "Use of device (e.g., terminal) checks to determine, as appropriate, the validity of the source of data input or operational instruction.",
+        "summary": "System must verify that data input comes from valid devices or terminals, relevant for IoT or specific hardware integrations.",
+        "tags": [
+            "device-authentication",
+            "input-validation",
+            "hardware-security"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.10(k)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.10(k)",
+        "title": "Controls for closed systems",
+        "text": "Use of appropriate controls over systems documentation including: (1) Adequate controls over the distribution of, access to, and use of documentation for system operation and maintenance. (2) Revision and change control procedures to maintain an audit trail that documents time-sequenced development and modification of systems documentation.",
+        "summary": "Requires version control and access restrictions for system documentation and configuration, including audit trails for changes.",
+        "tags": [
+            "change-management",
+            "version-control",
+            "configuration-management"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.30": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.30",
+        "title": "Controls for open systems",
+        "text": "Persons who use open systems to create, modify, maintain, or transmit electronic records shall employ procedures and controls designed to ensure the authenticity, integrity, and, as appropriate, the confidentiality of electronic records from the point of their creation to the point of their receipt. Such procedures and controls shall include those identified in \u00a7 11.10, as appropriate, and additional measures such as document encryption and use of appropriate digital signature standards to ensure, as necessary under the circumstances, record authenticity, integrity, and confidentiality.",
+        "summary": "For systems connected to external networks (open systems), encryption and digital signature standards must be used to ensure data integrity and confidentiality during transmission.",
+        "tags": [
+            "encryption",
+            "digital-signatures",
+            "network-security",
+            "data-integrity"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.50(a)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.50(a)",
+        "title": "Signature manifestations",
+        "text": "Signed electronic records shall contain information associated with the signing that clearly indicates all of the following: (1) The printed name of the signer; (2) The date and time when the signature was executed; and (3) The meaning (such as review, approval, responsibility, or authorship) associated with the signature.",
+        "summary": "Electronic signatures must explicitly store and display the signer's name, timestamp, and the specific reason for the signature.",
+        "tags": [
+            "electronic-signature",
+            "data-integrity",
+            "audit-logging"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.50(b)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.50(b)",
+        "title": "Signature manifestations",
+        "text": "The items identified in paragraphs (a)(1), (a)(2), and (a)(3) of this section shall be subject to the same controls as for electronic records and shall be included as part of any human readable form of the electronic record (such as electronic display or printout).",
+        "summary": "Signature details (name, time, meaning) must be visible on all human-readable views (screens, PDFs) and protected with the same security as the record itself.",
+        "tags": [
+            "electronic-signature",
+            "reporting",
+            "ui-ux-security"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.70": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.70",
+        "title": "Signature/record linking",
+        "text": "Electronic signatures and handwritten signatures executed to electronic records shall be linked to their respective electronic records to ensure that the signatures cannot be excised, copied, or otherwise transferred to falsify an electronic record by ordinary means.",
+        "summary": "Cryptographic or logical linking must bind the signature to the specific record, preventing the signature from being copied or moved to another document.",
+        "tags": [
+            "data-integrity",
+            "electronic-signature",
+            "anti-tampering"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.100(a)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.100(a)",
+        "title": "General requirements",
+        "text": "Each electronic signature shall be unique to one individual and shall not be reused by, or reassigned to, anyone else.",
+        "summary": "System must ensure unique identifiers for every user; user IDs cannot be recycled or reassigned to different individuals.",
+        "tags": [
+            "identity-management",
+            "access-control"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.200(a)(1)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.200(a)(1)",
+        "title": "Electronic signature components and controls",
+        "text": "Electronic signatures that are not based upon biometrics shall: (1) Employ at least two distinct identification components such as an identification code and password.",
+        "summary": "Non-biometric signatures must use Multi-Factor Authentication (MFA) or at minimum two distinct components (e.g., ID and Password).",
+        "tags": [
+            "authentication",
+            "mfa",
+            "electronic-signature"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.200(a)(1)(i)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.200(a)(1)(i)",
+        "title": "Electronic signature components and controls",
+        "text": "When an individual executes a series of signings during a single, continuous period of controlled system access, the first signing shall be executed using all electronic signature components; subsequent signings shall be executed using at least one electronic signature component that is only executable by, and designed to be used only by, the individual.",
+        "summary": "In a continuous session, the first signature requires full authentication (e.g., ID+Password), while subsequent signatures in that session require at least one component (e.g., Password only).",
+        "tags": [
+            "session-management",
+            "authentication",
+            "electronic-signature"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.200(a)(1)(ii)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.200(a)(1)(ii)",
+        "title": "Electronic signature components and controls",
+        "text": "When an individual executes one or more signings not performed during a single, continuous period of controlled system access, each signing shall be executed using all of the electronic signature components.",
+        "summary": "If a session is interrupted or non-continuous, every signature action requires re-entry of all authentication components (e.g., ID+Password).",
+        "tags": [
+            "session-management",
+            "authentication",
+            "electronic-signature"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.200(b)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.200(b)",
+        "title": "Electronic signature components and controls",
+        "text": "Electronic signatures based upon biometrics shall be designed to ensure that they cannot be used by anyone other than their genuine owners.",
+        "summary": "Biometric authentication systems must have high fidelity to prevent false positives or spoofing.",
+        "tags": [
+            "biometric-authentication",
+            "security-design"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.300(a)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.300(a)",
+        "title": "Controls for identification codes/passwords",
+        "text": "Maintaining the uniqueness of each combined identification code and password, such that no two individuals have the same combination of identification code and password.",
+        "summary": "The system must enforce unique ID/password combinations to prevent credential collisions.",
+        "tags": [
+            "identity-management",
+            "authentication"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.300(b)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.300(b)",
+        "title": "Controls for identification codes/passwords",
+        "text": "Ensuring that identification code and password issuances are periodically checked, recalled, or revised (e.g., to cover such events as password aging).",
+        "summary": "The system must support password expiration policies and forced revisions (password aging).",
+        "tags": [
+            "password-policy",
+            "credential-management"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.300(d)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.300(d)",
+        "title": "Controls for identification codes/passwords",
+        "text": "Following loss management procedures to electronically deauthorize lost, stolen, missing, or otherwise potentially compromised tokens, cards, and other devices that bear or generate identification code or password information.",
+        "summary": "System must provide the capability to immediately revoke or deauthorize compromised credentials, tokens, or cards.",
+        "tags": [
+            "access-revocation",
+            "incident-response",
+            "identity-management"
+        ]
+    },
+    "FDA (21 CFR Part 11) 11.300(e)": {
+        "source": "FDA (21 CFR Part 11)",
+        "clause_id": "11.300(e)",
+        "title": "Controls for identification codes/passwords",
+        "text": "Use of transaction safeguards to prevent unauthorized use of passwords and/or identification codes, and to detect and report in an immediate and urgent manner any attempts at their unauthorized use to the system security unit, and, as appropriate, to organizational management.",
+        "summary": "Implementation of intrusion detection, account lockout policies, and immediate alerting for failed authentication attempts or unauthorized access patterns.",
+        "tags": [
+            "intrusion-detection",
+            "alerting",
+            "account-lockout",
+            "security-monitoring"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(1)(ii)(D)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.308(a)(1)(ii)(D)",
+        "title": "Information system activity review (Required)",
+        "text": "Implement procedures to regularly review records of information system activity, such as audit logs, access reports, and security incident tracking reports.",
+        "summary": "Software must generate and maintain audit logs and access reports to facilitate regular security reviews of system activity.",
+        "tags": [
+            "audit-logging",
+            "security-monitoring",
+            "incident-response"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(4)(ii)(A)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.308(a)(4)(ii)(A)",
+        "title": "Isolating health care clearinghouse functions (Required)",
+        "text": "If a health care clearinghouse is part of a larger organization, the clearinghouse must implement policies and procedures that protect the electronic protected health information of the clearinghouse from unauthorized access by the larger organization.",
+        "summary": "Requires logical segmentation or isolation of software systems handling ePHI from other organizational systems to prevent unauthorized access.",
+        "tags": [
+            "network-segmentation",
+            "access-control",
+            "data-isolation"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(B)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.308(a)(5)(ii)(B)",
+        "title": "Protection from malicious software (Addressable)",
+        "text": "Procedures for guarding against, detecting, and reporting malicious software.",
+        "summary": "Software environments must include mechanisms (such as anti-malware integration) to detect, block, and report malicious software.",
+        "tags": [
+            "malware-protection",
+            "endpoint-security",
+            "vulnerability-management"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(C)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.308(a)(5)(ii)(C)",
+        "title": "Log-in monitoring (Addressable)",
+        "text": "Procedures for monitoring log-in attempts and reporting discrepancies.",
+        "summary": "The system must track login attempts, identifying and alerting on discrepancies or suspicious activities (e.g., brute force attacks).",
+        "tags": [
+            "authentication",
+            "security-monitoring",
+            "audit-logging"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(5)(ii)(D)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.308(a)(5)(ii)(D)",
+        "title": "Password management (Addressable)",
+        "text": "Procedures for creating, changing, and safeguarding passwords.",
+        "summary": "Implement system controls for password complexity, rotation, secure storage (hashing/salting), and safe modification workflows.",
+        "tags": [
+            "authentication",
+            "password-policy",
+            "access-control"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.308(a)(7)(ii)(A)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.308(a)(7)(ii)(A)",
+        "title": "Data backup plan (Required)",
+        "text": "Establish and implement procedures to create and maintain retrievable exact copies of electronic protected health information.",
+        "summary": "Software systems must include automated backup capabilities to ensure ePHI is copied and retrievable.",
+        "tags": [
+            "backup-and-recovery",
+            "data-availability"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.310(d)(1)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.310(d)(1)",
+        "title": "Device and media controls - Disposal (Required)",
+        "text": "Implement policies and procedures to address the final disposition of electronic protected health information, and/or the hardware or electronic media on which it is stored.",
+        "summary": "Requires software capabilities to securely delete or sanitize data (sanitization) when ePHI or storage media is decommissioned.",
+        "tags": [
+            "data-sanitization",
+            "secure-deletion"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.310(d)(2)(ii)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.310(d)(2)(ii)",
+        "title": "Device and media controls - Media re-use (Required)",
+        "text": "Implement procedures for removal of electronic protected health information from electronic media before the media are made available for re-use.",
+        "summary": "Systems must provide mechanisms to securely wipe or overwrite ePHI from storage media prior to reallocation.",
+        "tags": [
+            "data-sanitization",
+            "secure-deletion"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(1)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(a)(1)",
+        "title": "Access control (Required)",
+        "text": "Implement technical policies and procedures for electronic information systems that maintain electronic protected health information to allow access only to those persons or software programs that have been granted access rights as specified in \u00a7 164.308(a)(4).",
+        "summary": "Implement robust technical access controls (RBAC/ABAC) to restrict access to ePHI solely to authorized users and services.",
+        "tags": [
+            "access-control",
+            "authorization"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(i)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(a)(2)(i)",
+        "title": "Unique user identification (Required)",
+        "text": "Assign a unique name and/or number for identifying and tracking user identity.",
+        "summary": "The system must ensure every user is assigned a unique identifier to track activity and identity.",
+        "tags": [
+            "identity-management",
+            "authentication",
+            "audit-logging"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(ii)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(a)(2)(ii)",
+        "title": "Emergency access procedure (Required)",
+        "text": "Establish (and implement as needed) procedures for obtaining necessary electronic protected health information during an emergency.",
+        "summary": "Software must support emergency access mechanisms ('break-glass' features) to allow authorized access to critical data during emergencies.",
+        "tags": [
+            "access-control",
+            "emergency-access",
+            "availability"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(iii)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(a)(2)(iii)",
+        "title": "Automatic logoff (Addressable)",
+        "text": "Implement electronic procedures that terminate an electronic session after a predetermined time of inactivity.",
+        "summary": "The application must enforce automatic session termination or locking after a configurable period of user inactivity.",
+        "tags": [
+            "session-management",
+            "access-control"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(a)(2)(iv)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(a)(2)(iv)",
+        "title": "Encryption and decryption (Addressable)",
+        "text": "Implement a mechanism to encrypt and decrypt electronic protected health information.",
+        "summary": "Implement encryption for ePHI at rest and mechanisms for decryption by authorized processes.",
+        "tags": [
+            "data-encryption",
+            "cryptography"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(b)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(b)",
+        "title": "Audit controls (Required)",
+        "text": "Implement hardware, software, and/or procedural mechanisms that record and examine activity in information systems that contain or use electronic protected health information.",
+        "summary": "Implement comprehensive audit logging to record read, write, and modification activities on ePHI.",
+        "tags": [
+            "audit-logging",
+            "security-monitoring"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(c)(1)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(c)(1)",
+        "title": "Integrity (Required)",
+        "text": "Implement policies and procedures to protect electronic protected health information from improper alteration or destruction.",
+        "summary": "Implement technical controls (e.g., checksums, versioning, access restrictions) to prevent unauthorized modification or deletion of data.",
+        "tags": [
+            "data-integrity",
+            "change-management"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(c)(2)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(c)(2)",
+        "title": "Mechanism to authenticate electronic protected health information (Addressable)",
+        "text": "Implement electronic mechanisms to corroborate that electronic protected health information has not been altered or destroyed in an unauthorized manner.",
+        "summary": "Use hashing, digital signatures, or checksums to verify that ePHI has not been tampered with.",
+        "tags": [
+            "data-integrity",
+            "cryptography"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(d)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(d)",
+        "title": "Person or entity authentication (Required)",
+        "text": "Implement procedures to verify that a person or entity seeking access to electronic protected health information is the one claimed.",
+        "summary": "Implement authentication protocols (MFA, certificates, passwords) to verify the identity of users or systems requesting access.",
+        "tags": [
+            "authentication",
+            "identity-management"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(1)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(e)(1)",
+        "title": "Transmission security (Required)",
+        "text": "Implement technical security measures to guard against unauthorized access to electronic protected health information that is being transmitted over an electronic communications network.",
+        "summary": "Ensure technical measures (like TLS/SSL) are in place to secure ePHI during transmission over networks.",
+        "tags": [
+            "network-security",
+            "data-encryption",
+            "transmission-security"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(2)(i)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(e)(2)(i)",
+        "title": "Transmission security - Integrity controls (Addressable)",
+        "text": "Implement security measures to ensure that electronically transmitted electronic protected health information is not improperly modified without detection until disposed of.",
+        "summary": "Implement message integrity checks (HMAC, digital signatures) for data in transit to detect unauthorized modification.",
+        "tags": [
+            "data-integrity",
+            "network-security"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.312(e)(2)(ii)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.312(e)(2)(ii)",
+        "title": "Transmission security - Encryption (Addressable)",
+        "text": "Implement a mechanism to encrypt electronic protected health information whenever deemed appropriate.",
+        "summary": "Encrypt ePHI during transmission using secure protocols (e.g., HTTPS, SFTP, VPN).",
+        "tags": [
+            "data-encryption",
+            "network-security"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.514(b)(2)(i)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.514(b)(2)(i)",
+        "title": "De-identification of protected health information (Safe Harbor)",
+        "text": "The following identifiers of the individual or of relatives, employers, or household members of the individual, are removed: (A) Names; (B) All geographic subdivisions smaller than a State... (C) All elements of dates (except year)... (G) Social security numbers; (H) Medical record numbers... (Q) Full face photographic images...",
+        "summary": "Software attempting to de-identify data for secondary use must implement algorithms to strip or mask the 18 specific identifiers listed.",
+        "tags": [
+            "data-masking",
+            "privacy-enhancing-technologies",
+            "anonymization"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.524(c)(2)(ii)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.524(c)(2)(ii)",
+        "title": "Form of access requested (Electronic)",
+        "text": "If the protected health information that is the subject of a request for access is maintained in one or more designated record sets electronically and if the individual requests an electronic copy of such information, the covered entity must provide the individual with access to the protected health information in the electronic form and format requested by the individual, if it is readily producible in such form and format; or, if not, in a readable electronic form and format as agreed to by the covered entity and the individual.",
+        "summary": "The system must support the export of ePHI in standard electronic formats to fulfill patient access requests.",
+        "tags": [
+            "data-export",
+            "interoperability",
+            "access-control"
+        ]
+    },
+    "HIPAA Privacy and Security Rules (45 CFR Part 164) \u00a7 164.528(a)(1)": {
+        "source": "HIPAA Privacy and Security Rules (45 CFR Part 164)",
+        "clause_id": "\u00a7 164.528(a)(1)",
+        "title": "Right to an accounting of disclosures",
+        "text": "An individual has a right to receive an accounting of disclosures of protected health information made by a covered entity in the six years prior to the date on which the accounting is requested...",
+        "summary": "Software must maintain a long-term log (6 years) of specific data disclosures to generate accounting reports for individuals.",
+        "tags": [
+            "audit-logging",
+            "data-retention",
+            "reporting"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.12": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.12",
+        "title": "Classification of information",
+        "text": "Information shall be classified according to the information security needs of the organization based on confidentiality, integrity, availability and relevant interested party requirements.",
+        "summary": "Requires the implementation of metadata tagging or labeling capabilities within information systems to handle data classification levels.",
+        "tags": [
+            "data-classification",
+            "data-tagging",
+            "information-handling"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.14": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.14",
+        "title": "Information transfer",
+        "text": "Information transfer rules, procedures, or agreements shall be in place for all types of transfer facilities within the organization and between the organization and other parties.",
+        "summary": "Requires secure protocols (e.g., TLS, SFTP) and encryption mechanisms for data in transit between internal and external systems.",
+        "tags": [
+            "data-transfer",
+            "encryption-in-transit",
+            "secure-protocols"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.15": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.15",
+        "title": "Access control",
+        "text": "Rules to control physical and logical access to information and other associated assets shall be established and implemented based on business and information security requirements.",
+        "summary": "Requires the implementation of logical access control mechanisms (authentication and authorization gates) for information systems.",
+        "tags": [
+            "access-control",
+            "iam",
+            "logical-security"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.16": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.16",
+        "title": "Identity management",
+        "text": "The full life cycle of identities shall be managed.",
+        "summary": "Requires software processes for provisioning, modifying, and de-provisioning user identities and accounts.",
+        "tags": [
+            "identity-management",
+            "user-provisioning",
+            "account-lifecycle"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.17": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.17",
+        "title": "Authentication information",
+        "text": "Allocation and management of authentication information shall be controlled by a management process, including advising personnel on appropriate handling of authentication information.",
+        "summary": "Requires technical controls for managing credentials, such as password complexity enforcement, rotation, and secure storage (hashing/salting).",
+        "tags": [
+            "authentication",
+            "credential-management",
+            "password-policy"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.18": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.18",
+        "title": "Access rights",
+        "text": "Access rights to information and other associated assets shall be provisioned, reviewed, modified and removed in accordance with the organization\u2019s topic-specific policy on and rules for access control.",
+        "summary": "Requires systems to support granular permission assignment, modification, and revocation (RBAC/ABAC).",
+        "tags": [
+            "authorization",
+            "access-rights",
+            "rbac"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.23": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.23",
+        "title": "Information security for use of cloud services",
+        "text": "Processes for acquisition, use, management and exit from cloud services shall be established in accordance with the organization\u2019s information security requirements.",
+        "summary": "Requires secure configuration, access management, and segregation of data within cloud service environments.",
+        "tags": [
+            "cloud-security",
+            "cloud-configuration",
+            "vendor-management"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.28": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.28",
+        "title": "Collection of evidence",
+        "text": "The organization shall establish and implement procedures for the identification, collection, acquisition and preservation of evidence related to information security events.",
+        "summary": "Requires logging and data retention capabilities that ensure integrity for forensic analysis during incident response.",
+        "tags": [
+            "forensics",
+            "incident-response",
+            "log-retention"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.30": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.30",
+        "title": "ICT readiness for business continuity",
+        "text": "ICT readiness shall be planned, implemented, maintained and tested based on business continuity objectives and ICT continuity requirements.",
+        "summary": "Requires high availability, failover mechanisms, and redundancy configurations in software architecture to support business continuity.",
+        "tags": [
+            "business-continuity",
+            "high-availability",
+            "disaster-recovery",
+            "redundancy"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.33": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.33",
+        "title": "Protection of records",
+        "text": "Records shall be protected from loss, destruction, falsification, unauthorized access and unauthorized release.",
+        "summary": "Requires mechanisms to ensure data integrity and immutability for critical records and logs.",
+        "tags": [
+            "data-integrity",
+            "record-retention",
+            "access-control"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.5.34": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.5.34",
+        "title": "Privacy and protection of personal identifiable information (PII)",
+        "text": "The organization shall identify and meet the requirements regarding the preservation of privacy and protection of PII according to applicable laws and regulations and contractual requirements.",
+        "summary": "Requires technical controls such as encryption, anonymization, and strict access controls for PII data.",
+        "tags": [
+            "privacy",
+            "pii-protection",
+            "data-encryption"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.6.7": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.6.7",
+        "title": "Remote working",
+        "text": "Security measures shall be implemented when personnel are working remotely to protect information accessed, processed or stored outside the organization\u2019s premises.",
+        "summary": "Requires secure remote access technologies (VPN, MFA) and endpoint security controls.",
+        "tags": [
+            "remote-access",
+            "vpn",
+            "endpoint-security"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.7.7": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.7.7",
+        "title": "Clear desk and clear screen",
+        "text": "Clear desk rules for papers and removable storage media and clear screen rules for information processing facilities shall be defined and appropriately enforced.",
+        "summary": "Requires implementation of automatic session locking and screen timeouts for user endpoints.",
+        "tags": [
+            "session-management",
+            "screen-lock",
+            "endpoint-security"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.7.14": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.7.14",
+        "title": "Secure disposal or re-use of equipment",
+        "text": "Items of equipment containing storage media shall be verified to ensure that any sensitive data and licensed software has been removed or securely overwritten prior to disposal or re-use.",
+        "summary": "Requires software tools or utilities to securely wipe or overwrite storage media to prevent data recovery.",
+        "tags": [
+            "data-sanitization",
+            "secure-deletion",
+            "asset-management"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.1": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.1",
+        "title": "User end point devices",
+        "text": "Information stored on, processed by or accessible via user end point devices shall be protected.",
+        "summary": "Requires endpoint protection software, disk encryption, and configuration management on user devices.",
+        "tags": [
+            "endpoint-security",
+            "disk-encryption",
+            "device-management"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.2": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.2",
+        "title": "Privileged access rights",
+        "text": "The allocation and use of privileged access rights shall be restricted and managed.",
+        "summary": "Requires strict enforcement of principle of least privilege and Privileged Access Management (PAM) controls.",
+        "tags": [
+            "privileged-access",
+            "pam",
+            "least-privilege"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.3": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.3",
+        "title": "Information access restriction",
+        "text": "Access to information and other associated assets shall be restricted in accordance with the established topic-specific policy on access control.",
+        "summary": "Requires technical implementation of Access Control Lists (ACLs) and network segmentation to restrict data access.",
+        "tags": [
+            "access-control",
+            "network-segmentation",
+            "acl"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.4": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.4",
+        "title": "Access to source code",
+        "text": "Read and write access to source code, development tools and software libraries shall be appropriately managed.",
+        "summary": "Requires version control system permissions and access controls for code repositories.",
+        "tags": [
+            "source-code-protection",
+            "version-control",
+            "access-control"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.5": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.5",
+        "title": "Secure authentication",
+        "text": "Secure authentication technologies and procedures shall be implemented based on information access restrictions and the topic-specific policy on access control.",
+        "summary": "Requires implementation of Multi-Factor Authentication (MFA) and secure login protocols.",
+        "tags": [
+            "authentication",
+            "mfa",
+            "sso"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.6": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.6",
+        "title": "Capacity management",
+        "text": "The use of resources shall be monitored and adjusted in line with current and expected capacity requirements.",
+        "summary": "Requires system monitoring tools to track resource usage and enable scaling or alerting.",
+        "tags": [
+            "monitoring",
+            "capacity-planning",
+            "system-availability"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.7": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.7",
+        "title": "Protection against malware",
+        "text": "Protection against malware shall be implemented and supported by appropriate user awareness.",
+        "summary": "Requires implementation of anti-malware software, EDR solutions, and automated scanning.",
+        "tags": [
+            "antivirus",
+            "malware-protection",
+            "endpoint-security"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.8": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.8",
+        "title": "Management of technical vulnerabilities",
+        "text": "Information about technical vulnerabilities of information systems in use shall be obtained, the organization\u2019s exposure to such vulnerabilities shall be evaluated and appropriate measures shall be taken.",
+        "summary": "Requires automated vulnerability scanning and patch management systems.",
+        "tags": [
+            "vulnerability-management",
+            "patch-management",
+            "security-scanning"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.9": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.9",
+        "title": "Configuration management",
+        "text": "Configurations, including security configurations, of hardware, software, services and networks shall be established, documented, implemented, monitored and reviewed.",
+        "summary": "Requires configuration management tools to enforce security baselines and detect drift.",
+        "tags": [
+            "configuration-management",
+            "security-baselines",
+            "drift-detection"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.10": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.10",
+        "title": "Information deletion",
+        "text": "Information stored in information systems, devices or in any other storage media shall be deleted when no longer required.",
+        "summary": "Requires automated data retention policies and secure deletion mechanisms within applications.",
+        "tags": [
+            "data-retention",
+            "secure-deletion",
+            "data-lifecycle"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.11": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.11",
+        "title": "Data masking",
+        "text": "Data masking shall be used in accordance with the organization\u2019s topic-specific policy on access control and other related topic-specific policies, and business requirements, taking applicable legislation into consideration.",
+        "summary": "Requires implementation of dynamic masking, pseudonymization, or redaction of sensitive data in views and logs.",
+        "tags": [
+            "data-masking",
+            "obfuscation",
+            "privacy"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.12": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.12",
+        "title": "Data leakage prevention",
+        "text": "Data leakage prevention measures shall be applied to systems, networks and any other devices that process, store or transmit sensitive information.",
+        "summary": "Requires DLP solutions to monitor and block unauthorized exfiltration of sensitive data.",
+        "tags": [
+            "dlp",
+            "data-loss-prevention",
+            "egress-filtering"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.13": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.13",
+        "title": "Information backup",
+        "text": "Backup copies of information, software and systems shall be maintained and regularly tested in accordance with the agreed topic-specific policy on backup.",
+        "summary": "Requires automated backup solutions and restoration testing capabilities.",
+        "tags": [
+            "backup-and-recovery",
+            "data-availability",
+            "disaster-recovery"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.14": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.14",
+        "title": "Redundancy of information processing facilities",
+        "text": "Information processing facilities shall be implemented with redundancy sufficient to meet availability requirements.",
+        "summary": "Requires failover clusters, load balancing, and redundant infrastructure components.",
+        "tags": [
+            "redundancy",
+            "high-availability",
+            "infrastructure"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.15": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.15",
+        "title": "Logging",
+        "text": "Logs that record activities, exceptions, faults and other relevant events shall be produced, stored, protected and analysed.",
+        "summary": "Requires comprehensive audit logging, centralized log storage, and protection against log tampering.",
+        "tags": [
+            "audit-logging",
+            "log-management",
+            "monitoring"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.16": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.16",
+        "title": "Monitoring activities",
+        "text": "Networks, systems and applications shall be monitored for anomalous behaviour and appropriate actions taken to evaluate potential information security incidents.",
+        "summary": "Requires monitoring tools (IDS/IPS/SIEM) to detect and alert on anomalous security events.",
+        "tags": [
+            "monitoring",
+            "threat-detection",
+            "incident-response"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.17": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.17",
+        "title": "Clock synchronization",
+        "text": "The clocks of information processing systems used by the organization shall be synchronized to approved time sources.",
+        "summary": "Requires configuration of NTP (Network Time Protocol) to ensure consistent timestamps across all systems.",
+        "tags": [
+            "time-synchronization",
+            "ntp",
+            "logging"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.18": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.18",
+        "title": "Use of privileged utility programs",
+        "text": "The use of utility programs that can be capable of overriding system and application controls shall be restricted and tightly controlled.",
+        "summary": "Requires restrictions on the installation and execution of powerful system utilities and debuggers.",
+        "tags": [
+            "privileged-access",
+            "application-control",
+            "system-integrity"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.19": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.19",
+        "title": "Installation of software on operational systems",
+        "text": "Procedures and measures shall be implemented to securely manage software installation on operational systems.",
+        "summary": "Requires mechanisms like allowlisting or software restriction policies to control software installation.",
+        "tags": [
+            "application-allowlisting",
+            "change-management",
+            "software-integrity"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.20": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.20",
+        "title": "Networks security",
+        "text": "Networks and network devices shall be secured, managed and controlled to protect information in systems and applications.",
+        "summary": "Requires firewall configurations, secure routing, and network device hardening.",
+        "tags": [
+            "network-security",
+            "firewall",
+            "network-segmentation"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.21": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.21",
+        "title": "Security of network services",
+        "text": "Security mechanisms, service levels and service requirements of network services shall be identified, implemented and monitored.",
+        "summary": "Requires verification and monitoring of security controls within network services (e.g., DNSSEC, VPN).",
+        "tags": [
+            "network-security",
+            "service-monitoring",
+            "vendor-management"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.22": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.22",
+        "title": "Segregation of networks",
+        "text": "Groups of information services, users and information systems shall be segregated in the organization\u2019s networks.",
+        "summary": "Requires network separation using VLANs, subnets, or virtual networks to isolate assets.",
+        "tags": [
+            "network-segmentation",
+            "vlan",
+            "isolation"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.23": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.23",
+        "title": "Web filtering",
+        "text": "Access to external websites shall be managed to reduce exposure to malicious content.",
+        "summary": "Requires implementation of web proxies, DNS filtering, or URL blocking tools.",
+        "tags": [
+            "web-filtering",
+            "content-filtering",
+            "network-security"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.24": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.24",
+        "title": "Use of cryptography",
+        "text": "Rules for the effective use of cryptography, including cryptographic key management, shall be defined and implemented.",
+        "summary": "Requires correct implementation of encryption algorithms and secure key management lifecycles.",
+        "tags": [
+            "cryptography",
+            "encryption",
+            "key-management"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.25": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.25",
+        "title": "Secure development life cycle",
+        "text": "Rules for the secure development of software and systems shall be established and applied.",
+        "summary": "Requires integration of security gates and tools (SAST/DAST) into the software development lifecycle.",
+        "tags": [
+            "devsecops",
+            "sdlc",
+            "secure-development"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.26": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.26",
+        "title": "Application security requirements",
+        "text": "Information security requirements shall be identified, specified and approved when developing or acquiring applications.",
+        "summary": "Requires defining non-functional security requirements (NFRs) for applications.",
+        "tags": [
+            "requirements-analysis",
+            "application-security",
+            "procurement"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.27": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.27",
+        "title": "Secure system architecture and engineering principles",
+        "text": "Principles for engineering secure systems shall be established, documented, maintained and applied to any information system development activities.",
+        "summary": "Requires strict adherence to secure design patterns (e.g., defense in depth, fail secure) in system architecture.",
+        "tags": [
+            "security-architecture",
+            "secure-design",
+            "engineering-principles"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.28": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.28",
+        "title": "Secure coding",
+        "text": "Secure coding principles shall be applied to software development.",
+        "summary": "Requires adherence to secure coding standards (e.g., OWASP) to prevent common vulnerabilities like SQLi and XSS.",
+        "tags": [
+            "secure-coding",
+            "code-quality",
+            "vulnerability-prevention"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.29": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.29",
+        "title": "Security testing in development and acceptance",
+        "text": "Security testing processes shall be defined and implemented in the development life cycle.",
+        "summary": "Requires execution of security tests (penetration testing, scanning) prior to production deployment.",
+        "tags": [
+            "security-testing",
+            "penetration-testing",
+            "acceptance-testing"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.31": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.31",
+        "title": "Separation of development, test and production environments",
+        "text": "Development, testing and production environments shall be separated and secured.",
+        "summary": "Requires logical and network isolation between dev, test, and production environments.",
+        "tags": [
+            "environment-separation",
+            "isolation",
+            "release-management"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.32": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.32",
+        "title": "Change management",
+        "text": "Changes to information processing facilities and information systems shall be subject to change management procedures.",
+        "summary": "Requires automated CI/CD pipelines and gated check-ins to control software changes.",
+        "tags": [
+            "change-management",
+            "ci-cd",
+            "version-control"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.33": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.33",
+        "title": "Test information",
+        "text": "Test information shall be appropriately selected, protected and managed.",
+        "summary": "Requires use of sanitized or synthetic data in testing environments; prohibits production data use without masking.",
+        "tags": [
+            "test-data-management",
+            "data-sanitization",
+            "privacy"
+        ]
+    },
+    "ISO/IEC 27001:2022 A.8.34": {
+        "source": "ISO/IEC 27001:2022",
+        "clause_id": "A.8.34",
+        "title": "Protection of information systems during audit testing",
+        "text": "Audit tests and other assurance activities involving assessment of operational systems shall be planned and agreed between the tester and appropriate management.",
+        "summary": "Requires systems to support read-only access or isolated clones for auditing to prevent operational disruption.",
+        "tags": [
+            "audit-compliance",
+            "system-integrity",
+            "operational-security"
+        ]
+    }
+}

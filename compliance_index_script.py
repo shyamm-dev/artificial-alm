@@ -24,3 +24,6 @@ with open(base_path + "compliance_index.json", "w", encoding="utf-8") as index_f
 
 with open(base_path + "compliance_reverse_index.json", "w", encoding="utf-8") as reverse_index_file:
     json.dump(reverse_index, reverse_index_file, indent=4)
+
+with open(base_path + "compliance_tags.json", "w", encoding="utf-8") as tags_file:
+    json.dump(list(reverse_index.keys()), tags_file, indent=4)
