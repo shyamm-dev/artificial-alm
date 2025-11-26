@@ -1,7 +1,6 @@
 from .google_gen_ai import GoogleGenAI
 import json
 
-from google.genai import types
 from .schema import ComplianceTestCaseResponseSchema
 
 class ComplianceTestCaseGeneration:

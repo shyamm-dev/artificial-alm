@@ -4,12 +4,21 @@ from dataclasses import dataclass
 class JiraQueries:
     FETCH_ISSUE_DATA = """SELECT
                         jpc.frameworks as compliance_frameworks,
+                        JSON_GROUP_ARRAY(
+                            JSON_OBJECT(
+                                'title', pcr.title,
+                                'description', pcr.description,
+                                'severity', pcr.severity
+                            )
+                        ) as custom_rules,
                         sji.summary,
                         sji.description
                     FROM scheduled_job_issue sji
                     JOIN scheduled_job sj ON sji.job_id = sj.id
                     LEFT JOIN jira_project_compliance jpc ON sj.project_id = jpc.project_id
-                    WHERE sji.id = ? AND sji.status = 'pending';"""
+                    LEFT JOIN project_custom_rule pcr ON sj.project_id = pcr.project_id
+                    WHERE sji.id = ? AND sji.status = 'pending'
+                    GROUP BY sji.id;"""
     
     UPDATE_ISSUE_STATUS = """UPDATE scheduled_job_issue
                      SET status = ?

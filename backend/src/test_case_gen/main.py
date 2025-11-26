@@ -40,7 +40,7 @@ async def async_handler(request: Request) -> Tuple[Dict[str, Any], int]:
             repo: IssueRepository = ManualUploadIssueRepository(conn)
 
         try:
-            compliance_list_string, summary, description = repo.fetch_issue_data(issue_id)
+            compliance_list_string, custom_rules, summary, description = repo.fetch_issue_data(issue_id)
 
             compliance_list = json.loads(compliance_list_string) if compliance_list_string else []
 
@@ -51,7 +51,7 @@ async def async_handler(request: Request) -> Tuple[Dict[str, Any], int]:
             # Run both test case generations concurrently
             fnf_response, compliance_response = await asyncio.gather(
                 FNFTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt),
-                ComplianceTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt, project_compliance=compliance_list)
+                ComplianceTestCaseGeneration(GOOGLE_CLOUD_API_KEY).generate(prompt, project_compliance=compliance_list, project_custom_rules=custom_rules)
             )
 
             if not fnf_response.get("success"):
