@@ -35,12 +35,9 @@ Include:
 Include advanced scenarios **only if applicable** to the given requirement
 - Simultaneous Multi-User Actions (concurrent updates or conflicting actions.)
 - Emergency and Override Workflows (actions under emergency situations requiring override.)
-- High-Volume / Stress Scenarios (bulk data entry, report generation, or multiple notifications.)
 - Cross-Module Integration (interactions between modules affecting safety or compliance e.g., lab results affecting prescriptions).  
-- Edge Compliance and Security Tests (unauthorized access, tampering with audit logs, PHI leaks, encryption, consent violations.)
 - Historical Data and Reporting (retrieving long-term records or analytics, ensuring accuracy and completeness.) 
 - Notification and Communication Workflows (secure routing and delivery validation.)
-- System Resilience / Failures (network, database, or service failures during critical actions.)
 
 These **do not reference compliance**.
 
@@ -63,6 +60,7 @@ Include:
 - Load and stress testing
 - Compatibility verification
 - Reliability and availability tests
+- System Resilience / Failures
 
 ---
 

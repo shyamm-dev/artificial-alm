@@ -34,10 +34,10 @@ class ComplianceTestCaseGeneration:
 
     def __get_compliance_clause_ids(self, tags: list) -> list:
         reverse_index = self.__get_compliance_reverse_index()
-        clause_ids = set()
+        clause_ids = []
         for tag in tags:
-            clause_ids.add(reverse_index[tag])
-        return list(clause_ids)
+            clause_ids.extend(reverse_index[tag])
+        return list(set(clause_ids))
 
     def __get_compliance_clauses(self, clause_ids: list) -> list:
         compliance_index = self.__get_compliance_index()

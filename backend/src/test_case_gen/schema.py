@@ -102,7 +102,7 @@ class ComplianceTestCaseResponseSchema:
                                 type=types.Type.OBJECT,
                                 properties={
                                     "type": types.Schema(type=types.Type.STRING, enum=["compliance"]),
-                                    "compliance_rule": types.Schema(type=types.Type.STRING, description="Compliance Rule Involved (Exact rule text or clause from Compliance Requirements)"),
+                                    "compliance_rule": types.Schema(type=types.Type.STRING, description="Compliance Rule Involved (Exact rule with clause id )"),
                                     "preconditions": types.Schema(type=types.Type.STRING, description="Preconditions (if any)"),
                                     "testing_procedure": types.Schema(type=types.Type.ARRAY, items=types.Schema(type=types.Type.STRING), description="Steps for testing"),
                                     "expected_result": types.Schema(type=types.Type.STRING, description="Expected result (System behavior must remain compliant with the rule.)"),
