@@ -128,6 +128,8 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
         const [mounted, setMounted] = useState(false);
         const value = row.getValue("createdAt");
         const date = new Date(value as string);
+        date.setHours(date.getHours() + 5);
+        date.setMinutes(date.getMinutes() + 30);
         
         useEffect(() => {
           setMounted(true);
@@ -169,6 +171,8 @@ export const columns: ColumnDef<ScheduledJobIssue>[] = [
         const [mounted, setMounted] = useState(false);
         const value = row.getValue("updatedAt");
         const date = new Date(value as string);
+        date.setHours(date.getHours() + 5);
+        date.setMinutes(date.getMinutes() + 30);
         
         useEffect(() => {
           setMounted(true);

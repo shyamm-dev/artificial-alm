@@ -152,7 +152,12 @@ export function StandaloneProjectSheet({
               </div>
               {project.compliance?.updatedAt && (
                 <div className="mt-2 text-xs text-muted-foreground">
-                  Last updated on {new Date(project.compliance.updatedAt).toLocaleDateString()}
+                  Last updated on {(() => {
+                    const date = new Date(project.compliance.updatedAt);
+                    date.setHours(date.getHours() + 5);
+                    date.setMinutes(date.getMinutes() + 30);
+                    return date.toLocaleDateString();
+                  })()}
                 </div>
               )}
             </div>

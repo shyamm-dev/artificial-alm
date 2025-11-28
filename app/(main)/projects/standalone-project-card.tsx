@@ -261,7 +261,12 @@ export default function StandaloneProjectCard({
 
         {/* Metadata */}
         <div className="text-xs text-muted-foreground">
-          <span>Created : {new Date(project.createdAt).toLocaleDateString()}</span>
+          <span>Created : {(() => {
+            const date = new Date(project.createdAt);
+            date.setHours(date.getHours() + 5);
+            date.setMinutes(date.getMinutes() + 30);
+            return date.toLocaleDateString();
+          })()}</span>
         </div>
       </CardContent>
       <EditProjectDialog

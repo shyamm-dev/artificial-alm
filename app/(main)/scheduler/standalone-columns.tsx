@@ -122,6 +122,8 @@ export const standaloneColumns: ColumnDef<StandaloneScheduledJobRequirement>[] =
         const [mounted, setMounted] = useState(false);
         const value = row.getValue("createdAt");
         const date = new Date(value as string);
+        date.setHours(date.getHours() + 5);
+        date.setMinutes(date.getMinutes() + 30);
         
         useEffect(() => {
           setMounted(true);
@@ -163,6 +165,8 @@ export const standaloneColumns: ColumnDef<StandaloneScheduledJobRequirement>[] =
         const [mounted, setMounted] = useState(false);
         const value = row.getValue("updatedAt");
         const date = new Date(value as string);
+        date.setHours(date.getHours() + 5);
+        date.setMinutes(date.getMinutes() + 30);
         
         useEffect(() => {
           setMounted(true);

@@ -121,7 +121,12 @@ export default function ProjectSheet({
               </div>
               {project.compliance?.lastUpdatedByName && (
                 <div className="mt-2 text-xs text-muted-foreground">
-                  Last updated by {project.compliance.lastUpdatedByName} on {new Date(project.compliance.updatedAt).toLocaleDateString()}
+                  Last updated by {project.compliance.lastUpdatedByName} on {(() => {
+                    const date = new Date(project.compliance.updatedAt);
+                    date.setHours(date.getHours() + 5);
+                    date.setMinutes(date.getMinutes() + 30);
+                    return date.toLocaleDateString();
+                  })()}
                 </div>
               )}
             </div>
