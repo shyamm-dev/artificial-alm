@@ -3,7 +3,8 @@ export const COMPLIANCE_FRAMEWORKS = [
   "IEC 62304",
   "ISO 9001",
   "ISO 13485",
-  "ISO 27001"
+  "ISO 27001",
+  "HIPPA"
 ] as const;
 
 export const SCHEDULED_JOB_ISSUE_STATUS = [
