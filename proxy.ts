@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "./lib/get-server-session";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const session = await getServerSession();
   const pathname = request.nextUrl.pathname;
 
@@ -19,7 +19,6 @@ export async function middleware(request: NextRequest) {
 // TODO: Need to consider switching to edge runtime if Firebase app hosting supports it.
 
 export const config = {
-  runtime: "nodejs",
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
